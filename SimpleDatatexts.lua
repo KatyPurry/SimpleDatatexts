@@ -240,25 +240,28 @@ end
 -------------------------------------------------
 local dropdownFrame = CreateFrame("Frame", addonName .. "_SlotDropdown", UIParent, "UIDropDownMenuTemplate")
 function addon:ShowSlotDropdown(slot, bar)
-    local names = {}
-    for name in pairs(addon.modules) do
-        tinsert(names, name)
-    end
-    tsort(names)
+    local function InitializeDropdown(slot, bar)
+        local info = UIDropDownMenu_CreateInfo()
+        info.notCheckable = true
 
-    local items = {}
-    for _, name in ipairs(names) do
-        local moduleName = name
-        tinsert(items, {
-            text = moduleName,
-            func = function()
+        local names = {}
+        for name in pairs(addon.modules) do
+            tinsert(names, name)
+        end
+        tsort(names)
+
+        for _, moduleName in ipairs(names) do
+            info.text = moduleName
+            info.func = function()
                 SDTDB.bars[bar:GetName()].slots[slot.index] = moduleName
                 addon:RebuildSlots(bar)
-            end,
-        })
+            end
+            UIDropDownMenu_AddButton(info)
+        end
     end
 
-    EasyMenu(items, dropdownFrame, "cursor", 0, 0, "MENU")
+	UIDropDownMenu_Initialize(dropdownFrame, InitializeDropdown)
+    ToggleDropDownMenu(1, nil, dropdownFrame, "cursor", 0, 0)
 end
 
 -------------------------------------------------

@@ -8,11 +8,6 @@ local mod = {}
 -- Find Ara's guild LDB object
 local ara = LDB:GetDataObjectByName("|cFFFFB366Ara|r Guild")
 
-if not ara then
-    print("|cffff0000[SDT]|r Ara Guild LDB object not found!")
-    return
-end
-
 ----------------------------------------------------
 -- Module wrapper for SDT
 ----------------------------------------------------
@@ -42,6 +37,8 @@ function mod.Create(slotFrame)
     slotFrame:SetScript("OnEnter", function(self)
         if ara.OnEnter then
             ara.OnEnter(self)
+        else
+            addon.Print("Ara Guild LDB object not found!")
         end
     end)
     slotFrame:SetScript("OnLeave", function(self)
@@ -57,6 +54,8 @@ function mod.Create(slotFrame)
     slotFrame:SetScript("OnClick", function(self, button)
         if ara.OnClick then
             ara.OnClick(self, button)
+        else
+            addon.Print("Ara Guild LDB object not found!")
         end
     end)
 

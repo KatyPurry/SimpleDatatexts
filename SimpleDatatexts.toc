@@ -7,6 +7,7 @@
 
 # Core
 SimpleDatatexts.lua
+Ara_Broker_Guild_Friends.lua
 
 # Datatext Modules
 modules/Bags.lua
@@ -24,4 +25,5 @@ modules/Versatility.lua
 
 # Libs
 libs/LibStub.lua
+libs/CallbackHandler-1.0.lua
 libs/LibDataBroker-1.1.lua
