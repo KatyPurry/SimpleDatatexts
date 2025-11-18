@@ -5,13 +5,25 @@ local LDB = LibStub("LibDataBroker-1.1")
 
 local mod = {}
 
--- Find Ara's Friends LDB object
+----------------------------------------------------
+-- Lua Locals
+----------------------------------------------------
+local CreateFrame = CreateFrame
+local format      = string.format
+
+----------------------------------------------------
+-- LDB Object Local
+----------------------------------------------------
 local ara = LDB:GetDataObjectByName("|cFFFFB366Ara|r Friends")
 
 ----------------------------------------------------
 -- Module wrapper for SDT
 ----------------------------------------------------
 function mod.Create(slotFrame)
+    if not ara then
+        addon.Print("Ara Friends LDB object not found! SDT Friends datatext disabled.")
+        return
+    end
     local f = CreateFrame("Frame", nil, slotFrame)
     f:SetAllPoints(slotFrame)
 
@@ -35,16 +47,10 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        if ara.OnEnter then
-            ara.OnEnter(self)
-        else
-            addon.Print("Ara Friends LDB object not found!")
-        end
+        if ara.OnEnter then ara.OnEnter(self) end
     end)
     slotFrame:SetScript("OnLeave", function(self)
-        if ara.OnLeave then
-            ara.OnLeave(self)
-        end
+        if ara.OnLeave then ara.OnLeave(self) end
     end)
 
     ----------------------------------------------------
@@ -52,19 +58,17 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:RegisterForClicks("AnyUp")
     slotFrame:SetScript("OnClick", function(self, button)
-        if ara.OnClick then
-            ara.OnClick(self, button)
-        else
-            addon.Print("Ara Friends LDB object not found!")
-        end
+        if ara.OnClick then ara.OnClick(self, button) end
     end)
 
-    -- Initial update
     Update()
 
     return f
 end
 
+----------------------------------------------------
+-- Register with SDT
+----------------------------------------------------
 addon:RegisterDataText("Friends", mod)
 
 return mod

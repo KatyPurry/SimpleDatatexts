@@ -1,7 +1,6 @@
 -- modules/Mail.lua
 -- Mail datatext adapted from ElvUI for Simple DataTexts (SDT)
 local addonName, addon = ...
-local SDTC = addon.cache
 
 local mod = {}
 
@@ -52,7 +51,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
 
         local senders = { GetLatestThreeSenders() }
@@ -73,25 +73,6 @@ function mod.Create(slotFrame)
         GameTooltip:Hide()
     end)
 
-    ----------------------------------------------------
-    -- Click Handler (optional: open mailbox)
-    ----------------------------------------------------
-    slotFrame:SetScript("OnClick", function()
-        if HasNewMail() then
-            _G.OpenMailFrame()
-        end
-    end)
-
-    ----------------------------------------------------
-    -- ApplySettings (color)
-    ----------------------------------------------------
-    function f:ApplySettings(hex)
-        displayString = "%s%s|r"
-        SDTC.colorRGB = hex or SDTC.colorRGB
-        OnEvent(f)
-    end
-
-    -- initial display
     OnEvent(f)
 
     return f

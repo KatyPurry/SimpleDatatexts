@@ -1,18 +1,35 @@
 -- modules/System.lua
 -- System datatext adapted from ElvUI for Simple DataTexts (SDT)
 local addonName, addon = ...
-local SDTC = addon.cache
+
 local mod = {}
--- WoW API locals
-local GetAddOnInfo = C_AddOns.GetAddOnInfo
-local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
-local GetNumAddOns = C_AddOns.GetNumAddOns
-local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
--- Local helpers
-local floor, format, wipe, ipairs, pairs = math.floor, string.format, wipe, ipairs, pairs
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local GetAddOnInfo     = C_AddOns.GetAddOnInfo
+local GetNumAddOns     = C_AddOns.GetNumAddOns
+local IsAddOnLoaded    = C_AddOns.IsAddOnLoaded
+local IsShiftKeyDown   = IsShiftKeyDown
+local ResetCPUUsage    = ResetCPUUsage
 
--- Color gradient for status
+----------------------------------------------------
+-- Misc Locals
+----------------------------------------------------
+local floor = math.floor
+local format = string.format
+local tinsert = table.insert
+local tsort = table.sort
+local wipe = table.wipe
+local ipairs = ipairs
+local pairs = pairs
+local enteredFrame = false
+local infoTable = {}
+local wait = 0
+
+----------------------------------------------------
+-- Status Colors
+----------------------------------------------------
 local statusColors = {
     '|cff0CD809', -- green
     '|cffE8DA0F', -- yellow
@@ -20,7 +37,9 @@ local statusColors = {
     '|cffD80909', -- red
 }
 
--- Format memory nicely
+----------------------------------------------------
+-- Format Memory
+----------------------------------------------------
 local function FormatMem(memory)
     if memory >= 1024 then
         return format("%.2f mb", memory / 1024)
@@ -29,7 +48,9 @@ local function FormatMem(memory)
     end
 end
 
--- Determine color for FPS / latency
+----------------------------------------------------
+-- Status Color Picker
+----------------------------------------------------
 local function StatusColor(fps, ping)
     if fps then
         return statusColors[fps >= 30 and 1 or (fps >= 20 and 2) or (fps >= 10 and 3) or 4]
@@ -38,108 +59,12 @@ local function StatusColor(fps, ping)
     end
 end
 
--- Local state for the module
-local enteredFrame = false
-local infoTable = {}
-
--- Create the module frame
-function mod.Create(slotFrame)
-    local f = CreateFrame("Frame", nil, slotFrame)
-    f:SetAllPoints(slotFrame)
-    f:EnableMouse(false)
-
-    -- text object
-    local text = slotFrame.text
-    if not text then
-        text = slotFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        text:SetPoint("CENTER")
-        slotFrame.text = text
-    end
-
-    -- mouseover state
-    slotFrame:EnableMouse(true)
-    slotFrame:SetScript("OnEnter", function(self)
-        enteredFrame = true
-        mod.OnEnter(self)
-    end)
-    slotFrame:SetScript("OnLeave", function()
-        enteredFrame = false
-        GameTooltip:Hide()
-    end)
-
-    -- clicking: Shift = GC, Ctrl+Shift = toggle CPU profiling
-    slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    slotFrame:SetScript("OnClick", function(self, button)
-        mod.OnClick(button)
-    end)
-
-    -- update text every second
-    local wait = 0
-    f:SetScript("OnUpdate", function(self, elapsed)
-        wait = wait + elapsed
-        if wait < 1 then return end
-        wait = 0
-
-        local fps = floor(GetFramerate())
-        local _, _, homePing, worldPing = GetNetStats()
-        local latency = homePing
-        local c = addon:GetTagColor()
-        text:SetFormattedText("|c%sFPS:|r %s%d|r |c%sMS:|r %s%d|r", c, StatusColor(fps), fps, c, StatusColor(nil, latency), latency)
-
-        if enteredFrame then
-            mod.OnEnter(self)
-        end
-    end)
-
-    -- Update immediately upon creation
-    local function UpdateText()
-        local fps = floor(GetFramerate())
-        local _, _, homePing, worldPing = GetNetStats()
-        local latency = homePing
-        text:SetFormattedText("FPS: %s%d|r MS: %s%d|r", StatusColor(fps), fps, StatusColor(nil, latency), latency)
-    end
-    UpdateText()
-    f.Update = UpdateText
-
-    -- Event handling: keep track of addons loaded
-    local function OnEvent(self, event, ...)
-        if event == "MODIFIER_STATE_CHANGED" then
-            if enteredFrame then mod.OnEnter(self) end
-        else
-            local addOnCount = GetNumAddOns()
-            if addOnCount ~= #infoTable then
-                wipe(infoTable)
-                local counter = 1
-                for i = 1, addOnCount do
-                    local name, title, _, loadable, reason = GetAddOnInfo(i)
-                    if loadable or reason == "DEMAND_LOADED" then
-                        infoTable[counter] = {name = name, title = title, index = i}
-                        counter = counter + 1
-                    end
-                end
-            end
-        end
-    end
-
-    f:SetScript("OnEvent", OnEvent)
-    f:RegisterEvent("MODIFIER_STATE_CHANGED")
-    f:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-    return f
-end
-
--- Click behavior
-function mod.OnClick(button)
-    local shiftDown = IsShiftKeyDown()
-    if shiftDown then
-        collectgarbage("collect")
-        ResetCPUUsage()
-    end
-end
-
--- Tooltip display
+----------------------------------------------------
+-- Tooltip Creation Function
+----------------------------------------------------
 function mod.OnEnter(self)
-    GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+    local anchor = addon:FindBestAnchorPoint(self)
+    GameTooltip:SetOwner(self, anchor)
     GameTooltip:ClearLines()
 
     local fps = floor(GetFramerate())
@@ -174,15 +99,15 @@ function mod.OnEnter(self)
                 cpu = cpu,
                 sort = cpuProfiling and (cpu or mem) or mem
             }
-            table.insert(infoDisplay, displayData)
+            tinsert(infoDisplay, displayData)
         end
     end
 
     -- Sort by usage
-    table.sort(infoDisplay, function(a,b) return a.sort > b.sort end)
+    tsort(infoDisplay, function(a,b) return a.sort > b.sort end)
 
     -- Display addons
-    GameTooltip:AddDoubleLine("Total Memory:", BreakUpLargeNumbers(totalMEM).." mb", .69, .31, .31, .84, .75, .65)
+    GameTooltip:AddDoubleLine("Total Memory:", FormatMem(totalMEM), .69, .31, .31, .84, .75, .65)
     GameTooltip:AddLine(" ")
     for _, data in ipairs(infoDisplay) do
         local memStr = FormatMem(data.mem or 0)
@@ -190,7 +115,7 @@ function mod.OnEnter(self)
             local cpuStr = data.cpu and format("%d ms", floor(data.cpu)) or "0 ms"
             GameTooltip:AddDoubleLine(data.title, memStr.." / "..cpuStr)
         else
-            local red = data.mem / totalMEM
+            local red = totalMEM > 0 and data.mem / totalMEM or 0
 		    local green = (1 - red) + .5
             GameTooltip:AddDoubleLine(data.title, memStr, 1, 1, 1, red or 1, green or 1, 0)
         end
@@ -201,7 +126,107 @@ function mod.OnEnter(self)
     GameTooltip:Show()
 end
 
+----------------------------------------------------
+-- Module Creation
+----------------------------------------------------
+function mod.Create(slotFrame)
+    local f = CreateFrame("Frame", nil, slotFrame)
+    f:SetAllPoints(slotFrame)
+    f:EnableMouse(false)
+
+    local text = slotFrame.text
+    if not text then
+        text = slotFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        text:SetPoint("CENTER")
+        slotFrame.text = text
+    end
+
+    ----------------------------------------------------
+    -- Tooltip Handler
+    ----------------------------------------------------
+    slotFrame:EnableMouse(true)
+    slotFrame:SetScript("OnEnter", function(self)
+        enteredFrame = true
+        mod.OnEnter(self)
+    end)
+    slotFrame:SetScript("OnLeave", function()
+        enteredFrame = false
+        GameTooltip:Hide()
+    end)
+
+    ----------------------------------------------------
+    -- Click Handler
+    ----------------------------------------------------
+    slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    slotFrame:SetScript("OnClick", function(self, button)
+        local shiftDown = IsShiftKeyDown()
+        if shiftDown then
+            collectgarbage("collect")
+            ResetCPUUsage()
+        end
+    end)
+
+    ----------------------------------------------------
+    -- Update Logic
+    ----------------------------------------------------
+    
+    f:SetScript("OnUpdate", function(self, elapsed)
+        wait = wait + elapsed
+        if wait < 1 then return end
+        wait = 0
+
+        local fps = floor(GetFramerate())
+        local _, _, homePing, worldPing = GetNetStats()
+        local latency = homePing
+        local c = addon:GetTagColor()
+        text:SetFormattedText("|c%sFPS:|r %s%d|r |c%sMS:|r %s%d|r", c, StatusColor(fps), fps, c, StatusColor(nil, latency), latency)
+
+        if enteredFrame then
+            mod.OnEnter(slotFrame)
+        end
+    end)
+
+    local function UpdateText()
+        local fps = floor(GetFramerate())
+        local _, _, homePing, worldPing = GetNetStats()
+        local latency = homePing
+        text:SetFormattedText("FPS: %s%d|r MS: %s%d|r", StatusColor(fps), fps, StatusColor(nil, latency), latency)
+    end
+    UpdateText()
+    f.Update = UpdateText
+
+    ----------------------------------------------------
+    -- Event Handler
+    ----------------------------------------------------
+    local function OnEvent(self, event, ...)
+        if event == "MODIFIER_STATE_CHANGED" then
+            if enteredFrame then mod.OnEnter(self) end
+        else
+            local addOnCount = GetNumAddOns()
+            if addOnCount ~= #infoTable then
+                wipe(infoTable)
+                local counter = 1
+                for i = 1, addOnCount do
+                    local name, title, _, loadable, reason = GetAddOnInfo(i)
+                    if loadable or reason == "DEMAND_LOADED" then
+                        infoTable[counter] = {name = name, title = title, index = i}
+                        counter = counter + 1
+                    end
+                end
+            end
+        end
+    end
+
+    f:SetScript("OnEvent", OnEvent)
+    f:RegisterEvent("MODIFIER_STATE_CHANGED")
+    f:RegisterEvent("PLAYER_ENTERING_WORLD")
+
+    return f
+end
+
+----------------------------------------------------
 -- Register with SDT
+----------------------------------------------------
 addon:RegisterDataText("System", mod)
 
 return mod

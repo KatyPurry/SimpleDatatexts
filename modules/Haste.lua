@@ -6,11 +6,28 @@ local SDTC = addon.cache
 local mod = {}
 
 ----------------------------------------------------
--- Utility
+-- Lua Locals
 ----------------------------------------------------
-local function FormatPercent(v)
-    return string.format("%.2f%%", v)
-end
+local CreateFrame = CreateFrame
+local format      = string.format
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local GetCombatRating      = GetCombatRating
+local GetCombatRatingBonus = GetCombatRatingBonus
+local GetHaste             = GetHaste
+local UnitAttackSpeed      = UnitAttackSpeed
+
+----------------------------------------------------
+-- Constants Locals
+----------------------------------------------------
+local STAT_HASTE = STAT_HASTE
+local CR_HASTE_MELEE = CR_HASTE_MELEE
+local CR_HASTE_RANGED = CR_HASTE_RANGED
+local STAT_HASTE_BASE_TOOLTIP = STAT_HASTE_BASE_TOOLTIP
+local STAT_HASTE_TOOLTIP = STAT_HASTE_TOOLTIP
+local ATTACK_SPEED = ATTACK_SPEED
 
 ----------------------------------------------------
 -- Module Creation
@@ -34,7 +51,7 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateHaste()
         currentHaste = GetHaste() or 0
-        text:SetFormattedText("|c%sHaste: %s|r", addon:GetTagColor(), FormatPercent(currentHaste))
+        text:SetFormattedText("|c%sHaste: %s|r", addon:GetTagColor(), addon:FormatPercent(currentHaste))
     end
     f.Update = UpdateHaste
 
@@ -61,15 +78,15 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
 
         -- Haste
         local haste = GetHaste()
         GameTooltip:AddLine(format('%s: %s%.2f%%|r', STAT_HASTE, '|cffFFFFFF', haste), 1, 1, 1)
-        local playerClass = select(2, UnitClass("player"))
-        local hasteStat = playerClass == "HUNTER" and CR_HASTE_RANGED or CR_HASTE_MELEE
-        GameTooltip:AddLine(format('%s'..STAT_HASTE_BASE_TOOLTIP, _G['STAT_HASTE_'..playerClass..'_TOOLTIP'] or STAT_HASTE_TOOLTIP, GetCombatRating(hasteStat), GetCombatRatingBonus(hasteStat)), nil, nil, nil, true)
+        local hasteStat = SDTC.playerClass == "HUNTER" and CR_HASTE_RANGED or CR_HASTE_MELEE
+        GameTooltip:AddLine(format('%s'..STAT_HASTE_BASE_TOOLTIP, _G['STAT_HASTE_'..SDTC.playerClass..'_TOOLTIP'] or STAT_HASTE_TOOLTIP, GetCombatRating(hasteStat), GetCombatRatingBonus(hasteStat)), nil, nil, nil, true)
 
         -- Attack speed
         local mh, oh = UnitAttackSpeed("player")
@@ -88,11 +105,6 @@ function mod.Create(slotFrame)
             )
         end
 
-        -- Rating
-        local rating = CR_HASTE_MELEE
-        local ratingAmount = GetCombatRating(rating)
-        local ratingBonus = GetCombatRatingBonus(rating)
-
         GameTooltip:Show()
     end)
 
@@ -100,7 +112,6 @@ function mod.Create(slotFrame)
         GameTooltip:Hide()
     end)
 
-    -- Initialize immediately
     UpdateHaste()
 
     return f

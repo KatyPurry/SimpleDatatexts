@@ -61,7 +61,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
 
         local masteryRating, bonusCoeff = GetMasteryEffect()

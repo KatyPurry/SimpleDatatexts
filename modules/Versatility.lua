@@ -1,16 +1,33 @@
 -- modules/Versatility.lua
 -- Versatility datatext adapted from ElvUI for Simple DataTexts (SDT)
 local addonName, addon = ...
-local SDTC = addon.cache
 
 local mod = {}
 
 ----------------------------------------------------
--- Utility
+-- Lua Locals
 ----------------------------------------------------
-local function FormatPercent(v)
-    return string.format("%.2f%%", v)
-end
+local format = string.format
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local BreakUpLargeNumbers  = BreakUpLargeNumbers
+local CreateFrame          = CreateFrame
+local GameTooltip          = GameTooltip
+local GetCombatRating      = GetCombatRating
+local GetCombatRatingBonus = GetCombatRatingBonus
+
+----------------------------------------------------
+-- Constants Locals
+----------------------------------------------------
+local CR_VERSATILITY_DAMAGE_DONE  = CR_VERSATILITY_DAMAGE_DONE
+local CR_VERSATILITY_DAMAGE_TAKEN = CR_VERSATILITY_DAMAGE_TAKEN
+local CR_VERSATILITY_TOOLTIP      = CR_VERSATILITY_TOOLTIP
+local FONT_COLOR_CODE_CLOSE       = FONT_COLOR_CODE_CLOSE
+local HIGHLIGHT_FONT_COLOR_CODE   = HIGHLIGHT_FONT_COLOR_CODE
+local STAT_VERSATILITY            = STAT_VERSATILITY
+local VERSATILITY_TOOLTIP_FORMAT  = VERSATILITY_TOOLTIP_FORMAT
 
 ----------------------------------------------------
 -- Module Creation
@@ -35,7 +52,7 @@ function mod.Create(slotFrame)
     local function UpdateVersatility()
         currentVers = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
         versReduction = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_TAKEN)
-        text:SetFormattedText("|c%sVers: %s|r", addon:GetTagColor(), FormatPercent(currentVers))
+        text:SetFormattedText("|c%sVers: %s|r", addon:GetTagColor(), addon:FormatPercent(currentVers))
     end
 
     f.Update = UpdateVersatility
@@ -63,7 +80,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
 
         local versatility = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE)

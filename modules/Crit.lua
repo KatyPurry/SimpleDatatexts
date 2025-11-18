@@ -6,11 +6,30 @@ local SDTC = addon.cache
 local mod = {}
 
 ----------------------------------------------------
--- Utility
+-- Lua Locals
 ----------------------------------------------------
-local function FormatPercent(v)
-    return string.format("%.2f%%", v)
-end
+local format = string.format
+local min    = math.min
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local GameTooltip          = GameTooltip
+local GetCombatRating      = GetCombatRating
+local GetCombatRatingBonus = GetCombatRatingBonus
+local GetCritChance        = GetCritChance
+local GetRangedCritChance  = GetRangedCritChance
+local GetSpellCritChance   = GetSpellCritChance
+
+----------------------------------------------------
+-- Constants Locals
+----------------------------------------------------
+local CR_CRIT_MELEE        = CR_CRIT_MELEE
+local CR_CRIT_RANGED       = CR_CRIT_RANGED
+local CR_CRIT_SPELL        = CR_CRIT_SPELL
+local CR_CRIT_TOOLTIP      = CR_CRIT_TOOLTIP
+local MAX_SPELL_SCHOOLS    = MAX_SPELL_SCHOOLS
+local MELEE_CRIT_CHANCE    = MELEE_CRIT_CHANCE
 
 ----------------------------------------------------
 -- Module Creation
@@ -57,7 +76,7 @@ function mod.Create(slotFrame)
 		    ratingIndex = CR_CRIT_MELEE
 	    end
 
-        text:SetFormattedText("|c%sCrit: %s|r", addon:GetTagColor(), FormatPercent(critChance))
+        text:SetFormattedText("|c%sCrit: %s|r", addon:GetTagColor(), addon:FormatPercent(critChance))
     end
     f.Update = UpdateCrit
 
@@ -84,7 +103,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
 
         local critical = GetCombatRating(ratingIndex)
@@ -99,6 +119,7 @@ function mod.Create(slotFrame)
     end)
 
     UpdateCrit()
+
     return f
 end
 

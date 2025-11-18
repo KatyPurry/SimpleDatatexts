@@ -1,15 +1,37 @@
 -- Simple DataTexts
--- Addon locals
+
+----------------------------------------------------
+-- Addon Locals
+----------------------------------------------------
 local addonName, addon = ...
--- lua locals
+
+----------------------------------------------------
+-- Lua Locals
+----------------------------------------------------
+local format           = string.format
+local print            = print
 local strsplit         = strsplit
 local stringlower      = string.lower
 local tinsert          = table.insert
 local tonumber         = tonumber
 local tostring         = tostring
 local tsort            = table.sort
--- WoW API locals
-local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
+local wipe             = table.wipe
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local CreateFrame               = CreateFrame
+local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
+local GetClassColor             = C_ClassColor.GetClassColor
+local ToggleDropDownMenu        = ToggleDropDownMenu
+local UIDropDownMenu_AddButton  = UIDropDownMenu_AddButton
+local UIDropDownMenu_CreateInfo = UIDropDownMenu_CreateInfo
+local UIDropDownMenu_Initialize = UIDropDownMenu_Initialize
+local UIDropDownMenu_SetText    = UIDropDownMenu_SetText
+local UIParent                  = UIParent
+local UnitClass                 = UnitClass
+local UnitName                  = UnitName
 
 -- Defaults
 _G.SDTDB = _G.SDTDB or {
@@ -27,19 +49,27 @@ addon.bars = addon.bars or {}
 addon.cache = {}
 addon.cache.playerName = UnitName("player")
 addon.cache.playerClass = select(2, UnitClass("player"))
-local colors = { C_ClassColor.GetClassColor(addon.cache.playerClass):GetRGB() }
+local colors = { GetClassColor(addon.cache.playerClass):GetRGB() }
 addon.cache.colorR = colors[1]
 addon.cache.colorG = colors[2]
 addon.cache.colorB = colors[3]
 addon.cache.colorRGB = format("|cff%02x%02x%02x", addon.cache.colorR * 255, addon.cache.colorG * 255, addon.cache.colorB * 255)
-addon.cache.colorHex = C_ClassColor.GetClassColor(addon.cache.playerClass):GenerateHexColor()
+addon.cache.colorHex = GetClassColor(addon.cache.playerClass):GenerateHexColor()
 addon.cache.version = GetAddOnMetadata(addonName, "Version") or "not defined"
+addon.cache.moduleNames = {}
 
 -------------------------------------------------
 -- Module Registration
 -------------------------------------------------
 function addon:RegisterDataText(name, module)
     addon.modules[name] = module
+end
+
+-------------------------------------------------
+-- Utility: Print function
+-------------------------------------------------
+function addon.Print(...)
+    print("[|cFFFF6600SDT|r]", ...)
 end
 
 -------------------------------------------------
@@ -53,10 +83,30 @@ function addon:GetTagColor()
 end
 
 -------------------------------------------------
--- Utility: Print function
+-- Utility: Format Percentage
 -------------------------------------------------
-function addon.Print(...)
-    print("[|cFFFF6600SDT|r]", ...)
+function addon:FormatPercent(v)
+    return string.format("%.2f%%", v)
+end
+
+-------------------------------------------------
+-- Utility: Format Percentage
+-------------------------------------------------
+function addon:FindBestAnchorPoint(frame)
+    local x, y = frame:GetCenter()
+    local screenWidth = UIParent:GetRight()
+    local screenHeight = UIParent:GetTop()
+
+    local anchor, relPoint
+    if not x or not y then
+        return "ANCHOR_BOTTOM"
+    else
+        if y < screenHeight / 2 then
+            return "ANCHOR_TOP"
+        else
+            return "ANCHOR_BOTTOM"
+        end
+    end
 end
 
 -------------------------------------------------
@@ -240,17 +290,11 @@ end
 -------------------------------------------------
 local dropdownFrame = CreateFrame("Frame", addonName .. "_SlotDropdown", UIParent, "UIDropDownMenuTemplate")
 function addon:ShowSlotDropdown(slot, bar)
-    local function InitializeDropdown(slot, bar)
+    local function InitializeDropdown()
         local info = UIDropDownMenu_CreateInfo()
         info.notCheckable = true
 
-        local names = {}
-        for name in pairs(addon.modules) do
-            tinsert(names, name)
-        end
-        tsort(names)
-
-        for _, moduleName in ipairs(names) do
+        for _, moduleName in ipairs(addon.cache.moduleNames) do
             info.text = moduleName
             info.func = function()
                 SDTDB.bars[bar:GetName()].slots[slot.index] = moduleName
@@ -392,13 +436,7 @@ local function buildSlotSelectors(barName)
             end
             UIDropDownMenu_AddButton(info)
 
-            local moduleNames = {}
-            for name in pairs(addon.modules) do
-                tinsert(moduleNames, name)
-            end
-            tsort(moduleNames)
-
-            for _, name in ipairs(moduleNames) do
+            for _, name in ipairs(addon.cache.moduleNames) do
                 local moduleName = name
                 info.text = moduleName
                 info.func = function()
@@ -630,12 +668,25 @@ removeBarButton:SetScript("OnClick", function()
 end)
 
 -------------------------------------------------
+-- Create Module List
+-------------------------------------------------
+local function CreateModuleList()
+    wipe(addon.cache.moduleNames)
+    for name in pairs(addon.modules) do
+        tinsert(addon.cache.moduleNames, name)
+    end
+    tsort(addon.cache.moduleNames)
+end
+
+-------------------------------------------------
 -- Loader to restore bars on addon load
 -------------------------------------------------
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", function(self, event, arg)
     if arg == addonName then
+        CreateModuleList()      
+
         if not next(SDTDB.bars) then
             SDTDB.bars["SDT_Bar1"] = { numSlots = 3, slots = {}, showBackground = true, showBorder = true }
         end

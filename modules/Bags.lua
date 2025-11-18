@@ -6,6 +6,31 @@ local SDTC = addon.cache
 local mod = {}
 
 ----------------------------------------------------
+-- Lua Locals
+----------------------------------------------------
+local format = string.format
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local CreateFrame                = CreateFrame
+local GameTooltip                = GameTooltip
+local GetInventoryItemDurability = GetInventoryItemDurability
+local GetInventoryItemLink       = GetInventoryItemLink
+local GetInventoryItemQuality    = GetInventoryItemQuality
+local GetInventoryItemTexture    = GetInventoryItemTexture
+local ToggleAllBags              = ToggleAllBags
+local ContainerIDToInventoryID   = C_Container.ContainerIDToInventoryID
+local GetBagName                 = C_Container.GetBagName
+local GetContainerNumFreeSlots   = C_Container.GetContainerNumFreeSlots
+local GetContainerNumSlots       = C_Container.GetContainerNumSlots
+
+----------------------------------------------------
+-- Useful Tables
+----------------------------------------------------
+local bagData = {}
+
+----------------------------------------------------
 -- Utility
 ----------------------------------------------------
 local NUM_BAG_SLOTS = NUM_BAG_SLOTS + (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and 1 or 0)
@@ -17,10 +42,10 @@ local function ColorGradient(p)
     if p >= 1 then return 0.1, 1, 0.1 end
     if p < 0.5 then
         local t = p / 0.5
-        return 1, 0.1 + (1 - 0.1) * t, 0.1
+        return 1, 0.1 + 0.9 * t, 0.1
     else
         local t = (p - 0.5) / 0.5
-        return 1 - (1 - 0.1) * t, 1, 0.1
+        return 1 - 0.9 * t, 1, 0.1
     end
 end
 
@@ -47,10 +72,12 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateBags()
         local freeNormal, totalNormal, freeReagent, totalReagent = 0, 0, 0, 0
+        bagData = {}
 
         for i = 0, NUM_BAG_SLOTS do
-            local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(i)
-            local totalSlots = C_Container.GetContainerNumSlots(i)
+            local freeSlots, bagType = GetContainerNumFreeSlots(i)
+            local totalSlots = GetContainerNumSlots(i)
+            bagData[i] = { free = freeSlots, total = totalSlots, bagType = bagType }
 
             if not bagType or bagType == 0 then
                 if i == REAGENT_CONTAINER then
@@ -90,29 +117,30 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
         GameTooltip:AddLine("Bags")
         GameTooltip:AddLine(" ")
 
         for i = 0, NUM_BAG_SLOTS do
-            local bagName = C_Container.GetBagName(i)
+            local bagName = GetBagName(i)
             if bagName then
-                local numSlots = C_Container.GetContainerNumSlots(i)
-                local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(i)
+                local numSlots = bagData[i].total
+                local freeSlots, bagType = bagData[i].free, bagData[i].bagType
                 local usedSlots = numSlots - freeSlots
 
                 local r1, g1, b1 = 1, 1, 1
                 local r2, g2, b2 = ColorGradient(usedSlots / numSlots)
 
                 if i > 0 then
-                    local id = C_Container.ContainerIDToInventoryID(i)
+                    local id = ContainerIDToInventoryID(i)
                     local icon = GetInventoryItemTexture('player', id)
                     local quality = GetInventoryItemQuality('player', id) or 1
                     r1, g1, b1 = GetItemQualityColor(quality)
-                    GameTooltip:AddDoubleLine(string.format(iconString, icon or "", bagName), string.format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
+                    GameTooltip:AddDoubleLine(format(iconString, icon or "", bagName), format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
                 else
-                    GameTooltip:AddDoubleLine(bagName, string.format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
+                    GameTooltip:AddDoubleLine(bagName, format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
                 end
             end
         end

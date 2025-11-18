@@ -6,6 +6,34 @@ local SDTC = addon.cache
 local mod = {}
 
 ----------------------------------------------------
+-- Lua Locals
+----------------------------------------------------
+local format = string.format
+local min    = math.min
+local pairs  = pairs
+local wipe   = table.wipe
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local GameTooltip                = GameTooltip
+local GetCoinTextureString       = GetCoinTextureString
+local GetInventoryItemDurability = GetInventoryItemDurability
+local GetInventoryItemLink       = GetInventoryItemLink
+local GetInventoryItemTexture    = GetInventoryItemTexture
+local GetRepairAllCost           = GetRepairAllCost
+local InCombatLockdown           = InCombatLockdown
+local MerchantFrame              = MerchantFrame
+local ToggleCharacter            = ToggleCharacter
+
+----------------------------------------------------
+-- Constants Locals
+----------------------------------------------------
+local DURABILITY  = DURABILITY
+local REPAIR_COST = REPAIR_COST
+local UNKNOWN     = UNKNOWN
+
+----------------------------------------------------
 -- Inventory Slots
 ----------------------------------------------------
 local slots = {
@@ -45,13 +73,6 @@ local function ColorGradient(p)
         local b = 0.1
         return r, g, b
     end
-end
-
-----------------------------------------------------
--- Utility
-----------------------------------------------------
-local function FormatPercent(v)
-    return format("%d%%", math.floor(v + 0.5))
 end
 
 ----------------------------------------------------
@@ -119,7 +140,7 @@ function mod.Create(slotFrame)
         -- colorize percent
         local r, g, b = ColorGradient(totalDurability / 100)
         local durabilityHex = format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
-        text:SetFormattedText("|c%sDurability: |r %s%s|r", addon:GetTagColor(), durabilityHex, FormatPercent(totalDurability))
+        text:SetFormattedText("|c%sDurability: |r %s%s|r", addon:GetTagColor(), durabilityHex, addon:FormatPercent(totalDurability))
 
         -- pulse if below threshold
         if totalDurability <= percThreshold then
@@ -156,23 +177,24 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        GameTooltip:AddLine(_G.DURABILITY or "Durability")
+        GameTooltip:AddLine(DURABILITY or "Durability")
         GameTooltip:AddLine(" ")
 
         for slotIndex, perc in pairs(invDurability) do
             local texture = GetInventoryItemTexture("player", slotIndex)
-            local link = GetInventoryItemLink("player", slotIndex) or _G.UNKNOWN
+            local link = GetInventoryItemLink("player", slotIndex) or UNKNOWN
             local colorR, colorG, colorB = ColorGradient((perc or 0) / 100)
             local left = format("|T%s:14:14:0:0:64:64:4:60:4:60|t %s", texture or "", link)
-            local right = FormatPercent(perc or 0)
+            local right = addon:FormatPercent(perc or 0)
             GameTooltip:AddDoubleLine(left, right, 1, 1, 1, colorR, colorG, colorB)
         end
 
         if totalRepairCost and totalRepairCost > 0 then
             GameTooltip:AddLine(" ")
-            GameTooltip:AddDoubleLine(_G.REPAIR_COST or "Repair Cost", GetCoinTextureString(totalRepairCost) or tostring(totalRepairCost), 0.6, 0.8, 1, 1, 1, 1)
+            GameTooltip:AddDoubleLine(REPAIR_COST or "Repair Cost", GetCoinTextureString(totalRepairCost) or tostring(totalRepairCost), 0.6, 0.8, 1, 1, 1, 1)
         end
 
         GameTooltip:Show()
@@ -182,7 +204,9 @@ function mod.Create(slotFrame)
         GameTooltip:Hide()
     end)
 
-    -- clicking opens character pane
+    ----------------------------------------------------
+    -- Click Handler
+    ----------------------------------------------------
     slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     slotFrame:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
@@ -192,10 +216,8 @@ function mod.Create(slotFrame)
         end
     end)
 
-    -- initialize immediately
     UpdateDurability()
 
-    -- return the created frame (slot module frame) so SDT can keep a reference if needed
     return f
 end
 

@@ -1,39 +1,61 @@
 -- modules/Time.lua
 -- Time & Lockout datatext adapted from ElvUI for Simple DataTexts (SDT)
 local addonName, addon = ...
-local SDTC = addon.cache
 
 local mod = {}
 
--- WoW API locals
-local _G = _G
-local format, unpack, wipe, tinsert, sort = string.format, unpack, table.wipe, table.insert, table.sort
+----------------------------------------------------
+-- Lua Locals
+----------------------------------------------------
+local date    = date
+local format  = string.format
+local next    = next
+local tinsert = table.insert
+local tsort   = table.sort
+local unpack  = unpack
+local wipe    = table.wipe
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local CreateFrame = CreateFrame
 local SecondsToTime = SecondsToTime
 local GetNumSavedInstances = GetNumSavedInstances
 local GetSavedInstanceInfo = GetSavedInstanceInfo
 local EJ_GetNumTiers, EJ_SelectTier, EJ_GetInstanceByIndex = EJ_GetNumTiers, EJ_SelectTier, EJ_GetInstanceByIndex
 local C_DateAndTime_GetSecondsUntilDailyReset = C_DateAndTime.GetSecondsUntilDailyReset
 local C_DateAndTime_GetSecondsUntilWeeklyReset = C_DateAndTime.GetSecondsUntilWeeklyReset
+local TimeManagerFrame = TimeManagerFrame
+local GameTimeFrame = GameTimeFrame
+local ToggleFrame = ToggleFrame
+local GameTooltip = GameTooltip
 
+----------------------------------------------------
 -- Constants
-local TIMEMANAGER_TOOLTIP_LOCALTIME = _G.TIMEMANAGER_TOOLTIP_LOCALTIME
-local DAILY_RESET = format('%s %s', _G.DAILY, _G.RESET)
-local WEEKLY_RESET = format('%s %s', _G.WEEKLY, _G.RESET)
-local AMPM = { _G.TIMEMANAGER_PM, _G.TIMEMANAGER_AM }
+----------------------------------------------------
+local TIMEMANAGER_TOOLTIP_LOCALTIME = TIMEMANAGER_TOOLTIP_LOCALTIME
+local DAILY_RESET = format('%s %s', DAILY, RESET)
+local WEEKLY_RESET = format('%s %s', WEEKLY, RESET)
+local AMPM = { TIMEMANAGER_PM, TIMEMANAGER_AM }
 
 local lockoutColorExtended = { r = 0.3, g = 1, b = 0.3 }
 local lockoutColorNormal = { r = 0.8, g = 0.8, b = 0.8 }
 
+local ICON_EJ = ICON_EJ
 local OVERRIDE_ICON = [[Interface\EncounterJournal\UI-EJ-Dungeonbutton-%s]]
 
--- Internal state
+----------------------------------------------------
+-- Misc Locals
+----------------------------------------------------
 local enteredFrame = false
 local updateTime = 5
 local lockedInstances = { raids = {}, dungeons = {} }
 local collectedImages = false
 local instanceIconByName = {}
 
--- Time helpers
+----------------------------------------------------
+-- Time Helpers
+----------------------------------------------------
 local function ToTime(secs)
     return SecondsToTime(secs, true, nil, 3)
 end
@@ -55,7 +77,9 @@ local function GetTimeValues()
     return ConvertTime(dateTable.hour, dateTable.min, dateTable.sec)
 end
 
--- Collect instance textures from EJ
+----------------------------------------------------
+-- Instance Data from EJ
+----------------------------------------------------
 local function GetInstanceImages(index, raid)
     local instanceID, name, _, _, buttonImage = EJ_GetInstanceByIndex(index, raid)
     while instanceID do
@@ -80,66 +104,9 @@ local function CollectImages()
     end
 end
 
--- Tooltip population
-local function OnEnter(self)
-    GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-    GameTooltip:ClearLines()
-    GameTooltip:AddLine("TIME")
-    GameTooltip:AddLine(" ")
-    enteredFrame = true
-
-    -- Saved instances
-    if next(lockedInstances.raids) then
-        GameTooltip:AddLine("Saved Raid(s)")
-        sort(lockedInstances.raids, function(a,b) return a[1]<b[1] end)
-        for _, info in next, lockedInstances.raids do
-            local difficultyLetter, buttonImg = info[2], info[3]
-            local name, _, reset, _, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(info[4])
-            local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
-            if numEncounters and numEncounters > 0 and (encounterProgress and encounterProgress > 0) then
-                GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-            else
-                GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-            end
-        end
-        GameTooltip:AddLine(" ")
-    end
-
-    -- Saved dungeons
-    if next(lockedInstances.dungeons) then
-        GameTooltip:AddLine("Saved Dungeon(s)")
-        sort(lockedInstances.dungeons, function(a,b) return a[1]<b[1] end)
-        for _, info in next, lockedInstances.dungeons do
-            local difficultyLetter, buttonImg = info[2], info[3]
-            local name, _, reset, _, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(info[4])
-            local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
-            if numEncounters and numEncounters > 0 and (encounterProgress and encounterProgress > 0) then
-                GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-            else
-                GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-            end
-        end
-        GameTooltip:AddLine(" ")
-    end
-
-    -- Daily/weekly reset
-    local dailyReset = C_DateAndTime_GetSecondsUntilDailyReset()
-    local weeklyReset = C_DateAndTime_GetSecondsUntilWeeklyReset()
-    if dailyReset then
-        GameTooltip:AddDoubleLine(DAILY_RESET, ToTime(dailyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
-    end
-    if weeklyReset then
-        GameTooltip:AddDoubleLine(WEEKLY_RESET, ToTime(weeklyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
-    end
-    GameTooltip:AddLine(" ")
-
-    -- Local/realm time
-    local Hr, Min, Sec, AmPm = GetTimeValues()
-    GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, format('%02d:%02d:%02d', Hr, Min, Sec), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
-    GameTooltip:Show()
-end
-
--- Frame creation
+----------------------------------------------------
+-- Module Creation
+----------------------------------------------------
 function mod.Create(slotFrame)
     local f = CreateFrame("Frame", nil, slotFrame)
     f:SetAllPoints(slotFrame)
@@ -149,7 +116,28 @@ function mod.Create(slotFrame)
     text:SetPoint("CENTER")
     slotFrame.text = text
 
-    -- Events
+    ----------------------------------------------------
+    -- Update logic
+    ----------------------------------------------------
+    f:SetScript("OnUpdate", function(self, elapsed)
+        self.timeElapsed = (self.timeElapsed or updateTime) - elapsed
+        if self.timeElapsed > 0 then return end
+        self.timeElapsed = updateTime
+
+        local Hr, Min, Sec, AmPm = GetTimeValues()
+        text:SetFormattedText('|c%s%02d:%02d %s|r', addon:GetTagColor(), Hr, Min, AMPM[AmPm])
+    end)
+
+    local function UpdateText()
+        local Hr, Min, Sec, AmPm = GetTimeValues()
+        text:SetFormattedText('|c%s%02d:%02d %s|r', addon:GetTagColor(), Hr, Min, AMPM[AmPm])
+    end
+    
+    f.Update = UpdateText
+
+    ----------------------------------------------------
+    -- Event Handler
+    ----------------------------------------------------
     local function OnEvent(self, event)
         wipe(lockedInstances.raids)
         wipe(lockedInstances.dungeons)
@@ -168,47 +156,94 @@ function mod.Create(slotFrame)
         end
     end
 
-    f.Update = function() OnEvent(f) end
-
     f:SetScript("OnEvent", OnEvent)
     f:RegisterEvent("PLAYER_ENTERING_WORLD")
     f:RegisterEvent("UPDATE_INSTANCE_INFO")
     f:RegisterEvent("BOSS_KILL")
 
+    ----------------------------------------------------
     -- Tooltip
+    ----------------------------------------------------
     slotFrame:EnableMouse(true)
-    slotFrame:SetScript("OnEnter", function(self) OnEnter(self) end)
+    slotFrame:SetScript("OnEnter", function(self)
+        local anchor = addon:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
+        GameTooltip:ClearLines()
+        GameTooltip:AddLine("TIME")
+        GameTooltip:AddLine(" ")
+        enteredFrame = true
+
+        -- Saved instances
+        if next(lockedInstances.raids) then
+            GameTooltip:AddLine("Saved Raid(s)")
+            tsort(lockedInstances.raids, function(a,b) return a[1]<b[1] end)
+            for _, info in next, lockedInstances.raids do
+                local difficultyLetter, buttonImg = info[2], info[3]
+                local name, _, reset, _, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(info[4])
+                local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
+                if numEncounters and numEncounters > 0 and (encounterProgress and encounterProgress > 0) then
+                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                else
+                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                end
+            end
+            GameTooltip:AddLine(" ")
+        end
+
+        -- Saved dungeons
+        if next(lockedInstances.dungeons) then
+            GameTooltip:AddLine("Saved Dungeon(s)")
+            tsort(lockedInstances.dungeons, function(a,b) return a[1]<b[1] end)
+            for _, info in next, lockedInstances.dungeons do
+                local difficultyLetter, buttonImg = info[2], info[3]
+                local name, _, reset, _, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(info[4])
+                local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
+                if numEncounters and numEncounters > 0 and (encounterProgress and encounterProgress > 0) then
+                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                else
+                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                end
+            end
+            GameTooltip:AddLine(" ")
+        end
+
+        -- Daily/weekly reset
+        local dailyReset = C_DateAndTime_GetSecondsUntilDailyReset()
+        local weeklyReset = C_DateAndTime_GetSecondsUntilWeeklyReset()
+        if dailyReset then
+            GameTooltip:AddDoubleLine(DAILY_RESET, ToTime(dailyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+        end
+        if weeklyReset then
+            GameTooltip:AddDoubleLine(WEEKLY_RESET, ToTime(weeklyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+        end
+        GameTooltip:AddLine(" ")
+
+        -- Local/realm time
+        local Hr, Min, Sec, AmPm = GetTimeValues()
+        GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, format('%02d:%02d:%02d', Hr, Min, Sec), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+        GameTooltip:Show()
+    end)
     slotFrame:SetScript("OnLeave", function() enteredFrame = false; GameTooltip:Hide() end)
 
-    -- Click opens calendar (simplified)
+    ----------------------------------------------------
+    -- Click to Open
+    ----------------------------------------------------
     slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     slotFrame:SetScript("OnClick", function(_, btn)
         if btn == "RightButton" then
-            ToggleFrame(_G.TimeManagerFrame)
+            ToggleFrame(TimeManagerFrame)
         else
-            _G.GameTimeFrame:Click()
+            GameTimeFrame:Click()
         end
     end)
 
-    -- Text updater
-    f:SetScript("OnUpdate", function(self, elapsed)
-        self.timeElapsed = (self.timeElapsed or updateTime) - elapsed
-        if self.timeElapsed > 0 then return end
-        self.timeElapsed = updateTime
-
-        local Hr, Min, Sec, AmPm = GetTimeValues()
-        text:SetFormattedText('|c%s%02d:%02d %s|r', addon:GetTagColor(), Hr, Min, AMPM[AmPm])
-    end)
-
-    -- Update immediately upon creation
-    do
-        local Hr, Min, Sec, AmPm = GetTimeValues()
-        text:SetFormattedText('|c%s%02d:%02d %s|r', addon:GetTagColor(), Hr, Min, AMPM[AmPm])
-    end
-
+    UpdateText()
     return f
 end
 
+----------------------------------------------------
+-- Register with SDT
+----------------------------------------------------
 addon:RegisterDataText("Time", mod)
 
 return mod

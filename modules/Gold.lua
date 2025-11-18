@@ -46,7 +46,7 @@ local COPPER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10
 ----------------------------------------------------
 -- Helpers
 ----------------------------------------------------
-local function SortFunction(a,b) return a.amount > b.amount end
+local function SortFunction(a,b) return (a.amount or 0) > (b.amount or 0) end
 
 local function UpdateTotal(faction, change)
     if faction == 'Alliance' then
@@ -144,7 +144,8 @@ end
 ----------------------------------------------------
 local function ShowTooltip(self)
     local tooltip = GameTooltip
-    tooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+    local anchor = addon:FindBestAnchorPoint(self)
+    tooltip:SetOwner(self, anchor)
     tooltip:ClearLines()
     tooltip:AddLine("GOLD")
     tooltip:AddLine(" ")
@@ -180,6 +181,7 @@ local function ShowTooltip(self)
     if totalHorde > 0 then tooltip:AddDoubleLine("Horde: ", FormatMoney(totalHorde), 1, .2, .2, 1,1,1) end
     tooltip:AddLine(" ")
     tooltip:AddDoubleLine("Total: ", FormatMoney(totalGold), 1,1,1,1,1,1)
+    tooltip:AddDoubleLine("Warband: ", FormatMoney(warbandGold), 1,1,1,1,1,1)
     if C_WowTokenPublic_GetCurrentMarketPrice then
         tooltip:AddLine(" ")
         tooltip:AddDoubleLine("WoW Token:", FormatMoney(C_WowTokenPublic_GetCurrentMarketPrice() or 0), 0,.8,1,1,1,1)
@@ -203,13 +205,14 @@ function mod.Create(slotFrame)
     local text = slotFrame.text or slotFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     text:SetPoint("CENTER")
     slotFrame.text = text
-    UpdateGold(slotFrame)
 
-    -- Events
+    ----------------------------------------------------
+    -- Event Handler
+    ----------------------------------------------------
     local function OnEvent(_, event)
         UpdateWarbandGold()
         if not Ticker then
-            C_WowTokenPublic_UpdateMarketPrice()
+            UpdateMarketPrice()
             Ticker = C_Timer_NewTicker(60, UpdateMarketPrice)
         end
         UpdateGold(slotFrame)
@@ -225,12 +228,16 @@ function mod.Create(slotFrame)
     f:RegisterEvent("TRADE_MONEY_CHANGED")
     f:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 
-    -- Tooltip
+    ----------------------------------------------------
+    -- Tooltip Handler
+    ----------------------------------------------------
     slotFrame:EnableMouse(true)
     slotFrame:SetScript("OnEnter", ShowTooltip)
     slotFrame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-    -- Click
+    ----------------------------------------------------
+    -- Click Handler
+    ----------------------------------------------------
     slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     slotFrame:SetScript("OnClick", function(_, btn)
         if btn == "RightButton" then
@@ -243,6 +250,8 @@ function mod.Create(slotFrame)
             ToggleAllBags()
         end
     end)
+
+    UpdateGold(slotFrame)
 
     return f
 end
