@@ -318,6 +318,10 @@ local title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 title:SetPoint("TOPLEFT", 16, -16)
 title:SetText(panel.name)
 
+local version = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+version:SetPoint("LEFT", title, "RIGHT", 6, -1)
+version:SetText("v" .. addon.cache.version)
+
 local function MakeLabel(parent, text, point, x, y)
     local t = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     t:SetPoint(point, x, y)
@@ -391,14 +395,9 @@ end)
 -------------------------------------------------
 -- Right Column Controls (per-panel)
 -------------------------------------------------
-local selectedLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-selectedLabel:SetPoint("LEFT", lockCheckbox, "RIGHT", 280, 0)
-selectedLabel:SetText("Selected Panel Settings")
-selectedLabel:Hide()
-
 local removeBarButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-removeBarButton:SetSize(140, 24)
-removeBarButton:SetPoint("TOPLEFT", selectedLabel, "BOTTOMLEFT", 0, -8)
+removeBarButton:SetSize(160, 24)
+removeBarButton:SetPoint("LEFT", lockCheckbox, "RIGHT", 280, 0)
 removeBarButton:SetText("Remove Selected Panel")
 removeBarButton:Hide()
 
@@ -421,7 +420,7 @@ local function buildSlotSelectors(barName)
     if not b then return end
 
     for i = 1, b.numSlots do
-        local lbl = MakeLabel(panel, "Slot " .. i .. ":", "TOPLEFT", 320, -280 - ((i - 1) * 50))
+        local lbl = MakeLabel(panel, "Slot " .. i .. ":", "TOPLEFT", 320, -310 - ((i - 1) * 50))
         local dd = CreateFrame("Frame", addonName .. "_SlotSel_" .. i, panel, "UIDropDownMenuTemplate")
         dd:SetPoint("TOPLEFT", lbl, "BOTTOMLEFT", -20, -6)
         UIDropDownMenu_SetWidth(dd, 140)
@@ -536,7 +535,7 @@ local opacitySlider, opacityBox = CreateSliderWithBox(panel, "Background Opacity
 local slotSlider, slotBox = CreateSliderWithBox(panel, "Slots", "Slots", 1, 5, 1, opacitySlider, 0, -20)
 local widthSlider, widthBox = CreateSliderWithBox(panel, "Width", "Width", 100, 800, 1, slotSlider, 0, -20)
 local heightSlider, heightBox = CreateSliderWithBox(panel, "Height", "Height", 16, 128, 1, widthSlider, 0, -20)
-local scaleSlider, scaleBox = CreateSliderWithBox(panel, "Scale", "Scale", 50, 500, 1, nameEditBox, 0, -20)
+local scaleSlider, scaleBox = CreateSliderWithBox(panel, "Scale", "Scale", 50, 500, 1, nameEditBox, 0, -30)
 
 -- Panel dropdown initializer
 local function PanelDropdown_Initialize(self, level)
@@ -558,7 +557,6 @@ UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
 function updateSelectedBarControls()
     local barName = panel.selectedBar
     if not barName then
-        selectedLabel:Hide()
         removeBarButton:Hide()
         bgCheckbox:Hide()
         borderCheckbox:Hide()
@@ -578,7 +576,6 @@ function updateSelectedBarControls()
         return
     end
 
-    selectedLabel:Show()
     removeBarButton:Show()
     bgCheckbox:Show()
     borderCheckbox:Show()
