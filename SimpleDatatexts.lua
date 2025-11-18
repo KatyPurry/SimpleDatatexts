@@ -3,7 +3,7 @@
 ----------------------------------------------------
 -- Addon Locals
 ----------------------------------------------------
-local addonName, addon = ...
+local addonName, SDT = ...
 
 ----------------------------------------------------
 -- Lua Locals
@@ -37,49 +37,49 @@ local UnitName                  = UnitName
 -- Defaults
 _G.SDTDB = _G.SDTDB or {
     bars = {}, -- keyed by name: { numSlots = 3, slots = { [1] = "FPS", ... }, point = { point = ..., relativePoint = ..., x = ..., y = ... }, showBackground = true, showBorder = true, width = 300, height = 22, scale = 100, bgOpacity = 50 }
-    settings = { locked = false, useClassColor = false },
+    settings = { locked = false, useClassColor = false, debug = false },
     gold = {}
 }
 
-addon.modules = addon.modules or {}
-addon.bars = addon.bars or {}
+SDT.modules = SDT.modules or {}
+SDT.bars = SDT.bars or {}
+SimpleDatatexts = SDT
 
 -------------------------------------------------
 -- Build Our Cache
 -------------------------------------------------
-addon.cache = {}
-addon.cache.playerName = UnitName("player")
-addon.cache.playerClass = select(2, UnitClass("player"))
-local colors = { GetClassColor(addon.cache.playerClass):GetRGB() }
-addon.cache.colorR = colors[1]
-addon.cache.colorG = colors[2]
-addon.cache.colorB = colors[3]
---addon.cache.colorRGB = format("|cff%02x%02x%02x", addon.cache.colorR * 255, addon.cache.colorG * 255, addon.cache.colorB * 255)
-addon.cache.colorHex = GetClassColor(addon.cache.playerClass):GenerateHexColor()
-addon.cache.version = GetAddOnMetadata(addonName, "Version") or "not defined"
-addon.cache.moduleNames = {}
-SDTCache = addon.cache
+SDT.cache = {}
+SDT.cache.playerName = UnitName("player")
+SDT.cache.playerClass = select(2, UnitClass("player"))
+local colors = { GetClassColor(SDT.cache.playerClass):GetRGB() }
+SDT.cache.colorR = colors[1]
+SDT.cache.colorG = colors[2]
+SDT.cache.colorB = colors[3]
+--SDT.cache.colorRGB = format("|cff%02x%02x%02x", SDT.cache.colorR * 255, SDT.cache.colorG * 255, SDT.cache.colorB * 255)
+SDT.cache.colorHex = GetClassColor(SDT.cache.playerClass):GenerateHexColor()
+SDT.cache.version = GetAddOnMetadata(addonName, "Version") or "not defined"
+SDT.cache.moduleNames = {}
 
 -------------------------------------------------
 -- Module Registration
 -------------------------------------------------
-function addon:RegisterDataText(name, module)
-    addon.modules[name] = module
+function SDT:RegisterDataText(name, module)
+    SDT.modules[name] = module
 end
 
 -------------------------------------------------
 -- Utility: Print function
 -------------------------------------------------
-function addon.Print(...)
+function SDT.Print(...)
     print("[|cFFFF6600SDT|r]", ...)
 end
 
 -------------------------------------------------
 -- Utility: Get Tag Color
 -------------------------------------------------
-function addon:GetTagColor()
+function SDT:GetTagColor()
     if SDTDB.settings.useClassColor then
-        return addon.cache.colorHex
+        return SDT.cache.colorHex
     end
     return "ffffffff"
 end
@@ -87,22 +87,22 @@ end
 -------------------------------------------------
 -- Utility: Color Text
 -------------------------------------------------
-function addon:ColorText(text)
-    local color = addon:GetTagColor()
+function SDT:ColorText(text)
+    local color = SDT:GetTagColor()
     return "|c"..color..text.."|r"
 end
 
 -------------------------------------------------
 -- Utility: Format Percentage
 -------------------------------------------------
-function addon:FormatPercent(v)
+function SDT:FormatPercent(v)
     return string.format("%.2f%%", v)
 end
 
 -------------------------------------------------
 -- Utility: Format Percentage
 -------------------------------------------------
-function addon:FindBestAnchorPoint(frame)
+function SDT:FindBestAnchorPoint(frame)
     local x, y = frame:GetCenter()
     local screenWidth = UIParent:GetRight()
     local screenHeight = UIParent:GetTop()
@@ -159,7 +159,7 @@ end
 -------------------------------------------------
 -- Create or Restore a Data Bar
 -------------------------------------------------
-function addon:CreateDataBar(id, numSlots)
+function SDT:CreateDataBar(id, numSlots)
     local name = "SDT_Bar" .. id
     if not SDTDB.bars[name] then
         SDTDB.bars[name] = { numSlots = numSlots or 3, slots = {}, showBackground = true, showBorder = true, width = 300, height = 22, name = name }
@@ -167,7 +167,7 @@ function addon:CreateDataBar(id, numSlots)
     local saved = SDTDB.bars[name]
 
     local bar = CreateMovableFrame(name)
-    addon.bars[name] = bar
+    SDT.bars[name] = bar
 
     bar:SetSize(300, 22)
     if saved.point then
@@ -194,14 +194,14 @@ function addon:CreateDataBar(id, numSlots)
     end
 
     bar:ApplyBackground()
-    addon:RebuildSlots(bar)
+    SDT:RebuildSlots(bar)
     return bar
 end
 
 -------------------------------------------------
 -- Rebuild Slots (size/assignments)
 -------------------------------------------------
-function addon:RebuildSlots(bar)
+function SDT:RebuildSlots(bar)
     if not bar then return end
 
     -- hide and clear existing slot frames
@@ -234,8 +234,8 @@ function addon:RebuildSlots(bar)
         slot.text:SetText("")
 
         local assignedName = saved.slots[i]
-        if assignedName and addon.modules[assignedName] then
-            local mod = addon.modules[assignedName]
+        if assignedName and SDT.modules[assignedName] then
+            local mod = SDT.modules[assignedName]
             if slot.moduleFrame and slot.moduleFrame.Hide then slot.moduleFrame:Hide() end
             slot.module = assignedName
             slot.moduleFrame = mod.Create(slot)
@@ -249,7 +249,7 @@ function addon:RebuildSlots(bar)
         slot:RegisterForClicks("RightButtonUp")
         slot:SetScript("OnMouseUp", function(self, btn)
             if btn == "RightButton" then
-                addon:ShowSlotDropdown(self, bar)
+                SDT:ShowSlotDropdown(self, bar)
             end
         end)
 
@@ -275,18 +275,18 @@ end
 -------------------------------------------------
 -- Rebuild Slots on All Bars
 -------------------------------------------------
-function addon:RebuildAllSlots()
+function SDT:RebuildAllSlots()
     for _, bar in pairs(SDTDB.bars) do
-        addon.Print("Rebuilding slots for bar " .. bar.name)
-        addon:RebuildSlots(bar)
+        SDT.Print("Rebuilding slots for bar " .. bar.name)
+        SDT:RebuildSlots(bar)
     end
 end
 
 -------------------------------------------------
 -- Update All Modules
 -------------------------------------------------
-function addon:UpdateAllModules()
-    for _, bar in pairs(addon.bars) do
+function SDT:UpdateAllModules()
+    for _, bar in pairs(SDT.bars) do
         for _, slot in pairs(bar.slots) do
             if slot.moduleFrame and slot.moduleFrame.Update then
                 slot.moduleFrame.Update()
@@ -299,16 +299,16 @@ end
 -- Slot Selection Dropdown
 -------------------------------------------------
 local dropdownFrame = CreateFrame("Frame", addonName .. "_SlotDropdown", UIParent, "UIDropDownMenuTemplate")
-function addon:ShowSlotDropdown(slot, bar)
+function SDT:ShowSlotDropdown(slot, bar)
     local function InitializeDropdown()
         local info = UIDropDownMenu_CreateInfo()
         info.notCheckable = true
 
-        for _, moduleName in ipairs(addon.cache.moduleNames) do
+        for _, moduleName in ipairs(SDT.cache.moduleNames) do
             info.text = moduleName
             info.func = function()
                 SDTDB.bars[bar:GetName()].slots[slot.index] = moduleName
-                addon:RebuildSlots(bar)
+                SDT:RebuildSlots(bar)
             end
             UIDropDownMenu_AddButton(info)
         end
@@ -330,7 +330,7 @@ title:SetText(panel.name)
 
 local version = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 version:SetPoint("LEFT", title, "RIGHT", 6, -1)
-version:SetText("v" .. addon.cache.version)
+version:SetText("v" .. SDT.cache.version)
 
 local function MakeLabel(parent, text, point, x, y)
     local t = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -362,7 +362,7 @@ classColorCheckbox.Text:SetText("Use Class Color")
 classColorCheckbox:SetChecked(SDTDB.settings.useClassColor)
 classColorCheckbox:SetScript("OnClick", function(self)
     SDTDB.settings.useClassColor = self:GetChecked()
-    addon:UpdateAllModules()
+    SDT:UpdateAllModules()
 end)
 
 -- Add Panel
@@ -441,17 +441,17 @@ local function buildSlotSelectors(barName)
             info.func = function()
                 SDTDB.bars[barName].slots[i] = nil
                 UIDropDownMenu_SetText(dd, "(empty)")
-                if addon.bars[barName] then addon:RebuildSlots(addon.bars[barName]) end
+                if SDT.bars[barName] then SDT:RebuildSlots(SDT.bars[barName]) end
             end
             UIDropDownMenu_AddButton(info)
 
-            for _, name in ipairs(addon.cache.moduleNames) do
+            for _, name in ipairs(SDT.cache.moduleNames) do
                 local moduleName = name
                 info.text = moduleName
                 info.func = function()
                     SDTDB.bars[barName].slots[i] = name
                     UIDropDownMenu_SetText(dd, name)
-                    if addon.bars[barName] then addon:RebuildSlots(addon.bars[barName]) end
+                    if SDT.bars[barName] then SDT:RebuildSlots(SDT.bars[barName]) end
                 end
                 UIDropDownMenu_AddButton(info)
             end
@@ -502,17 +502,17 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
                 barData.height = val
             elseif name == "Scale" then
                 barData.scale = val
-                if addon.bars[panel.selectedBar] then
-                    addon.bars[panel.selectedBar]:SetScale(val / 100)
+                if SDT.bars[panel.selectedBar] then
+                    SDT.bars[panel.selectedBar]:SetScale(val / 100)
                 end
             elseif name == "Background Opacity" then
                 barData.bgOpacity = val
-                if addon.bars[panel.selectedBar] then
-                    addon.bars[panel.selectedBar]:ApplyBackground()
+                if SDT.bars[panel.selectedBar] then
+                    SDT.bars[panel.selectedBar]:ApplyBackground()
                 end
             end
-            if addon.bars[panel.selectedBar] then
-                addon:RebuildSlots(addon.bars[panel.selectedBar])
+            if SDT.bars[panel.selectedBar] then
+                SDT:RebuildSlots(SDT.bars[panel.selectedBar])
             end
             if name == "Slots" then
                 buildSlotSelectors(panel.selectedBar)
@@ -527,10 +527,10 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
             val = math.max(min, math.min(max, val))
             slider:SetValue(val)
             self:SetText(val)
-            if name == "Scale" and addon.bars[panel.selectedBar] then
-                addon.bars[panel.selectedBar]:SetScale(val / 100)
-            elseif name == "Background Opacity" and addon.bars[panel.selectedBar] then
-                addon.bars[panel.selectedBar]:ApplyBackground()
+            if name == "Scale" and SDT.bars[panel.selectedBar] then
+                SDT.bars[panel.selectedBar]:SetScale(val / 100)
+            elseif name == "Background Opacity" and SDT.bars[panel.selectedBar] then
+                SDT.bars[panel.selectedBar]:ApplyBackground()
             end
         else
             -- reset to slider value if invalid
@@ -610,12 +610,12 @@ function updateSelectedBarControls()
     bgCheckbox:SetChecked(b.showBackground)
     bgCheckbox:SetScript("OnClick", function(self)
         b.showBackground = self:GetChecked()
-        if addon.bars[barName] then addon.bars[barName]:ApplyBackground() end
+        if SDT.bars[barName] then SDT.bars[barName]:ApplyBackground() end
     end)
     borderCheckbox:SetChecked(b.showBorder)
     borderCheckbox:SetScript("OnClick", function(self)
         b.showBorder = self:GetChecked()
-        if addon.bars[barName] then addon.bars[barName]:ApplyBackground() end
+        if SDT.bars[barName] then SDT.bars[barName]:ApplyBackground() end
     end)
 
     -- Slots
@@ -644,7 +644,7 @@ function updateSelectedBarControls()
     opacityBox:SetText(opacity)
 
     -- Rebuild slots & selectors
-    if addon.bars[barName] then addon:RebuildSlots(addon.bars[barName]) end
+    if SDT.bars[barName] then SDT:RebuildSlots(SDT.bars[barName]) end
     buildSlotSelectors(barName)
 end
 
@@ -654,7 +654,7 @@ addBarButton:SetScript("OnClick", function()
     local id = NextBarID()
     local name = "SDT_Bar" .. id
     SDTDB.bars[name] = { numSlots = 3, slots = {}, showBackground = true, showBorder = true, width = 300, height = 22 }
-    addon:CreateDataBar(id, 3)
+    SDT:CreateDataBar(id, 3)
     UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
     UIDropDownMenu_SetText(panelDropdown, name)
     panel.selectedBar = name
@@ -665,7 +665,7 @@ end)
 removeBarButton:SetScript("OnClick", function()
     local barName = panel.selectedBar
     if not barName then return end
-    if addon.bars[barName] then addon.bars[barName]:Hide() addon.bars[barName] = nil end
+    if SDT.bars[barName] then SDT.bars[barName]:Hide() SDT.bars[barName] = nil end
     SDTDB.bars[barName] = nil
     panel.selectedBar = nil
     UIDropDownMenu_SetText(panelDropdown, "(none)")
@@ -678,11 +678,11 @@ end)
 -- Create Module List
 -------------------------------------------------
 local function CreateModuleList()
-    wipe(addon.cache.moduleNames)
-    for name in pairs(addon.modules) do
-        tinsert(addon.cache.moduleNames, name)
+    wipe(SDT.cache.moduleNames)
+    for name in pairs(SDT.modules) do
+        tinsert(SDT.cache.moduleNames, name)
     end
-    tsort(addon.cache.moduleNames)
+    tsort(SDT.cache.moduleNames)
 end
 
 -------------------------------------------------
@@ -699,8 +699,8 @@ loader:SetScript("OnEvent", function(self, event, arg)
         end
         for barName, data in pairs(SDTDB.bars) do
             local id = tonumber(barName:match("SDT_Bar(%d+)") or "0")
-            if id > 0 and not addon.bars[barName] then
-                addon:CreateDataBar(id, data.numSlots)
+            if id > 0 and not SDT.bars[barName] then
+                SDT:CreateDataBar(id, data.numSlots)
             end
         end
         UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
@@ -712,19 +712,19 @@ loader:SetScript("OnEvent", function(self, event, arg)
 end)
 
 local function SlashHelp()
-    addon.Print("|cffffff00--[Options]--|r")
-    addon.Print("Lock/Unlock: |cff8888ff/sdt lock|r")
-    addon.Print("Width: |cff8888ff/sdt width <barName> <newWidth>|r")
-    addon.Print("Height: |cff8888ff/sdt height <barName> <newHeight>|r")
-    addon.Print("Scale: |cff8888ff/sdt scale <barName> <newScale>|r")
-    addon.Print("Settings: |cff8888ff/sdt config|r")
-    addon.Print("Version: |cff8888ff/sdt version|r")
+    SDT.Print("|cffffff00--[Options]--|r")
+    SDT.Print("Lock/Unlock: |cff8888ff/sdt lock|r")
+    SDT.Print("Width: |cff8888ff/sdt width <barName> <newWidth>|r")
+    SDT.Print("Height: |cff8888ff/sdt height <barName> <newHeight>|r")
+    SDT.Print("Scale: |cff8888ff/sdt scale <barName> <newScale>|r")
+    SDT.Print("Settings: |cff8888ff/sdt config|r")
+    SDT.Print("Version: |cff8888ff/sdt version|r")
 end
 
 local function BarAdjustments(adj, bar, num)
     -- Make sure we have all of our values
     if not adj or not bar or not num then
-        addon.Print("Usage: /sdt " .. adj .. " <barName> <value>")
+        SDT.Print("Usage: /sdt " .. adj .. " <barName> <value>")
         SlashHelp()
         return
     end
@@ -739,9 +739,9 @@ local function BarAdjustments(adj, bar, num)
             end
         end
         if not resolved then
-            addon.Print("Invalid panel name supplied. Valid panel names are:")
+            SDT.Print("Invalid panel name supplied. Valid panel names are:")
             for j,k in pairs(SDTDB.bars) do
-                addon.Print("- ", tostring(j), "("..tostring(k.name)..")")
+                SDT.Print("- ", tostring(j), "("..tostring(k.name)..")")
             end
             return
         end
@@ -750,7 +750,7 @@ local function BarAdjustments(adj, bar, num)
 
     -- Validate the number supplied
     if type(num) ~= "number" then
-        addon.Print("A valid numeric value for the adjustment must be specified.")
+        SDT.Print("A valid numeric value for the adjustment must be specified.")
         SlashHelp()
         return
     end
@@ -761,30 +761,30 @@ local function BarAdjustments(adj, bar, num)
             SDTDB.bars[bar].width = num
             widthSlider:SetValue(num)
             widthBox:SetText(num)
-            addon:RebuildSlots(addon.bars[bar])
+            SDT:RebuildSlots(SDT.bars[bar])
         else
-            addon.Print("Invalid panel width specified.")
+            SDT.Print("Invalid panel width specified.")
         end
     elseif adj == "height" then
         if num >= 16 and num <= 128 then
             SDTDB.bars[bar].height = num
             heightSlider:SetValue(num)
             heightBox:SetText(num)
-            addon:RebuildSlots(addon.bars[bar])
+            SDT:RebuildSlots(SDT.bars[bar])
         else
-            addon.Print("Invalid panel height specified.")
+            SDT.Print("Invalid panel height specified.")
         end
     elseif adj == "scale" then
         if num >= 50 and num <= 500 then
             SDTDB.bars[bar].scale = num
             scaleSlider:SetValue(num)
             scaleBox:SetText(num)
-            addon.bars[bar]:SetScale(num / 100)
+            SDT.bars[bar]:SetScale(num / 100)
         else
-            addon.Print("Invalid panel scale specified.")
+            SDT.Print("Invalid panel scale specified.")
         end
     else
-        addon.Print("Invalid adjustment type specified.")
+        SDT.Print("Invalid adjustment type specified.")
     end
 end
 
@@ -806,13 +806,13 @@ SlashCmdList["SDT"] = function(msg)
     elseif command == "lock" then
         SDTDB.settings.locked = not SDTDB.settings.locked
         lockCheckbox:SetChecked(SDTDB.settings.locked)
-        addon.Print("SDT panels are now: ", SDTDB.settings.locked and "|cffff0000LOCKED|r" or "|cff00ff00UNLOCKED|r")
+        SDT.Print("SDT panels are now: ", SDTDB.settings.locked and "|cffff0000LOCKED|r" or "|cff00ff00UNLOCKED|r")
     elseif command == "width" or command == "height" or command == "scale" then
         BarAdjustments(command, bar, num)
     elseif command == "update" then
-        addon:UpdateAllModules()
+        SDT:UpdateAllModules()
     elseif command == "version" then
-        addon.Print("Simple Datatexts Version: |cff8888ff" ..tostring(addon.cache.version) .. "|r")
+        SDT.Print("Simple Datatexts Version: |cff8888ff" ..tostring(SDT.cache.version) .. "|r")
     else
         SlashHelp()
     end
