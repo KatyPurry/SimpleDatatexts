@@ -39,9 +39,13 @@ function mod.Create(slotFrame)
     -- Update function simply reflects Ara's text
     ----------------------------------------------------
     local function Update()
+        for k,v in pairs(ara) do
+            SDT.Print(tostring(k), tostring(v))
+        end
         text:SetFormattedText(SDT:ColorText(ara.text or ""))
     end
     f.Update = Update
+    SDT.friendFrame = f
 
     ----------------------------------------------------
     -- Tooltip: forward to Ara
@@ -65,6 +69,15 @@ function mod.Create(slotFrame)
     Update()
 
     return f
+end
+
+----------------------------------------------------
+-- Update the frame when an Ara option changes
+----------------------------------------------------
+function SDT:UpdateFriends()
+    if self.friendFrame then
+        self.friendFrame:Update()
+    end
 end
 
 ----------------------------------------------------

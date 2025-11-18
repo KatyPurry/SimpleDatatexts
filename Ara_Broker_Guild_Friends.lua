@@ -4,6 +4,7 @@
 -- TODO? defaultConfig as config metatable / remove old values only (don't add new ones).
 -- TODO  split column "notes" to "notes" and "officier notes" (change sort columns accordingly and add a button.offNotes).
 local _, _, _, wowTOC = GetBuildInfo()
+local SDT = SimpleDatatexts
 
 local BUTTON_HEIGHT, ICON_SIZE, GAP, TEXT_OFFSET, INFO_HEIGHT, FONT_SIZE, MAX_ENTRIES = 15, 13, 10, 5, 25, 12
 
@@ -194,11 +195,13 @@ local function UpdateGuildBlockText()
 	else
 		f.GuildBlock.text = "No Guild"
 	end
+	SDT:UpdateGuild()
 end
 
 local function UpdateFriendBlockText(updatePanel)
 	local totalRF, onlineRF = BNGetNumFriends()
 	f.FriendsBlock.text = (config.showFriendsTotal and "%d/%d" or "%d"):format( onlineFriends + onlineRF, totalFriends + totalRF )
+	SDT:UpdateFriends()
 	if updatePanel then f:BN_FRIEND_INFO_CHANGED() end
 end
 

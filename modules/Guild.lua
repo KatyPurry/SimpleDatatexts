@@ -11,6 +11,11 @@ local mod = {}
 ----------------------------------------------------
 local CreateFrame = CreateFrame
 local format      = string.format
+local strfind     = string.find
+local strlenutf8  = strlenutf8
+local strsplit    = string.split
+local strsub      = string.sub
+local strtrim     = string.trim
 
 ----------------------------------------------------
 -- LDB Object Local
@@ -36,12 +41,36 @@ function mod.Create(slotFrame)
     end
 
     ----------------------------------------------------
+    -- Shorten Ara's text, if guild name is too long
+    ----------------------------------------------------
+    local function shortenText(txt)
+        local colonPos = strfind(txt, ":")
+        if not colonPos then
+            return txt
+        end
+
+        local left = strsub(txt, 1, colonPos - 1)
+        local right = strsub(txt, colonPos + 1)
+        right = strtrim(right)
+
+        local maxLen = 12
+        if strlenutf8(left) > maxLen then
+            left = strsub(left, 1, maxLen - 3) .. "…"
+        end
+
+        return format("%s: %s", left, right)
+    end
+
+    ----------------------------------------------------
     -- Update function simply reflects Ara's text
     ----------------------------------------------------
     local function Update()
-        text:SetText(SDT:ColorText(ara.text or ""))
+        local txt = ara.text or ""
+        txt = shortenText(txt)
+        text:SetText(SDT:ColorText(txt))
     end
     f.Update = Update
+    SDT.guildFrame = f
 
     ----------------------------------------------------
     -- Tooltip: forward to Ara
@@ -65,6 +94,15 @@ function mod.Create(slotFrame)
     Update()
 
     return f
+end
+
+----------------------------------------------------
+-- Update the frame when an Ara option changes
+----------------------------------------------------
+function SDT:UpdateGuild()
+    if self.guildFrame then
+        self.guildFrame:Update()
+    end
 end
 
 ----------------------------------------------------

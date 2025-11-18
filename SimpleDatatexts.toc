@@ -7,6 +7,8 @@
 
 # Core
 SimpleDatatexts.lua
+
+# Ara
 Ara_Broker_Guild_Friends.lua
 
 # Datatext Modules
