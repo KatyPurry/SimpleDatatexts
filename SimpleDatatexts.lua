@@ -25,6 +25,8 @@ local wipe             = table.wipe
 local CreateFrame               = CreateFrame
 local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
 local GetClassColor             = C_ClassColor.GetClassColor
+local IsControlKeyDown          = IsControlKeyDown
+local IsShiftKeyDown            = IsShiftKeyDown
 local ToggleDropDownMenu        = ToggleDropDownMenu
 local UIDropDownMenu_AddButton  = UIDropDownMenu_AddButton
 local UIDropDownMenu_CreateInfo = UIDropDownMenu_CreateInfo
@@ -246,9 +248,9 @@ function SDT:RebuildSlots(bar)
         end
 
         slot:EnableMouse(true)
-        slot:RegisterForClicks("RightButtonUp")
+        slot:RegisterForClicks("AnyUp")
         slot:SetScript("OnMouseUp", function(self, btn)
-            if btn == "RightButton" then
+            if btn == "RightButton" and not IsShiftKeyDown() and not IsControlKeyDown() then
                 SDT:ShowSlotDropdown(self, bar)
             end
         end)

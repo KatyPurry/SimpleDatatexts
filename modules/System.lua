@@ -158,10 +158,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     -- Click Handler
     ----------------------------------------------------
-    slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     slotFrame:SetScript("OnClick", function(self, button)
-        local shiftDown = IsShiftKeyDown()
-        if shiftDown then
+        if button == "LeftButton" and IsShiftKeyDown() then
             collectgarbage("collect")
             ResetCPUUsage()
         end

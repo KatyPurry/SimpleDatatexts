@@ -109,8 +109,10 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     -- Click Handler
     ----------------------------------------------------
-    slotFrame:SetScript("OnClick", function()
-        _G.ToggleAllBags()
+    slotFrame:SetScript("OnClick", function(self, button)
+        if button == "LeftButton" then
+            _G.ToggleAllBags()
+        end
     end)
 
     ----------------------------------------------------

@@ -27,7 +27,6 @@ local GetRealmName                           = GetRealmName
 local IsLoggedIn                             = IsLoggedIn
 local IsShiftKeyDown                         = IsShiftKeyDown
 local IsControlKeyDown                       = IsControlKeyDown
-local ToggleAllBags                          = ToggleAllBags
 local UnitName                               = UnitName
 local WARBANDBANK_TYPE                       = (Enum.BankType and Enum.BankType.Account) or 2
 
@@ -192,7 +191,7 @@ local function ShowTooltip(self)
 
     tooltip:AddLine(" ")
     tooltip:AddLine(strjoin('', '|cffaaaaaa', "Reset Session Data: Hold Ctrl + Right Click", '|r'))
-    tooltip:AddLine(strjoin('', '|cffaaaaaa', "Reset Character Data: Hold Shift + Right Click", '|r'))
+    --tooltip:AddLine(strjoin('', '|cffaaaaaa', "Reset Character Data: Hold Shift + Right Click", '|r'))
     tooltip:Show()
 end
 
@@ -240,16 +239,15 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     -- Click Handler
     ----------------------------------------------------
-    slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    slotFrame:SetScript("OnClick", function(_, btn)
-        if btn == "RightButton" then
+    slotFrame:SetScript("OnClick", function(self, button)
+        if button == "RightButton" then
             if IsShiftKeyDown() then
                 -- Show menu for deleting characters
             elseif IsControlKeyDown() then
                 Profit, Spent = 0,0
             end
         else
-            ToggleAllBags()
+            _G.ToggleAllBags()
         end
     end)
 

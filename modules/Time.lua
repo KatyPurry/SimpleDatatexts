@@ -229,11 +229,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     -- Click to Open
     ----------------------------------------------------
-    slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    slotFrame:SetScript("OnClick", function(_, btn)
-        if btn == "RightButton" then
-            ToggleFrame(TimeManagerFrame)
-        else
+    slotFrame:SetScript("OnClick", function(self, button)
+        if button == "LeftButton" then
             GameTimeFrame:Click()
         end
     end)

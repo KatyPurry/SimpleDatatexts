@@ -208,7 +208,6 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     -- Click Handler
     ----------------------------------------------------
-    slotFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     slotFrame:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
             if not InCombatLockdown() then
