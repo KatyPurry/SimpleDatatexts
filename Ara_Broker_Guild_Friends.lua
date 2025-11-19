@@ -237,8 +237,8 @@ function f:GUILD_ROSTER_UPDATE()
 	for k, v in next, guildEntries do del(v) guildEntries[k]=nil end
 	local r,g,b = unpack(colors.officerNote)
 	local officerColor = ("\124cff%.2x%.2x%.2x"):format( r*255, g*255, b*255 )
-	local totalMembers, _, numOnlineAndMobileMembers = GetNumGuildMembers()
-	local scanTotal = GetGuildRosterShowOffline() and totalMembers or numOnlineAndMobileMembers--Attempt CPU saving, if "show offline" is unchecked, we can reliably scan only online members instead of whole roster
+	local totalMembers, onlineMembers = GetNumGuildMembers()
+	local scanTotal = GetGuildRosterShowOffline() and totalMembers or onlineMembers--Attempt CPU saving, if "show offline" is unchecked, we can reliably scan only online members instead of whole roster
 	for i=1, scanTotal do
 		local name, rank, rankIndex, level, class, zone, note, offnote, connected, status, engClass, achPoints, achRank, isMobile = GetGuildRosterInfo(i)
 		if not name then break end
