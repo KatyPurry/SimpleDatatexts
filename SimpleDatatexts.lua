@@ -6,6 +6,24 @@
 local addonName, SDT = ...
 
 ----------------------------------------------------
+-- Library Instances
+----------------------------------------------------
+local LSM = LibStub("LibSharedMedia-3.0")
+
+----------------------------------------------------
+-- Defaults
+----------------------------------------------------
+_G.SDTDB = _G.SDTDB or {
+    bars = {}, -- keyed by name: { numSlots = 3, slots = { [1] = "FPS", ... }, point = { point = ..., relativePoint = ..., x = ..., y = ... }, showBackground = true, showBorder = true, width = 300, height = 22, scale = 100, bgOpacity = 50 }
+    settings = { locked = false, useClassColor = false, useCustomColor = false, customColorHex = "ffffff", debug = false, font = "Friz Quadrata TT", fontSize = 12 },
+    gold = {}
+}
+
+SDT.modules = SDT.modules or {}
+SDT.bars = SDT.bars or {}
+SimpleDatatexts = SDT
+
+----------------------------------------------------
 -- Lua Locals
 ----------------------------------------------------
 local format           = string.format
@@ -18,6 +36,25 @@ local tonumber         = tonumber
 local tostring         = tostring
 local tsort            = table.sort
 local wipe             = table.wipe
+
+-------------------------------------------------
+-- Utility: Print function
+-------------------------------------------------
+function SDT.Print(...)
+    print("[|cFFFF6600SDT|r]", ...)
+end
+
+----------------------------------------------------
+-- Register Fonts
+----------------------------------------------------
+LSM:Register("font", "Action Man", [[Interface\AddOns\SimpleDatatexts\fonts\ActionMan.ttf]])
+LSM:Register("font", "Continuum Medium", [[Interface\AddOns\SimpleDatatexts\fonts\ContinuumMedium.ttf]])
+LSM:Register("font", "Die Die Die", [[Interface\AddOns\SimpleDatatexts\fonts\DieDieDie.ttf]])
+LSM:Register("font", "Expressway", [[Interface\AddOns\SimpleDatatexts\fonts\Expressway.ttf]])
+LSM:Register("font", "Homespun", [[Interface\AddOns\SimpleDatatexts\fonts\Homespun.ttf]])
+LSM:Register("font", "Invisible", [[Interface\AddOns\SimpleDatatexts\fonts\Invisible.ttf]])
+LSM:Register("font", "PT Sans Narrow", [[Interface\AddOns\SimpleDatatexts\fonts\PTSansNarrow.ttf]])
+local fonts
 
 ----------------------------------------------------
 -- WoW API Locals
@@ -35,17 +72,6 @@ local UIDropDownMenu_SetText    = UIDropDownMenu_SetText
 local UIParent                  = UIParent
 local UnitClass                 = UnitClass
 local UnitName                  = UnitName
-
--- Defaults
-_G.SDTDB = _G.SDTDB or {
-    bars = {}, -- keyed by name: { numSlots = 3, slots = { [1] = "FPS", ... }, point = { point = ..., relativePoint = ..., x = ..., y = ... }, showBackground = true, showBorder = true, width = 300, height = 22, scale = 100, bgOpacity = 50 }
-    settings = { locked = false, useClassColor = false, debug = false },
-    gold = {}
-}
-
-SDT.modules = SDT.modules or {}
-SDT.bars = SDT.bars or {}
-SimpleDatatexts = SDT
 
 -------------------------------------------------
 -- Build Our Cache
@@ -70,17 +96,12 @@ function SDT:RegisterDataText(name, module)
 end
 
 -------------------------------------------------
--- Utility: Print function
--------------------------------------------------
-function SDT.Print(...)
-    print("[|cFFFF6600SDT|r]", ...)
-end
-
--------------------------------------------------
 -- Utility: Get Tag Color
 -------------------------------------------------
 function SDT:GetTagColor()
-    if SDTDB.settings.useClassColor then
+    if SDTDB.settings.useCustomColor then
+        return "ff"..SDTDB.settings.customColorHex
+    elseif SDTDB.settings.useClassColor then
         return SDT.cache.colorHex
     end
     return "ffffffff"
@@ -92,6 +113,25 @@ end
 function SDT:ColorText(text)
     local color = SDT:GetTagColor()
     return "|c"..color..text.."|r"
+end
+
+-------------------------------------------------
+-- Utility: Apply Chosen Font
+-------------------------------------------------
+function SDT:ApplyFont()
+    local fontPath = LSM:Fetch("font", SDTDB.settings.font) or STANDARD_TEXT_FONT
+    local fontSize = SDTDB.settings.fontSize or 12
+
+    for _, bar in pairs(SDT.bars) do
+        for k, slot in pairs(bar.slots) do
+            if slot.text then
+                slot.text:SetFont(fontPath, fontSize, "")
+            end
+            if slot.moduleFrame and slot.moduleFrame.text and slot.moduleFrame.text.SetFont then
+                slot.moduleFrame.text:SetFont(fontPath, fontSize, "")
+            end
+        end
+    end
 end
 
 -------------------------------------------------
@@ -272,6 +312,8 @@ function SDT:RebuildSlots(bar)
 
         bar.slots[i] = slot
     end
+
+    SDT:ApplyFont()
 end
 
 -------------------------------------------------
@@ -362,14 +404,102 @@ local classColorCheckbox = CreateFrame("CheckButton", nil, panel, "InterfaceOpti
 classColorCheckbox:SetPoint("TOPLEFT", lockCheckbox, "BOTTOMLEFT", 0, -20)
 classColorCheckbox.Text:SetText("Use Class Color")
 classColorCheckbox:SetChecked(SDTDB.settings.useClassColor)
+
+
+local customColorCheckbox = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
+customColorCheckbox:SetPoint("TOPLEFT", classColorCheckbox, "BOTTOMLEFT", 0, -20)
+customColorCheckbox.Text:SetText("Use Custom Color")
+customColorCheckbox:SetChecked(SDTDB.settings.useCustomColor)
+
 classColorCheckbox:SetScript("OnClick", function(self)
     SDTDB.settings.useClassColor = self:GetChecked()
+    if self:GetChecked() then
+        SDTDB.settings.useCustomColor = false
+        customColorCheckbox:SetChecked(false)
+    end
     SDT:UpdateAllModules()
+end)
+customColorCheckbox:SetScript("OnClick", function(self)
+    SDTDB.settings.useCustomColor = self:GetChecked()
+    if self:GetChecked() then
+        SDTDB.settings.useClassColor = false
+        classColorCheckbox:SetChecked(false)
+    end
+    SDT:UpdateAllModules()
+end)
+
+local colorEditBox = CreateFrame("EditBox", addonName .. "_ColorEditBox", panel, "InputBoxTemplate")
+colorEditBox:SetSize(60, 20)
+colorEditBox:SetPoint("LEFT", customColorCheckbox, "RIGHT", 120, 0)
+colorEditBox:SetAutoFocus(false)
+colorEditBox:SetJustifyH("CENTER")
+colorEditBox:SetJustifyV("MIDDLE")
+
+colorEditBox:SetScript("OnShow", function(self)
+    self:SetText("#"..SDTDB.settings.customColorHex or "#ffffff")
+end)
+
+colorEditBox:SetScript("OnEnterPressed", function(self)
+    local txt = self:GetText():gsub("#",""):gsub("%s+", "")
+    SDTDB.settings.customColorHex = txt
+    self:SetText("#"..txt)
+    SDT:UpdateAllModules()
+end)
+
+local fontLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+fontLabel:SetPoint("TOPLEFT", customColorCheckbox, "BOTTOMLEFT", 0, -20)
+fontLabel:SetText("Display Font:")
+
+local fontDropdown = CreateFrame("Frame", addonName .. "_FontDropdown", panel, "UIDropDownMenuTemplate")
+fontDropdown:SetPoint("TOPLEFT", fontLabel, "BOTTOMLEFT", -20, -4)
+UIDropDownMenu_SetWidth(fontDropdown, 160)
+
+local fontSizeSlider = CreateFrame("Slider", addonName.."_FontSizeSlider", panel, "OptionsSliderTemplate")
+fontSizeSlider:SetPoint("TOPLEFT", fontDropdown, "BOTTOMLEFT", 20, -20)
+fontSizeSlider:SetMinMaxValues(4, 40)
+fontSizeSlider:SetValueStep(1)
+fontSizeSlider:SetWidth(160)
+getglobal(fontSizeSlider:GetName().."Text"):SetText("Font Size")
+getglobal(fontSizeSlider:GetName().."Low"):SetText(tostring(4))
+getglobal(fontSizeSlider:GetName().."High"):SetText(tostring(40))
+fontSizeSlider:SetScript("OnShow", function(self)
+    self:SetValue(SDTDB.settings.fontSize)
+end)
+
+local fontSizeBox = CreateFrame("EditBox", addonName.."_FontSizeEditBox", panel, "InputBoxTemplate")
+fontSizeBox:SetSize(50, 20)
+fontSizeBox:SetPoint("LEFT", fontSizeSlider, "RIGHT", 25, 0)
+fontSizeBox:SetAutoFocus(false)
+fontSizeBox:SetJustifyH("CENTER")
+fontSizeBox:SetJustifyV("MIDDLE")
+fontSizeBox:SetScript("OnShow", function(self)
+    self:SetText(SDTDB.settings.fontSize)
+end)
+
+-- Sync slider -> editbox
+fontSizeSlider:SetScript("OnValueChanged", function(self, value)
+    local val = math.floor(value + 0.5)
+    fontSizeBox:SetText(val)
+    SDTDB.settings.fontSize = val
+    SDT:ApplyFont()
+end)
+    
+    -- Sync editbox -> slider
+fontSizeBox:SetScript("OnEnterPressed", function(self)
+    local val = tonumber(self:GetText())
+    if val then
+        val = math.max(4, math.min(40, val))
+        fontSizeSlider:SetValue(val)
+        self:SetText(val)
+    else
+        self:SetText(math.floor(fontSizeSlider:GetValue()+0.5))
+    end
+    SDT:ApplyFont()
 end)
 
 -- Add Panel
 local addBarButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-addBarButton:SetPoint("TOPLEFT", classColorCheckbox, "BOTTOMLEFT", 0, -16)
+addBarButton:SetPoint("TOPLEFT", fontSizeSlider, "BOTTOMLEFT", 0, -30)
 addBarButton:SetSize(140, 24)
 addBarButton:SetText("Create New Panel")
 
@@ -563,7 +693,23 @@ local function PanelDropdown_Initialize(self, level)
         UIDropDownMenu_AddButton(info)
     end
 end
-UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
+
+-- Font dropdown initializer
+local function FontDropdown_Initialize(self, level)
+    for _, fontName in ipairs(fonts) do
+        local info = UIDropDownMenu_CreateInfo()
+        info.notCheckable = true
+        info.text = fontName
+        info.value = fontName
+        info.func = function()
+            SDTDB.settings.font = fontName
+            UIDropDownMenu_SetSelectedValue(fontDropdown, fontName)
+            UIDropDownMenu_SetText(fontDropdown, fontName)
+            SDT:ApplyFont()
+        end
+        UIDropDownMenu_AddButton(info)
+    end
+end
 
 -- Update per-panel controls
 function updateSelectedBarControls()
@@ -650,7 +796,6 @@ function updateSelectedBarControls()
     buildSlotSelectors(barName)
 end
 
-
 -- Add Panel button click
 addBarButton:SetScript("OnClick", function()
     local id = NextBarID()
@@ -696,20 +841,45 @@ loader:SetScript("OnEvent", function(self, event, arg)
     if arg == addonName then
         CreateModuleList()      
 
+        -- If no bars exist, create our first bar
         if not next(SDTDB.bars) then
             SDTDB.bars["SDT_Bar1"] = { numSlots = 3, slots = {}, showBackground = true, showBorder = true }
         end
+
+        -- Create our bars
         for barName, data in pairs(SDTDB.bars) do
             local id = tonumber(barName:match("SDT_Bar(%d+)") or "0")
             if id > 0 and not SDT.bars[barName] then
                 SDT:CreateDataBar(id, data.numSlots)
             end
         end
-        UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
+
+        -- Create and verify our fonts
+        fonts = LSM:List("font")
+        tsort(fonts)
+        local currentFont = SDTDB.settings.font
+        local found = false
+        for _, f in ipairs(fonts) do
+            if f == currentFont then
+                found = true
+                break
+            end
+        end
+        if not found then
+            SDT.Print("Saved font not found. Resetting font to Friz Quadrata TT.")
+            currentFont = "Friz Quadrata TT"
+            SDTDB.settings.font = currentFont
+        end
+        SDT.Print(SDTDB.settings.font, currentFont)
 
         -- Sync settings after the addon is fully loaded
+        UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
+        UIDropDownMenu_Initialize(fontDropdown, FontDropdown_Initialize)
+        UIDropDownMenu_SetSelectedValue(fontDropdown, currentFont)
+        UIDropDownMenu_SetText(fontDropdown, currentFont)
         lockCheckbox:SetChecked(SDTDB.settings.locked)
         classColorCheckbox:SetChecked(SDTDB.settings.useClassColor)
+        customColorCheckbox:SetChecked(SDTDB.settings.useCustomColor)
     end
 end)
 
