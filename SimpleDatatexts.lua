@@ -15,7 +15,7 @@ local LSM = LibStub("LibSharedMedia-3.0")
 ----------------------------------------------------
 _G.SDTDB = _G.SDTDB or {
     bars = {}, -- keyed by name: { numSlots = 3, slots = { [1] = "FPS", ... }, point = { point = ..., relativePoint = ..., x = ..., y = ... }, showBackground = true, showBorder = true, width = 300, height = 22, scale = 100, bgOpacity = 50 }
-    settings = { locked = false, useClassColor = false, useCustomColor = false, customColorHex = "ffffff", debug = false, font = "Friz Quadrata TT", fontSize = 12 },
+    settings = { locked = false, useClassColor = false, useCustomColor = false, customColorHex = "#ffffff", debug = false, font = "Friz Quadrata TT", fontSize = 12 },
     gold = {}
 }
 
@@ -100,7 +100,8 @@ end
 -------------------------------------------------
 function SDT:GetTagColor()
     if SDTDB.settings.useCustomColor then
-        return "ff"..SDTDB.settings.customColorHex
+        local color = SDTDB.settings.customColorHex:gsub("#", "")
+        return "ff"..color
     elseif SDTDB.settings.useClassColor then
         return SDT.cache.colorHex
     end
@@ -428,22 +429,51 @@ customColorCheckbox:SetScript("OnClick", function(self)
     SDT:UpdateAllModules()
 end)
 
-local colorEditBox = CreateFrame("EditBox", addonName .. "_ColorEditBox", panel, "InputBoxTemplate")
-colorEditBox:SetSize(60, 20)
-colorEditBox:SetPoint("LEFT", customColorCheckbox, "RIGHT", 120, 0)
-colorEditBox:SetAutoFocus(false)
-colorEditBox:SetJustifyH("CENTER")
-colorEditBox:SetJustifyV("MIDDLE")
-
-colorEditBox:SetScript("OnShow", function(self)
-    self:SetText("#"..SDTDB.settings.customColorHex or "#ffffff")
+local colorPickerButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+colorPickerButton:SetPoint("LEFT", customColorCheckbox, "RIGHT", 120, 0)
+colorPickerButton:SetSize(80, 24)
+colorPickerButton:SetScript("OnShow", function(self)
+    self:SetText(SDTDB.settings.customColorHex)
 end)
 
-colorEditBox:SetScript("OnEnterPressed", function(self)
-    local txt = self:GetText():gsub("#",""):gsub("%s+", "")
-    SDTDB.settings.customColorHex = txt
-    self:SetText("#"..txt)
-    SDT:UpdateAllModules()
+local function showColorPicker()
+    ColorPickerFrame:Hide()
+    
+    local initColor = SDTDB.settings.customColorHex:gsub("#", "")
+    local initR = tonumber(initColor:sub(1, 2), 16) / 255
+    local initG = tonumber(initColor:sub(3, 4), 16) / 255
+    local initB = tonumber(initColor:sub(5, 6), 16) / 255
+
+    local function onColorPicked()
+        local r, g, b = ColorPickerFrame:GetColorRGB()
+        SDTDB.settings.customColorHex = format("#%02X%02X%02X", r*255, g*255, b*255)
+        SDT:UpdateAllModules()
+        colorPickerButton:SetText(SDTDB.settings.customColorHex)
+    end
+
+    local function onCancel()
+        SDTDB.settings.customColorHex = format("#%02X%02X%02X", initR*255, initG*255, initB*255)
+        SDT:UpdateAllModules()
+        colorPickerButton:SetText(SDTDB.settings.customColorHex)
+    end
+
+    local previousValues = { initR, initG, initB }
+
+    local options = {
+        swatchFunc = onColorPicked,
+        cancelFunc = onCancel,
+        hasOpacity = false,
+        opacity = 1,
+        r = initR,
+        g = initG,
+        b = initB,
+    }
+    
+    ColorPickerFrame:SetupColorPickerAndShow(options)
+end
+
+colorPickerButton:SetScript("OnClick", function()
+    showColorPicker()
 end)
 
 local fontLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -718,6 +748,8 @@ function updateSelectedBarControls()
         removeBarButton:Hide()
         bgCheckbox:Hide()
         borderCheckbox:Hide()
+        opacitySlider:Hide()
+        opacityBox:Hide()
         slotSlider:Hide()
         slotBox:Hide()
         widthSlider:Hide()
@@ -728,8 +760,6 @@ function updateSelectedBarControls()
         nameEditBox:Hide()
         scaleSlider:Hide()
         scaleBox:Hide()
-        opacitySlider:Hide()
-        opacityBox:Hide()
         for _, f in ipairs(slotSelectors) do f:Hide() end
         return
     end
@@ -737,6 +767,8 @@ function updateSelectedBarControls()
     removeBarButton:Show()
     bgCheckbox:Show()
     borderCheckbox:Show()
+    opacitySlider:Show()
+    opacityBox:Show()
     slotSlider:Show()
     slotBox:Show()
     widthSlider:Show()
@@ -748,8 +780,6 @@ function updateSelectedBarControls()
     nameEditBox:Show()
     scaleSlider:Show()
     scaleBox:Show()
-    opacitySlider:Show()
-    opacityBox:Show()
 
     local b = SDTDB.bars[barName]
     if not b then return end
@@ -812,14 +842,52 @@ end)
 removeBarButton:SetScript("OnClick", function()
     local barName = panel.selectedBar
     if not barName then return end
-    if SDT.bars[barName] then SDT.bars[barName]:Hide() SDT.bars[barName] = nil end
-    SDTDB.bars[barName] = nil
-    panel.selectedBar = nil
-    UIDropDownMenu_SetText(panelDropdown, "(none)")
-    UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
-    for _, f in ipairs(slotSelectors) do f:Hide() end
-    slotSelectors = {}
+
+    StaticPopup_Show("SDT_CONFIRM_DELETE_BAR", nil, nil, barName)
 end)
+
+-- Confirmation Pop-up
+StaticPopupDialogs["SDT_CONFIRM_DELETE_BAR"] = {
+    text = "Are you sure you want to delete this bar?\nThis action cannot be undone.",
+    button1 = "Yes",
+    button2 = "No",
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3, -- avoids taint issues (3–4 are safest)
+    OnAccept = function(self, barName)
+        -- Perform the delete
+        if SDT.bars[barName] then
+            SDT.bars[barName]:Hide()
+            SDT.bars[barName] = nil
+        end
+        SDTDB.bars[barName] = nil
+
+        -- Clear UI state
+        panel.selectedBar = nil
+        UIDropDownMenu_SetText(panelDropdown, "(none)")
+        UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
+
+        for _, f in ipairs(slotSelectors) do f:Hide() end
+        slotSelectors = {}
+
+        removeBarButton:Hide()
+        bgCheckbox:Hide()
+        borderCheckbox:Hide()
+        opacitySlider:Hide()
+        opacityBox:Hide()
+        slotSlider:Hide()
+        slotBox:Hide()
+        widthSlider:Hide()
+        widthBox:Hide()
+        heightSlider:Hide()
+        heightBox:Hide()
+        renameLabel:Hide()
+        nameEditBox:Hide()
+        scaleSlider:Hide()
+        scaleBox:Hide()
+    end,
+}
 
 -------------------------------------------------
 -- Create Module List
