@@ -62,7 +62,7 @@ local function ToTime(secs)
 end
 
 local function ConvertTime(h, m, s)
-    if SDTDB.time24 then
+    if SDTDB.settings.use24HourClock then
         return h, m, s, -1
     elseif h >= 12 then
         if h > 12 then h = h - 12 end
@@ -76,6 +76,10 @@ end
 local function GetTimeValues()
     local dateTable = date("*t") -- simplified: can adjust for localTime/db.localTime
     return ConvertTime(dateTable.hour, dateTable.min, dateTable.sec)
+end
+
+function SDT:GetTimeValues()
+    return GetTimeValues()
 end
 
 ----------------------------------------------------
@@ -122,7 +126,7 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateText()
         local Hr, Min, Sec, AmPm = GetTimeValues()
-        local textString = format("%d:%02d %s", Hr, Min, AMPM[AmPm])
+        local textString = format("%d:%02d %s", Hr, Min, AMPM[AmPm] or "")
         text:SetText(SDT:ColorText(textString))
     end
 

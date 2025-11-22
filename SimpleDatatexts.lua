@@ -13,11 +13,34 @@ local LSM = LibStub("LibSharedMedia-3.0")
 ----------------------------------------------------
 -- Defaults
 ----------------------------------------------------
-_G.SDTDB = _G.SDTDB or {
-    bars = {}, -- keyed by name: { numSlots = 3, slots = { [1] = "FPS", ... }, point = { point = ..., relativePoint = ..., x = ..., y = ... }, showBackground = true, showBorder = true, width = 300, height = 22, scale = 100, bgOpacity = 50 }
-    settings = { locked = false, useClassColor = false, useCustomColor = false, customColorHex = "#ffffff", debug = false, font = "Friz Quadrata TT", fontSize = 12 },
+local defaultsTable = {
+    bars = {},
+    settings = { 
+        locked = false,
+        useClassColor = false,
+        useCustomColor = false,
+        customColorHex = "#ffffff",
+        use24HourClock = false,
+        font = "Friz Quadrata TT",
+        fontSize = 12,
+        debug = false,
+    },
     gold = {}
 }
+local function checkDefaultDBTable()
+    if not _G.SDTDB or next(_G.SDTDB) == nil then
+        print("[|cFFFF6600SDT|r]", "No database found. Creating default.")
+        _G.SDTDB = defaultsTable
+    else
+        if not _G.SDTDB.bars then _G.SDTDB.bars = {} end
+        if not _G.SDTDB.settings then _G.SDTDB.settings = {} end
+        if not _G.SDTDB.gold then _G.SDTDB.gold = {} end
+        for k,v in pairs(defaultsTable.settings) do
+            if _G.SDTDB.settings[k] == nil then _G.SDTDB.settings[k] = v end
+        end
+    end
+end
+_G.SDTDB = _G.SDTDB or defaultsTable
 
 SDT.modules = SDT.modules or {}
 SDT.bars = SDT.bars or {}
@@ -406,6 +429,14 @@ classColorCheckbox:SetPoint("TOPLEFT", lockCheckbox, "BOTTOMLEFT", 0, -20)
 classColorCheckbox.Text:SetText("Use Class Color")
 classColorCheckbox:SetChecked(SDTDB.settings.useClassColor)
 
+local use24HourClockCheckbox = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
+use24HourClockCheckbox:SetPoint("LEFT", classColorCheckbox, "RIGHT", 100, 0)
+use24HourClockCheckbox.Text:SetText("Use 24Hr Clock")
+use24HourClockCheckbox:SetChecked(SDTDB.settings.use24HourClock)
+use24HourClockCheckbox:SetScript("OnClick", function(self)
+    SDTDB.settings.use24HourClock = self:GetChecked()
+    SDT:UpdateAllModules()
+end)
 
 local customColorCheckbox = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
 customColorCheckbox:SetPoint("TOPLEFT", classColorCheckbox, "BOTTOMLEFT", 0, -20)
@@ -907,6 +938,8 @@ local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", function(self, event, arg)
     if arg == addonName then
+        checkDefaultDBTable()
+
         CreateModuleList()      
 
         -- If no bars exist, create our first bar
@@ -938,7 +971,6 @@ loader:SetScript("OnEvent", function(self, event, arg)
             currentFont = "Friz Quadrata TT"
             SDTDB.settings.font = currentFont
         end
-        SDT.Print(SDTDB.settings.font, currentFont)
 
         -- Sync settings after the addon is fully loaded
         UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
