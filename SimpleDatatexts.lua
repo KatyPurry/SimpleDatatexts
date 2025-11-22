@@ -28,16 +28,11 @@ local defaultsTable = {
     gold = {}
 }
 local function checkDefaultDBTable()
-    if not _G.SDTDB or next(_G.SDTDB) == nil then
-        print("[|cFFFF6600SDT|r]", "No database found. Creating default.")
-        _G.SDTDB = defaultsTable
-    else
-        if not _G.SDTDB.bars then _G.SDTDB.bars = {} end
-        if not _G.SDTDB.settings then _G.SDTDB.settings = {} end
-        if not _G.SDTDB.gold then _G.SDTDB.gold = {} end
-        for k,v in pairs(defaultsTable.settings) do
-            if _G.SDTDB.settings[k] == nil then _G.SDTDB.settings[k] = v end
-        end
+    if not _G.SDTDB.bars then _G.SDTDB.bars = {} end
+    if not _G.SDTDB.settings then _G.SDTDB.settings = {} end
+    if not _G.SDTDB.gold then _G.SDTDB.gold = {} end
+    for k,v in pairs(defaultsTable.settings) do
+        if _G.SDTDB.settings[k] == nil then _G.SDTDB.settings[k] = v end
     end
 end
 _G.SDTDB = _G.SDTDB or defaultsTable
