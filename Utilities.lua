@@ -32,6 +32,8 @@ local CreateFrame               = CreateFrame
 local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
 local GetClassColor             = C_ClassColor.GetClassColor
 local GetRealmName              = GetRealmName
+local GetScreenWidth            = GetScreenWidth
+local GetScreenHeight           = GetScreenHeight
 local IsControlKeyDown          = IsControlKeyDown
 local IsShiftKeyDown            = IsShiftKeyDown
 local ToggleDropDownMenu        = ToggleDropDownMenu
@@ -177,4 +179,42 @@ end
 function SDT:resetProfile(key)
     SDTDB[key] = CopyTable(charDefaultsTable)
     print("Profile "..key.." reset to defaults")
+end
+
+-------------------------------------------------
+-- Utility: SetCVar
+-------------------------------------------------
+function SDT:setCVar(cvar, value)
+    local valStr = ((type(value) == "boolean") and (value and '1' or '0')) or tostring(value)
+    if GetCVar(cvar) ~= valStr then
+        SetCVar(cvar, valStr)
+    end
+end
+
+-------------------------------------------------
+-- Utility: Handle Menu List
+-------------------------------------------------
+function SDT:handleMenuList(root, menuList, submenu, depth)
+    if submenu then root = submenu end
+
+    for _, list in next, menuList do
+        local previous
+		if list.isTitle then
+			root:CreateTitle(list.text)
+		elseif list.func or list.hasArrow then
+			local name = list.text or ('test'..depth)
+
+			local func = (list.arg1 or list.arg2) and (function() list.func(nil, list.arg1, list.arg2) end) or list.func
+			local checked = list.checked and (not list.notCheckable and function() return list.checked(list) end or E.noop)
+			if checked then
+				previous = root:CreateCheckbox(list.text or name, checked, func)
+			else
+				previous = root:CreateButton(list.text or name, func)
+			end
+		end
+
+		if list.menuList then -- loop it
+			HandleMenuList(root, list.menuList, list.hasArrow and previous, depth + 1)
+		end
+	end
 end
