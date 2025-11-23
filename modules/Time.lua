@@ -62,7 +62,8 @@ local function ToTime(secs)
 end
 
 local function ConvertTime(h, m, s)
-    if SDTDB.settings.use24HourClock then
+    local charKey = SDT:getCharKey()
+    if SDTDB[charKey].settings.use24HourClock then
         return h, m, s, -1
     elseif h >= 12 then
         if h > 12 then h = h - 12 end

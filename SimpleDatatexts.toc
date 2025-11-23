@@ -6,6 +6,8 @@
 ## SavedVariables: SDTDB
 
 # Core
+Utilities.lua
+Settings.lua
 SimpleDatatexts.lua
 
 # Ara

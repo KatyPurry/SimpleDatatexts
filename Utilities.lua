@@ -1,0 +1,180 @@
+-- Utility Functions
+
+----------------------------------------------------
+-- Addon Locals
+----------------------------------------------------
+local addonName, SDT = ...
+
+----------------------------------------------------
+-- Library Instances
+----------------------------------------------------
+local LSM = LibStub("LibSharedMedia-3.0")
+
+----------------------------------------------------
+-- Lua Locals
+----------------------------------------------------
+local format           = string.format
+local print            = print
+local strsplit         = strsplit
+local stringlower      = string.lower
+local tconcat          = table.concat
+local tinsert          = table.insert
+local tonumber         = tonumber
+local tostring         = tostring
+local tsort            = table.sort
+local wipe             = table.wipe
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local CopyTable                 = CopyTable
+local CreateFrame               = CreateFrame
+local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
+local GetClassColor             = C_ClassColor.GetClassColor
+local GetRealmName              = GetRealmName
+local IsControlKeyDown          = IsControlKeyDown
+local IsShiftKeyDown            = IsShiftKeyDown
+local ToggleDropDownMenu        = ToggleDropDownMenu
+local UIDropDownMenu_AddButton  = UIDropDownMenu_AddButton
+local UIDropDownMenu_CreateInfo = UIDropDownMenu_CreateInfo
+local UIDropDownMenu_Initialize = UIDropDownMenu_Initialize
+local UIDropDownMenu_SetText    = UIDropDownMenu_SetText
+local UIParent                  = UIParent
+local UnitClass                 = UnitClass
+local UnitName                  = UnitName
+
+-------------------------------------------------
+-- Build Our Addon Table and Cache
+-------------------------------------------------
+SDT.modules = SDT.modules or {}
+SDT.bars = SDT.bars or {}
+SimpleDatatexts = SDT
+
+SDT.cache = {}
+SDT.cache.playerName = UnitName("player")
+SDT.cache.playerNameLower = SDT.cache.playerName:lower()
+SDT.cache.playerClass = select(2, UnitClass("player"))
+SDT.cache.playerRealm = GetRealmName():gsub("[^%w]", ""):lower()
+SDT.cache.charKey = SDT.cache.playerNameLower.."-"..SDT.cache.playerRealm
+local colors = { GetClassColor(SDT.cache.playerClass):GetRGB() }
+SDT.cache.colorR = colors[1]
+SDT.cache.colorG = colors[2]
+SDT.cache.colorB = colors[3]
+SDT.cache.colorHex = GetClassColor(SDT.cache.playerClass):GenerateHexColor()
+SDT.cache.version = GetAddOnMetadata(addonName, "Version") or "not defined"
+SDT.cache.moduleNames = {}
+
+-------------------------------------------------
+-- Utility: Get Character Key
+-------------------------------------------------
+function SDT:getCharKey()
+    return SDT.cache.charKey
+end
+
+-------------------------------------------------
+-- Utility: Print function
+-------------------------------------------------
+function SDT.Print(...)
+    print("[|cFFFF6600SDT|r]", ...)
+end
+
+-------------------------------------------------
+-- Utility: Get Tag Color
+-------------------------------------------------
+function SDT:GetTagColor()
+    if SDT.SDTDB_CharDB.settings.useCustomColor then
+        local color = SDT.SDTDB_CharDB.settings.customColorHex:gsub("#", "")
+        return "ff"..color
+    elseif SDT.SDTDB_CharDB.settings.useClassColor then
+        return SDT.cache.colorHex
+    end
+    return "ffffffff"
+end
+
+-------------------------------------------------
+-- Utility: Color Text
+-------------------------------------------------
+function SDT:ColorText(text)
+    local color = SDT:GetTagColor()
+    return "|c"..color..text.."|r"
+end
+
+-------------------------------------------------
+-- Utility: Apply Chosen Font
+-------------------------------------------------
+function SDT:ApplyFont()
+    local fontPath = LSM:Fetch("font", SDT.SDTDB_CharDB.settings.font) or STANDARD_TEXT_FONT
+    local fontSize = SDT.SDTDB_CharDB.settings.fontSize or 12
+
+    for _, bar in pairs(SDT.bars) do
+        for k, slot in pairs(bar.slots) do
+            if slot.text then
+                slot.text:SetFont(fontPath, fontSize, "")
+            end
+            if slot.moduleFrame and slot.moduleFrame.text and slot.moduleFrame.text.SetFont then
+                slot.moduleFrame.text:SetFont(fontPath, fontSize, "")
+            end
+        end
+    end
+end
+
+-------------------------------------------------
+-- Utility: Format Percentage
+-------------------------------------------------
+function SDT:FormatPercent(v)
+    return string.format("%.2f%%", v)
+end
+
+-------------------------------------------------
+-- Utility: Format Percentage
+-------------------------------------------------
+function SDT:FindBestAnchorPoint(frame)
+    local x, y = frame:GetCenter()
+    local screenWidth = UIParent:GetRight()
+    local screenHeight = UIParent:GetTop()
+
+    local anchor, relPoint
+    if not x or not y then
+        return "ANCHOR_BOTTOM"
+    else
+        if y < screenHeight / 2 then
+            return "ANCHOR_TOP"
+        else
+            return "ANCHOR_BOTTOM"
+        end
+    end
+end
+
+-------------------------------------------------
+-- Utility: Functions for Settings
+-------------------------------------------------
+function SDT:getAllProfileKeys()
+    local keys = {}
+    for k in pairs(SDTDB) do
+        if k ~= "defaults" then
+            table.insert(keys, k)
+        end
+    end
+    return keys
+end
+
+function SDT:copyProfile(fromKey, toKey)
+    SDTDB[toKey] = CopyTable(SDTDB[fromKey])
+    print("Profile copied from "..fromKey.." to "..toKey)
+end
+
+function SDT:deleteProfile(key)
+    if SDTDB[key] then
+        SDTDB[key] = nil
+        print("Profile "..key.." deleted")
+        -- Ensure the current charDB points somewhere valid
+        if SDT:getCharKey() == key then
+            SDT.SDTDB_CharDB = SDTDB[SDT:getCharKey()] or CopyTable(charDefaultsTable)
+        end
+    end
+end
+
+function SDT:resetProfile(key)
+    SDTDB[key] = CopyTable(charDefaultsTable)
+    print("Profile "..key.." reset to defaults")
+end
