@@ -562,7 +562,7 @@ end
 
 -- Add Panel button click
 addBarButton:SetScript("OnClick", function()
-    local id = NextBarID()
+    local id = SDT:nextBarID()
     local name = "SDT_Bar" .. id
     SDT.SDTDB_CharDB.bars[name] = { numSlots = 3, slots = {}, showBackground = true, showBorder = true, width = 300, height = 22 }
     SDT:CreateDataBar(id, 3)

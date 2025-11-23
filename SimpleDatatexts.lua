@@ -44,24 +44,6 @@ local UnitClass                 = UnitClass
 local UnitName                  = UnitName
 
 -------------------------------------------------
--- Module Registration
--------------------------------------------------
-function SDT:RegisterDataText(name, module)
-    SDT.modules[name] = module
-end
-
--------------------------------------------------
--- Utility: find next free bar ID
--------------------------------------------------
-local function NextBarID()
-    local n = 1
-    while SDT.SDTDB_CharDB.bars["SDT_Bar" .. n] do
-        n = n + 1
-    end
-    return n
-end
-
--------------------------------------------------
 -- Movable Frame Helper
 -------------------------------------------------
 local function CreateMovableFrame(name)

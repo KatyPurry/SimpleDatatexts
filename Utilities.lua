@@ -218,3 +218,21 @@ function SDT:handleMenuList(root, menuList, submenu, depth)
 		end
 	end
 end
+
+-------------------------------------------------
+-- Utility: find next free bar ID
+-------------------------------------------------
+function SDT:nextBarID()
+    local n = 1
+    while SDT.SDTDB_CharDB.bars["SDT_Bar" .. n] do
+        n = n + 1
+    end
+    return n
+end
+
+-------------------------------------------------
+-- Module Registration
+-------------------------------------------------
+function SDT:RegisterDataText(name, module)
+    SDT.modules[name] = module
+end
