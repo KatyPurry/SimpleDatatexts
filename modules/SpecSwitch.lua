@@ -377,10 +377,10 @@ function mod.Create(slotFrame)
 
             if IsControlKeyDown() then
                 BuildLoadoutList()
-                CreateContextMenu(menuFrame, function(_, root) SDT:handleMenuList(root, loadoutList, nil, 1) end)
+                CreateContextMenu(menuFrame, function(_, root) SDT:HandleMenuList(root, loadoutList, nil, 1) end)
             else
                 BuildSpecAndLootLists()
-                CreateContextMenu(menuFrame, function(_, root) SDT:handleMenuList(root, specList, nil, 1) end)
+                CreateContextMenu(menuFrame, function(_, root) SDT:HandleMenuList(root, specList, nil, 1) end)
             end
         elseif button == "RightButton" and IsShiftKeyDown() then
             BuildSpecAndLootLists()
@@ -388,7 +388,7 @@ function mod.Create(slotFrame)
             if menuList[2] then
                 menuList[2].text = format(LOOT_SPECIALIZATION_DEFAULT, curName or UNKNOWN)
             end
-            CreateContextMenu(menuFrame, function(_, root) SDT:handleMenuList(root, menuList, nil, 1) end)
+            CreateContextMenu(menuFrame, function(_, root) SDT:HandleMenuList(root, menuList, nil, 1) end)
         end
     end)
 

@@ -104,7 +104,7 @@ function mod.Create(slotFrame)
     local function ToggleStream(_, arg1)
 	    local Stream = AudioStreams[arg1]
 
-        SDT:setCVar(Stream.Enabled, GetCVarBool(Stream.Enabled) and 0 or 1)
+        SDT:SetCVar(Stream.Enabled, GetCVarBool(Stream.Enabled) and 0 or 1)
 
 	    slotFrame.text:SetText(SDT:ColorText(GetStreamString(activeStream)))
     end
@@ -117,7 +117,7 @@ function mod.Create(slotFrame)
     end
 
     local function SelectSoundOutput(_, arg1)
-        SDT:setCVar('Sound_OutputDriverIndex', arg1)
+        SDT:SetCVar('Sound_OutputDriverIndex', arg1)
 	    Sound_GameSystem_RestartSoundSystem()
     end
 
@@ -171,7 +171,7 @@ function mod.Create(slotFrame)
 		    vol = 0
 	    end
 
-	    SDT:setCVar(activeStream.Volume, vol)
+	    SDT:SetCVar(activeStream.Volume, vol)
 	    slotFrame.text:SetText(SDT:ColorText(GetStreamString(activeStream)))
     end)
 
@@ -218,15 +218,15 @@ function mod.Create(slotFrame)
 			    return
 		    end
 
-            CreateContextMenu(volumeMenu, function(_, root) SDT:handleMenuList(root, menu, nil, 1) end)
+            CreateContextMenu(volumeMenu, function(_, root) SDT:HandleMenuList(root, menu, nil, 1) end)
 	    elseif button == 'MiddleButton' then
             if IsShiftKeyDown() then
-                CreateContextMenu(volumeMenu, function(_, root) SDT:handleMenuList(root, toggleMenu, nil, 1) end)
+                CreateContextMenu(volumeMenu, function(_, root) SDT:HandleMenuList(root, toggleMenu, nil, 1) end)
             else
-		        SDT:setCVar(AudioStreams[1].Enabled, GetCVarBool(AudioStreams[1].Enabled) and 0 or 1)
+		        SDT:SetCVar(AudioStreams[1].Enabled, GetCVarBool(AudioStreams[1].Enabled) and 0 or 1)
             end
 	    elseif button == 'RightButton' and IsShiftKeyDown() then
-            CreateContextMenu(volumeMenu, function(_, root) SDT:handleMenuList(root, deviceMenu, nil, 1) end)
+            CreateContextMenu(volumeMenu, function(_, root) SDT:HandleMenuList(root, deviceMenu, nil, 1) end)
 	    end
     end)
 

@@ -52,7 +52,7 @@ local charDefaultsTable = {
 
 local function checkDefaultDB()
     SDTDB = SDTDB or CopyTable(globalDefaultsTable)
-    local charKey = SDT:getCharKey()
+    local charKey = SDT:GetCharKey()
     SDTDB[charKey] = SDTDB[charKey] or {}
     SDT.SDTDB_CharDB = SDTDB[charKey]
 
@@ -86,7 +86,7 @@ end
 
 _G.SDTDB = _G.SDTDB or {}
 local earlyDefaults = CopyTable(charDefaultsTable)
-SDT.SDTDB_CharDB = (_G.SDTDB and _G.SDTDB[SDT:getCharKey()]) or earlyDefaults
+SDT.SDTDB_CharDB = (_G.SDTDB and _G.SDTDB[SDT:GetCharKey()]) or earlyDefaults
 
 -------------------------------------------------
 -- Settings Panel UI
@@ -562,7 +562,7 @@ end
 
 -- Add Panel button click
 addBarButton:SetScript("OnClick", function()
-    local id = SDT:nextBarID()
+    local id = SDT:NextBarID()
     local name = "SDT_Bar" .. id
     SDT.SDTDB_CharDB.bars[name] = { numSlots = 3, slots = {}, showBackground = true, showBorder = true, width = 300, height = 22 }
     SDT:CreateDataBar(id, 3)

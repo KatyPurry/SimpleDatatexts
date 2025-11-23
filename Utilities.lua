@@ -67,41 +67,6 @@ SDT.cache.version = GetAddOnMetadata(addonName, "Version") or "not defined"
 SDT.cache.moduleNames = {}
 
 -------------------------------------------------
--- Utility: Get Character Key
--------------------------------------------------
-function SDT:getCharKey()
-    return SDT.cache.charKey
-end
-
--------------------------------------------------
--- Utility: Print function
--------------------------------------------------
-function SDT.Print(...)
-    print("[|cFFFF6600SDT|r]", ...)
-end
-
--------------------------------------------------
--- Utility: Get Tag Color
--------------------------------------------------
-function SDT:GetTagColor()
-    if SDT.SDTDB_CharDB.settings.useCustomColor then
-        local color = SDT.SDTDB_CharDB.settings.customColorHex:gsub("#", "")
-        return "ff"..color
-    elseif SDT.SDTDB_CharDB.settings.useClassColor then
-        return SDT.cache.colorHex
-    end
-    return "ffffffff"
-end
-
--------------------------------------------------
--- Utility: Color Text
--------------------------------------------------
-function SDT:ColorText(text)
-    local color = SDT:GetTagColor()
-    return "|c"..color..text.."|r"
-end
-
--------------------------------------------------
 -- Utility: Apply Chosen Font
 -------------------------------------------------
 function SDT:ApplyFont()
@@ -121,10 +86,11 @@ function SDT:ApplyFont()
 end
 
 -------------------------------------------------
--- Utility: Format Percentage
+-- Utility: Color Text
 -------------------------------------------------
-function SDT:FormatPercent(v)
-    return string.format("%.2f%%", v)
+function SDT:ColorText(text)
+    local color = SDT:GetTagColor()
+    return "|c"..color..text.."|r"
 end
 
 -------------------------------------------------
@@ -148,53 +114,36 @@ function SDT:FindBestAnchorPoint(frame)
 end
 
 -------------------------------------------------
--- Utility: Functions for Settings
+-- Utility: Format Percentage
 -------------------------------------------------
-function SDT:getAllProfileKeys()
-    local keys = {}
-    for k in pairs(SDTDB) do
-        if k ~= "defaults" then
-            table.insert(keys, k)
-        end
-    end
-    return keys
-end
-
-function SDT:copyProfile(fromKey, toKey)
-    SDTDB[toKey] = CopyTable(SDTDB[fromKey])
-    print("Profile copied from "..fromKey.." to "..toKey)
-end
-
-function SDT:deleteProfile(key)
-    if SDTDB[key] then
-        SDTDB[key] = nil
-        print("Profile "..key.." deleted")
-        -- Ensure the current charDB points somewhere valid
-        if SDT:getCharKey() == key then
-            SDT.SDTDB_CharDB = SDTDB[SDT:getCharKey()] or CopyTable(charDefaultsTable)
-        end
-    end
-end
-
-function SDT:resetProfile(key)
-    SDTDB[key] = CopyTable(charDefaultsTable)
-    print("Profile "..key.." reset to defaults")
+function SDT:FormatPercent(v)
+    return string.format("%.2f%%", v)
 end
 
 -------------------------------------------------
--- Utility: SetCVar
+-- Utility: Get Character Key
 -------------------------------------------------
-function SDT:setCVar(cvar, value)
-    local valStr = ((type(value) == "boolean") and (value and '1' or '0')) or tostring(value)
-    if GetCVar(cvar) ~= valStr then
-        SetCVar(cvar, valStr)
+function SDT:GetCharKey()
+    return SDT.cache.charKey
+end
+
+-------------------------------------------------
+-- Utility: Get Tag Color
+-------------------------------------------------
+function SDT:GetTagColor()
+    if SDT.SDTDB_CharDB.settings.useCustomColor then
+        local color = SDT.SDTDB_CharDB.settings.customColorHex:gsub("#", "")
+        return "ff"..color
+    elseif SDT.SDTDB_CharDB.settings.useClassColor then
+        return SDT.cache.colorHex
     end
+    return "ffffffff"
 end
 
 -------------------------------------------------
 -- Utility: Handle Menu List
 -------------------------------------------------
-function SDT:handleMenuList(root, menuList, submenu, depth)
+function SDT:HandleMenuList(root, menuList, submenu, depth)
     if submenu then root = submenu end
 
     for _, list in next, menuList do
@@ -222,7 +171,7 @@ end
 -------------------------------------------------
 -- Utility: find next free bar ID
 -------------------------------------------------
-function SDT:nextBarID()
+function SDT:NextBarID()
     local n = 1
     while SDT.SDTDB_CharDB.bars["SDT_Bar" .. n] do
         n = n + 1
@@ -231,8 +180,59 @@ function SDT:nextBarID()
 end
 
 -------------------------------------------------
+-- Utility: Print function
+-------------------------------------------------
+function SDT.Print(...)
+    print("[|cFFFF6600SDT|r]", ...)
+end
+
+-------------------------------------------------
 -- Module Registration
 -------------------------------------------------
 function SDT:RegisterDataText(name, module)
     SDT.modules[name] = module
+end
+
+-------------------------------------------------
+-- Utility: SetCVar
+-------------------------------------------------
+function SDT:SetCVar(cvar, value)
+    local valStr = ((type(value) == "boolean") and (value and '1' or '0')) or tostring(value)
+    if GetCVar(cvar) ~= valStr then
+        SetCVar(cvar, valStr)
+    end
+end
+
+-------------------------------------------------
+-- Utility: Functions for Profile Handling
+-------------------------------------------------
+function SDT:GetAllProfileKeys()
+    local keys = {}
+    for k in pairs(SDTDB) do
+        if k ~= "defaults" then
+            table.insert(keys, k)
+        end
+    end
+    return keys
+end
+
+function SDT:CopyProfile(fromKey, toKey)
+    SDTDB[toKey] = CopyTable(SDTDB[fromKey])
+    print("Profile copied from "..fromKey.." to "..toKey)
+end
+
+function SDT:DeleteProfile(key)
+    if SDTDB[key] then
+        SDTDB[key] = nil
+        print("Profile "..key.." deleted")
+        -- Ensure the current charDB points somewhere valid
+        if SDT:getCharKey() == key then
+            SDT.SDTDB_CharDB = SDTDB[SDT:getCharKey()] or CopyTable(charDefaultsTable)
+        end
+    end
+end
+
+function SDT:ResetProfile(key)
+    SDTDB[key] = CopyTable(charDefaultsTable)
+    print("Profile "..key.." reset to defaults")
 end
