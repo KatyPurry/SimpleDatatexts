@@ -20,6 +20,7 @@ modules/AttackPower.lua
 modules/Bags.lua
 modules/Coordinates.lua
 modules/Crit.lua
+modules/Currency.lua
 modules/Durability.lua
 modules/Friends.lua
 modules/Gold.lua
