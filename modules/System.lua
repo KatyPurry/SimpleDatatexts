@@ -25,7 +25,6 @@ local wipe = table.wipe
 local ipairs = ipairs
 local pairs = pairs
 local enteredFrame = false
-local infoTable = {}
 local wait = 0
 
 ----------------------------------------------------
@@ -86,7 +85,7 @@ function mod.OnEnter(self)
 
     local totalMEM, totalCPU = 0, 0
     local infoDisplay = {}
-    for i, data in ipairs(infoTable) do
+    for i, data in ipairs(SDT.cache.addonList) do
         if IsAddOnLoaded(data.index) then
             local mem = GetAddOnMemoryUsage(data.index)
             totalMEM = totalMEM + mem
@@ -195,27 +194,11 @@ function mod.Create(slotFrame)
     -- Event Handler
     ----------------------------------------------------
     local function OnEvent(self, event, ...)
-        if event == "MODIFIER_STATE_CHANGED" then
-            if enteredFrame then mod.OnEnter(self) end
-        else
-            local addOnCount = GetNumAddOns()
-            if addOnCount ~= #infoTable then
-                wipe(infoTable)
-                local counter = 1
-                for i = 1, addOnCount do
-                    local name, title, _, loadable, reason = GetAddOnInfo(i)
-                    if loadable or reason == "DEMAND_LOADED" then
-                        infoTable[counter] = {name = name, title = title, index = i}
-                        counter = counter + 1
-                    end
-                end
-            end
-        end
+        if enteredFrame then mod.OnEnter(self) end
     end
 
     f:SetScript("OnEvent", OnEvent)
     f:RegisterEvent("MODIFIER_STATE_CHANGED")
-    f:RegisterEvent("PLAYER_ENTERING_WORLD")
 
     return f
 end

@@ -29,8 +29,10 @@ local wipe             = table.wipe
 ----------------------------------------------------
 local CopyTable                 = CopyTable
 local CreateFrame               = CreateFrame
+local GetAddOnInfo              = C_AddOns.GetAddOnInfo
 local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
 local GetClassColor             = C_ClassColor.GetClassColor
+local GetNumAddOns              = C_AddOns.GetNumAddOns
 local GetRealmName              = GetRealmName
 local IsControlKeyDown          = IsControlKeyDown
 local IsShiftKeyDown            = IsShiftKeyDown
@@ -244,6 +246,26 @@ local function CreateModuleList()
 end
 
 -------------------------------------------------
+-- Create Addon List
+-------------------------------------------------
+local function CreateAddonList()
+    if SDT.cache.addonList then
+        wipe(SDT.cache.addonList)
+    else
+        SDT.cache.addonList = {}
+    end
+    local addOnCount = GetNumAddOns()
+    local counter = 1
+    for i = 1, addOnCount do
+        local name, title, _, loadable, reason = GetAddOnInfo(i)
+        if loadable or reason == "DEMAND_LOADED" then
+            SDT.cache.addonList[counter] = {name = name, title = title, index = i}
+            counter = counter + 1
+        end
+    end
+end
+
+-------------------------------------------------
 -- Loader to restore bars on addon load
 -------------------------------------------------
 local loader = CreateFrame("Frame")
@@ -251,6 +273,7 @@ loader:RegisterEvent("PLAYER_ENTERING_WORLD")
 loader:SetScript("OnEvent", function(self, event, arg)
     --if arg == addonName then
         CreateModuleList()
+        CreateAddonList()
 
         -- Set our profile variable
         local profileName
