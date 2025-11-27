@@ -5,6 +5,12 @@
 ## Version: 12.0.0.13
 ## SavedVariables: SDTDB
 
+# Libs
+libs/LibStub.lua
+libs/CallbackHandler-1.0.lua
+libs/LibDataBroker-1.1.lua
+libs/LibSharedMedia-3.0.lua
+
 # Core
 Utilities.lua
 Settings.lua
@@ -35,9 +41,3 @@ modules/System.lua
 modules/Time.lua
 modules/Versatility.lua
 modules/Volume.lua
-
-# Libs
-libs/LibStub.lua
-libs/CallbackHandler-1.0.lua
-libs/LibDataBroker-1.1.lua
-libs/LibSharedMedia-3.0.lua
