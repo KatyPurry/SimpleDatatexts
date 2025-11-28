@@ -623,6 +623,7 @@ local function BorderDropdown_Initialize(self, level)
         SDT.bars[panelsSubPanel.selectedBar]:ApplyBackground()
         borderSizeSlider:Hide()
         borderSizeBox:Hide()
+        borderColorPicker:Hide()
     end
     UIDropDownMenu_AddButton(info)
     for _, name in ipairs(sortedBorderNames) do
@@ -637,6 +638,7 @@ local function BorderDropdown_Initialize(self, level)
             SDT.bars[panelsSubPanel.selectedBar]:ApplyBackground()
             borderSizeSlider:Show()
             borderSizeBox:Show()
+            borderColorPicker:Show()
         end
         UIDropDownMenu_AddButton(info)
     end
