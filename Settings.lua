@@ -941,7 +941,12 @@ local function UpdateProfileSpecs()
 end
 
 local function ProfileSelectDropdown_Init(self, level)
-    for profileName in pairs(SDTDB.profiles) do
+    local sortedProfiles = {}
+    for profileText in pairs(SDTDB.profiles) do
+        tinsert(sortedProfiles, profileText)
+    end
+    tsort(sortedProfiles)
+    for _, profileName in pairs(sortedProfiles) do
         local info = UIDropDownMenu_CreateInfo()
         info.text = profileName
         info.func = function()
@@ -968,7 +973,12 @@ local function ProfileCopyDropdown_Init(self, level)
     local blankEntry = UIDropDownMenu_CreateInfo()
     blankEntry.text = ""
     UIDropDownMenu_AddButton(blankEntry, level)
-    for profileName in pairs(SDTDB.profiles) do
+    local sortedProfiles = {}
+    for profileText in pairs(SDTDB.profiles) do
+        tinsert(sortedProfiles, profileText)
+    end
+    tsort(sortedProfiles)
+    for _, profileName in pairs(sortedProfiles) do
         local info = UIDropDownMenu_CreateInfo()
         info.text = profileName
         info.func = function()
@@ -984,7 +994,12 @@ local function ProfileDeleteDropdown_Init(self, level)
     local blankEntry = UIDropDownMenu_CreateInfo()
     blankEntry.text = ""
     UIDropDownMenu_AddButton(blankEntry, level)
-    for profileName in pairs(SDTDB.profiles) do
+    local sortedProfiles = {}
+    for profileText in pairs(SDTDB.profiles) do
+        tinsert(sortedProfiles, profileText)
+    end
+    tsort(sortedProfiles)
+    for _, profileName in pairs(sortedProfiles) do
         local info = UIDropDownMenu_CreateInfo()
         info.text = profileName
         info.func = function()
@@ -1088,6 +1103,31 @@ loader:SetScript("OnEvent", function(self, event, arg)
         checkDefaultDB()
 
         UpdateProfileSpecs()
+
+        -- Set our profile variable
+        local profileName
+        local dbInfo = SDTDB[SDT:GetCharKey()]
+        if dbInfo.useSpecProfiles then
+            local _, currentSpec = GetSpecializationInfo(GetSpecialization())
+            profileName = dbInfo.chosenProfile[currentSpec]
+        else
+            profileName = dbInfo.chosenProfile.generic
+        end
+        SDT.profileBars = SDTDB.profiles[profileName].bars
+        SDT.activeProfile = profileName
+
+        -- If no bars exist, create our first bar
+        if not next(SDT.profileBars) then
+            SDT.profileBars["SDT_Bar1"] = { numSlots = 3, slots = {}, bgOpacity = 50, border = "None", width = 300, height = 22 }
+        end
+
+        -- Create our bars
+        for barName, data in pairs(SDT.profileBars) do
+            local id = tonumber(barName:match("SDT_Bar(%d+)") or "0")
+            if id > 0 and not SDT.bars[barName] then
+                SDT:CreateDataBar(id, data.numSlots)
+            end
+        end
 
         -- Create and verify our fonts
         SDT.fonts = LSM:List("font")

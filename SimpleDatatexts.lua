@@ -282,31 +282,6 @@ loader:SetScript("OnEvent", function(self, event, arg)
         CreateModuleList()
         CreateAddonList()
 
-        -- Set our profile variable
-        local profileName
-        local dbInfo = SDTDB[SDT:GetCharKey()]
-        if dbInfo.useSpecProfiles then
-            local _, currentSpec = GetSpecializationInfo(GetSpecialization())
-            profileName = dbInfo.chosenProfile[currentSpec]
-        else
-            profileName = dbInfo.chosenProfile.generic
-        end
-        SDT.profileBars = SDTDB.profiles[profileName].bars
-        SDT.activeProfile = profileName
-
-        -- If no bars exist, create our first bar
-        if not next(SDT.profileBars) then
-            SDT.profileBars["SDT_Bar1"] = { numSlots = 3, slots = {}, bgOpacity = 50, border = "None", width = 300, height = 22 }
-        end
-
-        -- Create our bars
-        for barName, data in pairs(SDT.profileBars) do
-            local id = tonumber(barName:match("SDT_Bar(%d+)") or "0")
-            if id > 0 and not SDT.bars[barName] then
-                SDT:CreateDataBar(id, data.numSlots)
-            end
-        end
-
         -- Update modules to be safe
         SDT:UpdateAllModules()
     --end
