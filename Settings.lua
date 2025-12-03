@@ -932,7 +932,13 @@ local function UpdateProfileSpecs()
     local _, specThreeName = GetSpecializationInfo(3)
     specOneLabel:SetText(specOneName..":")
     specTwoLabel:SetText(specTwoName..":")
-    specThreeLabel:SetText(specThreeName..":")
+    -- If on 11.2.7 Retail, DH doesn't yet have 3 specs.
+    -- This can be removed once 12.0 hits.
+    if specThreeName then
+        specThreeLabel:SetText(specThreeName..":")
+    else
+        specThreeLabel:SetText("NYI:")
+    end
     local specFourName
     if SDT.cache.playerClass == "DRUID" then
         _, specFourName = GetSpecializationInfo(4)
