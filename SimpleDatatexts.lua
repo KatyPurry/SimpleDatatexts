@@ -378,7 +378,7 @@ SlashCmdList["SDT"] = function(msg)
         bar = tconcat(args, " ", 2, #args - 1)
     end
     if command == "config" then
-        Settings.OpenToCategory(SDT.SettingsPanel.name)
+        Settings.OpenToCategory(SDT.SettingsPanel.ID)
     elseif command == "lock" then
         SDT.SDTDB_CharDB.settings.locked = not SDT.SDTDB_CharDB.settings.locked
         lockCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.locked)

@@ -157,7 +157,7 @@ SDT.SettingsPanel = panel
 
 local title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 title:SetPoint("TOPLEFT", 16, -16)
-title:SetText(panel.name .. " - Global Settings")
+title:SetText(panel.name)
 
 local version = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 version:SetPoint("TOPRIGHT", -16, -17)
@@ -171,7 +171,8 @@ local function MakeLabel(parent, text, point, x, y)
 end
 
 local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
-category.ID = panel.name
+--category.ID = panel.name
+SDT.SettingsPanel.ID = category.ID
 Settings.RegisterAddOnCategory(category)
 
 -------------------------------------------------
@@ -653,7 +654,7 @@ local function PanelDropdown_Initialize(self, level)
         info.func = function()
             UIDropDownMenu_SetText(panelDropdown, displayName)
             panelsSubPanel.selectedBar = barName
-            updateSelectedBarControls()
+            SDT:UpdateSelectedBarControls()
         end
         UIDropDownMenu_AddButton(info)
     end
@@ -677,7 +678,7 @@ local function FontDropdown_Initialize(self, level)
 end
 
 -- Update per-panel controls
-function updateSelectedBarControls()
+function SDT:UpdateSelectedBarControls()
     local barName = panelsSubPanel.selectedBar
     if not barName then
         removeBarButton:Hide()
@@ -776,7 +777,7 @@ addBarButton:SetScript("OnClick", function()
     UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
     UIDropDownMenu_SetText(panelDropdown, name)
     panelsSubPanel.selectedBar = name
-    updateSelectedBarControls()
+    SDT:UpdateSelectedBarControls()
 end)
 
 -- Remove selected panel
