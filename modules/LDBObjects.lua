@@ -4,6 +4,8 @@ local SDT = SimpleDatatexts
 local SDTC = SDT.cache
 local LDB = LibStub("LibDataBroker-1.1")
 
+if not SDT.LDBDatatexts then SDT.LDBDatatexts = {} end
+
 ----------------------------------------------------
 -- Lua Locals
 ----------------------------------------------------
@@ -13,22 +15,30 @@ local tinsert     = table.insert
 local tsort       = table.sort
 
 ----------------------------------------------------
+-- Helper Functions
+----------------------------------------------------
+local function ShouldSkipLDBObject(name)
+    return name == "Ara Friends" -- Handled by Friends module
+      or name == "Ara Guild"  -- Handled by Guild module
+      or name == "CraftSimLDB" -- Only opens the CraftSim config settings
+      or name == "ALL THE THINGS" -- Appears to do nothing
+end
+
+local function StripColorCodes(text)
+    if not text then return nil end
+    return text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+end
+
+----------------------------------------------------
 -- Module wrapper for SDT
 ----------------------------------------------------
 local function HandleLDBObject(name, obj)
-    local cleanName = name:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
-    local cleanObjText = obj.text and obj.text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+    local cleanName = StripColorCodes(name)
 
     -- Skip objects already handled by other modules or those that are known to be "blank".
-    if cleanName == "Ara Friends" -- Handled by Friends module
-      or cleanName == "Ara Guild"  -- Handled by Guild module
-      or cleanName == "CraftSimLDB" -- Only opens the CraftSim config settings
-      or cleanName == "ALL THE THINGS" -- Appears to do nothing
-      then
+    if ShouldSkipLDBObject(cleanName) then
         return
     end
-
-    SDT.Print("LDB Object:", cleanName)
 
     local mod = {}
 
@@ -47,20 +57,21 @@ local function HandleLDBObject(name, obj)
         -- Update function
         ----------------------------------------------------
         local function Update()
+            local cleanObjText = obj.text and StripColorCodes(obj.text)
             local txt = ""
             if cleanName == "BugSack" then
-                txt = cleanName .. ": " .. cleanObjText
+                txt = cleanName .. ": " .. (cleanObjText or "")
             elseif cleanName == "WIM" then
-                txt = cleanName
-                if cleanObjText then
-                    txt = txt .. ": " .. cleanObjText
-                end
+                txt = cleanName .. (cleanObjText and (": " .. cleanObjText) or "")
+            elseif cleanName == "Core Loot Manager" then
+                txt = "CLM" .. (cleanObjText and (": " .. cleanObjText) or "")
             else
                 txt = cleanObjText or cleanName or "NO TEXT"
             end
             text:SetText(SDT:ColorText(txt))
         end
         f.Update = Update
+        SDT.LDBDatatexts[cleanName] = f
 
         ----------------------------------------------------
         -- Tooltip from LDB object
@@ -100,28 +111,31 @@ local function HandleLDBObject(name, obj)
     ----------------------------------------------------
     SDT:RegisterDataText(cleanName, mod)
 
-    --return mod
+    return mod
 end
 
 for name, obj in LDB:DataObjectIterator() do
     HandleLDBObject(name, obj)
 end
 
-LDB:RegisterCallback("LibDataBroker_DataObjectCreated",
-    function(_, name, obj)
-        local cleanName = name:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
-        -- Skip objects already handled by other modules or those that are known to be "blank".
-        if cleanName == "Ara Friends" -- Handled by Friends module
-          or cleanName == "Ara Guild"  -- Handled by Guild module
-          or cleanName == "CraftSimLDB" -- Only opens the CraftSim config settings
-          or cleanName == "ALL THE THINGS" -- Appears to do nothing
-        then
-            return
-        end
-        HandleLDBObject(name, obj)
-        tinsert(SDT.cache.moduleNames, name)
-        tsort(SDT.cache.moduleNames)
-        SDT:UpdateAllModules()
-        SDT:RebuildAllSlots()
+LDB:RegisterCallback("LibDataBroker_DataObjectCreated", function(_, name, obj)
+    local cleanName = StripColorCodes(name)
+    -- Skip objects already handled by other modules or those that are known to be "blank".
+    if ShouldSkipLDBObject(cleanName) then
+        return
     end
-)
+    HandleLDBObject(name, obj)
+    tinsert(SDT.cache.moduleNames, cleanName)
+    tsort(SDT.cache.moduleNames)
+    SDT:RebuildAllSlots()
+end)
+
+LDB:RegisterCallback("LibDataBroker_AttributeChanged", function(_, name, attr, val)
+    if attr == "text" or attr == "value" then
+        local cleanName = StripColorCodes(name)
+        local dt = SDT.LDBDatatexts[cleanName]
+        if dt and dt.Update then
+            dt.Update()
+        end
+    end
+end)
