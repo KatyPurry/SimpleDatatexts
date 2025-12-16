@@ -14,6 +14,7 @@ local LSM = LibStub("LibSharedMedia-3.0")
 -- Lua Locals
 ----------------------------------------------------
 local format           = string.format
+local mathfloor        = math.floor
 local print            = print
 local strsplit         = strsplit
 local stringlower      = string.lower
@@ -35,6 +36,7 @@ local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
 local GetClassColor             = C_ClassColor.GetClassColor
 local GetNumAddOns              = C_AddOns.GetNumAddOns
 local GetRealmName              = GetRealmName
+local GetScreenWidth            = GetScreenWidth
 local IsControlKeyDown          = IsControlKeyDown
 local IsShiftKeyDown            = IsShiftKeyDown
 local ToggleDropDownMenu        = ToggleDropDownMenu
@@ -91,7 +93,7 @@ end
 function SDT:CreateDataBar(id, numSlots)
     local name = "SDT_Bar" .. id
     if not SDT.profileBars[name] then
-        SDT.profileBars[name] = { numSlots = numSlots or 3, slots = {}, bgOpacity = 50, border = "None", width = 300, height = 22, name = name }
+        SDT.profileBars[name] = { numSlots = numSlots or 3, slots = {}, bgOpacity = 50, borderName = "None", border = "None", width = 300, height = 22, name = name }
     end
     local saved = SDT.profileBars[name]
 
@@ -361,7 +363,7 @@ local function BarAdjustments(adj, bar, num)
 
     -- Further validate the value is within parameters, then make the adjustment
     if adj == "width" then
-        if num >= 100 and num <= 800 then
+        if num >= 100 and num <= mathfloor(GetScreenWidth()) then
             SDT.profileBars[bar].width = num
             if SDT.UI and SDT.UI.widthSlider then SDT.UI.widthSlider:SetValue(num) end
             if SDT.UI and SDT.UI.widthBox then SDT.UI.widthBox:SetText(num) end

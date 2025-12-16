@@ -9,14 +9,24 @@ local addonName, SDT = ...
 -- Lua Locals
 ----------------------------------------------------
 local format           = string.format
+local mathfloor        = math.floor
+local mathmax          = math.max
 local tonumber         = tonumber
 local tostring         = tostring
 local tsort            = table.sort
 
 ----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local CreateFrame      = CreateFrame
+local GetScreenWidth   = GetScreenWidth
+
+----------------------------------------------------
 -- File Locals
 ----------------------------------------------------
 local charKey = SDT:GetCharKey()
+local MAX_VISIBLE_SLOTS = 5
+local SLOT_HEIGHT = 50
 
 ----------------------------------------------------
 -- Library Instances
@@ -198,6 +208,32 @@ local panelsSubPanel = CreateFrame("Frame", addonName .. "_PanelsSubPanel", UIPa
 panelsSubPanel.name = "Panels"
 panelsSubPanel.parent = panel.name
 SDT.PanelsSubPanel = panelsSubPanel
+
+local slotScrollFrame = CreateFrame(
+    "ScrollFrame",
+    addonName .. "_SlotScrollFrame",
+    panelsSubPanel,
+    "UIPanelScrollFrameTemplate"
+)
+
+slotScrollFrame:SetPoint("TOPLEFT", panelsSubPanel, "TOPLEFT", 315, -290)
+slotScrollFrame:SetPoint("BOTTOMRIGHT", panelsSubPanel, "BOTTOMRIGHT", -30, 20)
+slotScrollFrame:SetHeight(MAX_VISIBLE_SLOTS * SLOT_HEIGHT)
+
+local slotScrollChild = CreateFrame("Frame", nil, slotScrollFrame)
+slotScrollChild:SetSize(1, 1)
+slotScrollFrame:SetScrollChild(slotScrollChild)
+
+slotScrollFrame:EnableMouseWheel(true)
+slotScrollFrame:SetScript("OnMouseWheel", function(self, delta)
+    local newValue = self:GetVerticalScroll() - delta * 30
+    newValue = math.max(0, math.min(newValue, self:GetVerticalScrollRange()))
+    self:SetVerticalScroll(newValue)
+end)
+
+slotScrollFrame:Hide()
+slotScrollFrame.ScrollBar:Hide()
+slotScrollFrame:SetVerticalScroll(0)
 
 local panelsTitle = panelsSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 panelsTitle:SetPoint("TOPLEFT", 16, -16)
@@ -428,9 +464,10 @@ local function buildSlotSelectors(barName)
     if not b then return end
 
     for i = 1, b.numSlots do
-        local lbl = MakeLabel(panelsSubPanel, "Slot " .. i .. ":", "TOPLEFT", 320, -300 - ((i - 1) * 50))
-        local dd = CreateFrame("Frame", addonName .. "_SlotSel_" .. i, panelsSubPanel, "UIDropDownMenuTemplate")
-        dd:SetPoint("TOPLEFT", lbl, "BOTTOMLEFT", -22, -6)
+        local lbl = MakeLabel(slotScrollChild, "Slot " .. i .. ":", "TOPLEFT", 320, -300 - ((i - 1) * 50))
+        local dd = CreateFrame("Frame", addonName .. "_SlotSel_" .. i, slotScrollChild, "UIDropDownMenuTemplate")
+        lbl:SetPoint("TOPLEFT", slotScrollChild, "TOPLEFT", 0, -((i - 1) * 50))
+        dd:SetPoint("TOPLEFT", lbl, "BOTTOMLEFT", -15, -6)
         UIDropDownMenu_SetWidth(dd, 140)
 
         UIDropDownMenu_Initialize(dd, function(self, level)
@@ -458,6 +495,17 @@ local function buildSlotSelectors(barName)
         UIDropDownMenu_SetText(dd, b.slots[i] or "(empty)")
         table.insert(slotSelectors, lbl)
         table.insert(slotSelectors, dd)
+    end
+
+    local totalHeight = b.numSlots * SLOT_HEIGHT + 10
+    slotScrollChild:SetHeight(totalHeight)
+
+    if b.numSlots > MAX_VISIBLE_SLOTS then
+        slotScrollFrame:Show()
+        slotScrollFrame.ScrollBar:Show()
+    else
+        slotScrollFrame.ScrollBar:Hide()
+        slotScrollFrame:SetVerticalScroll(0)
     end
 end
 
@@ -489,7 +537,13 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
     -- Sync slider -> editbox
     slider:SetScript("OnValueChanged", function(self, value)
         local val = math.floor(value + 0.5)
+
+        -- Do nothing if the value didn't change
+        if self._lastValue == val then return end
+        self._lastValue = val
+
         eb:SetText(val)
+
         if panelsSubPanel.selectedBar then
             local barData = SDT.profileBars[panelsSubPanel.selectedBar]
             if name == "Slots" then
@@ -527,7 +581,7 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
     eb:SetScript("OnEnterPressed", function(self)
         local val = tonumber(self:GetText())
         if val then
-            val = math.max(min, math.min(max, val))
+            val = mathmax(min, math.min(max, val))
             slider:SetValue(val)
             self:SetText(val)
             if name == "Scale" and SDT.bars[panelsSubPanel.selectedBar] then
@@ -545,10 +599,11 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
     return slider, eb
 end
 
+-- Create sliders
 local scaleSlider, scaleBox = CreateSliderWithBox(panelsSubPanel, "Scale", "Scale", 50, 500, 1, removeBarButton, 5, -30)
 local opacitySlider, opacityBox = CreateSliderWithBox(panelsSubPanel, "Background Opacity", "Background Opacity", 0, 100, 1, scaleSlider, 0, -20)
-local slotSlider, slotBox = CreateSliderWithBox(panelsSubPanel, "Slots", "Slots", 1, 5, 1, opacitySlider, 0, -20)
-local widthSlider, widthBox = CreateSliderWithBox(panelsSubPanel, "Width", "Width", 100, 800, 1, slotSlider, 0, -20)
+local slotSlider, slotBox = CreateSliderWithBox(panelsSubPanel, "Slots", "Slots", 1, 12, 1, opacitySlider, 0, -20)
+local widthSlider, widthBox = CreateSliderWithBox(panelsSubPanel, "Width", "Width", 100, mathfloor(GetScreenWidth()), 1, slotSlider, 0, -20)
 local heightSlider, heightBox = CreateSliderWithBox(panelsSubPanel, "Height", "Height", 16, 128, 1, widthSlider, 0, -20)
 
 -- Store sliders in the SDT namespace for accessibility
@@ -574,9 +629,9 @@ local borderSizeSlider, borderSizeBox = CreateSliderWithBox(panelsSubPanel, "Bor
 
 local borderColorPicker = CreateFrame("Button", nil, panelsSubPanel, "UIPanelButtonTemplate")
 borderColorPicker:SetPoint("LEFT", borderDropdown, "RIGHT", -2, 2)
-borderColorPicker:SetSize(60, 24)
+borderColorPicker:SetSize(80, 24)
 borderColorPicker:SetScript("OnShow", function(self)
-    self:SetText(SDT.profileBars[panelsSubPanel.selectedBar].borderColor or "")
+    self:SetText(SDT.profileBars[panelsSubPanel.selectedBar].borderColor or "#000000")
 end)
 borderColorPicker:Hide()
 
@@ -705,6 +760,9 @@ function SDT:UpdateSelectedBarControls()
         nameEditBox:Hide()
         scaleSlider:Hide()
         scaleBox:Hide()
+        slotScrollFrame:Hide()
+        slotScrollFrame.ScrollBar:Hide()
+        slotScrollFrame:SetVerticalScroll(0)
         for _, f in ipairs(slotSelectors) do f:Hide() end
         return
     end
@@ -712,10 +770,15 @@ function SDT:UpdateSelectedBarControls()
     removeBarButton:Show()
     borderLabel:Show()
     borderDropdown:Show()
-    if SDT.profileBars[barName].borderName ~= "None" then
+    if not SDT.profileBars[barName].borderName or SDT.profileBars[barName].borderName == "None" then
+        borderSizeSlider:Hide()
+        borderSizeBox:Hide()
+        borderColorPicker:Hide()
+    else
         borderSizeSlider:Show()
         borderSizeBox:Show()
         borderColorPicker:Show()
+        borderColorPicker:SetText(SDT.profileBars[barName].borderColor or "#000000")
     end
     opacitySlider:Show()
     opacityBox:Show()
@@ -730,6 +793,7 @@ function SDT:UpdateSelectedBarControls()
     nameEditBox:Show()
     scaleSlider:Show()
     scaleBox:Show()
+    slotScrollFrame:Show()
 
     local b = SDT.profileBars[barName]
     if not b then return end
@@ -1111,10 +1175,17 @@ end)
 -------------------------------------------------
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("PLAYER_ENTERING_WORLD")
-loader:SetScript("OnEvent", function(self, event, arg)   
+loader:SetScript("OnEvent", function(self, event, arg)
     if event == "PLAYER_ENTERING_WORLD" then
+        -- Reset widthSlider's max width once the UI is initialized
+        local maxWidth = mathfloor(GetScreenWidth())
+        widthSlider:SetMinMaxValues(100, maxWidth)
+        getglobal(widthSlider:GetName().."High"):SetText(tostring(maxWidth))
+
+        -- Check our database
         checkDefaultDB()
 
+        -- Update the available specs for this character
         UpdateProfileSpecs()
 
         -- Set our profile variable
