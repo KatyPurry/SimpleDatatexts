@@ -22,6 +22,8 @@ local defaultConfig = {
 	showGuildNotes = true,
 	showFriendNotes = true,
 	showGuildName = false,
+	showGuildTag = false,
+	showFriendsTag = false,
 	showGuildXP = true,
 	showGuildXPTooltip = false,
 	showOwnBroadcast = true,
@@ -189,7 +191,8 @@ end
 
 local function UpdateGuildBlockText()
 	if IsInGuild() then
-		local guildName = config.showGuildName and GetGuildInfo"player" or ""
+		local guildName = config.showGuildName and GetGuildInfo("player") or ""
+		if guildName == "" and config.showGuildTag then guildName = "Guild" end
 		if guildName ~= "" then guildName = guildName .. ": " end
 		f.GuildBlock.text = (config.showGuildTotal and "%s%d/%d" or "%s%d"):format(guildName, #guildEntries, (GetNumGuildMembers()))
 	else
@@ -200,7 +203,8 @@ end
 
 local function UpdateFriendBlockText(updatePanel)
 	local totalRF, onlineRF = BNGetNumFriends()
-	f.FriendsBlock.text = (config.showFriendsTotal and "%d/%d" or "%d"):format( onlineFriends + onlineRF, totalFriends + totalRF )
+	local friendsTag = config.showFriendsTag and "Friends: " or ""
+	f.FriendsBlock.text = (config.showFriendsTotal and "%s%d/%d" or "%s%d"):format( friendsTag, onlineFriends + onlineRF, totalFriends + totalRF )
 	SDT:UpdateFriends()
 	if updatePanel then f:BN_FRIEND_INFO_CHANGED() end
 end
@@ -1149,7 +1153,9 @@ function f:SetupConfigMenu()
 	options = {
 		{ text = ("|cffffb366Ara|r Guild & Friends (%s)"):format( GetAddOnMetadata( addonName, "Version" ) ), isTitle = true },
 		{ text = "Show guild name", check = "showGuildName" },
+		{ text = "Show 'Guild' tag", check = "showGuildTag" },
 		{ text = "Show total number of guildmates", check = "showGuildTotal" },
+		{ text = "Show 'Friends' tag", check = "showFriendsTag" },
 		{ text = "Show total number of friends", check = "showFriendsTotal" },
 		{ text = "Show guild XP", check = "showGuildXP", submenu = {
 			{ text = "Show guild XP tooltip", check = "showGuildXPTooltip" },
@@ -1341,9 +1347,9 @@ function f:SetupConfigMenu()
 
 	SetOption = function(bt, var, val)
 		config[var] = val or not config[var]
-		if var == "showGuildName" or var == "showGuildTotal" then
+		if var == "showGuildName" or var == "showGuildTag" or var == "showGuildTotal" then
 			UpdateGuildBlockText()
-		elseif var == "showFriendsTotal" then
+		elseif var == "showFriendsTag" or var == "showFriendsTotal" then
 			UpdateFriendBlockText()
 		elseif var == "statusMode" then
 			PreFormatStatusText(colors.status)
