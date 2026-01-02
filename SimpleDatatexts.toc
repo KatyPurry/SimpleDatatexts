@@ -36,6 +36,7 @@ modules/Intellect.lua
 modules/LDBObjects.lua
 modules/Mail.lua
 modules/Mastery.lua
+modules/Spacer.lua
 modules/SpecSwitch.lua
 modules/Strength.lua
 modules/System.lua
