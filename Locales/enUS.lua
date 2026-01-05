@@ -314,4 +314,3 @@ L["Sort second column"] = "Sort second column"
 L["Sort third column"] = "Sort third column"
 L["Resize tooltip"] = "Resize tooltip"
 L["Remove friend"] = "Remove friend"
-

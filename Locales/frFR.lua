@@ -318,4 +318,3 @@ L["Sort second column"] = "Trier la deuxième colonne"
 L["Sort third column"] = "Trier la troisième colonne"
 L["Resize tooltip"] = "Redimensionner l’infobulle"
 L["Remove friend"] = "Supprimer un ami"
-
