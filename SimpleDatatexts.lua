@@ -179,7 +179,12 @@ function SDT:RebuildSlots(bar)
         slot.text:SetText("")
 
         local assignedName = saved.slots[i]
-        if assignedName and SDT.modules[assignedName] then
+        if assignedName == "(spacer)" then
+            -- Spacer: show nothing
+            slot.module = "(spacer)"
+            slot.text:SetText("")
+            if slot.moduleFrame and slot.moduleFrame.Hide then slot.moduleFrame:Hide() end
+        elseif assignedName and SDT.modules[assignedName] then
             local mod = SDT.modules[assignedName]
             if slot.moduleFrame and slot.moduleFrame.Hide then slot.moduleFrame:Hide() end
             slot.module = assignedName
@@ -247,6 +252,24 @@ local dropdownFrame = CreateFrame("Frame", addonName .. "_SlotDropdown", UIParen
 local function InitializeSlotDropdown(slot, bar)
     local info = UIDropDownMenu_CreateInfo()
     info.notCheckable = true
+
+    info.text = L["(empty)"]
+    info.func = function()
+        if SDT.profileBars[bar:GetName()] then
+            SDT.profileBars[bar:GetName()].slots[slot.index] = nil
+            SDT:RebuildSlots(bar)
+        end
+    end
+    UIDropDownMenu_AddButton(info)
+
+    info.text = "(spacer)"
+    info.func = function()
+        if SDT.profileBars[bar:GetName()] then
+            SDT.profileBars[bar:GetName()].slots[slot.index] = "(spacer)"
+            SDT:RebuildSlots(bar)
+        end
+    end
+    UIDropDownMenu_AddButton(info)
 
     for _, moduleName in ipairs(SDT.cache.moduleNames) do
         info.text = moduleName

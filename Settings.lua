@@ -513,6 +513,15 @@ local function buildSlotSelectors(barName)
             end
             UIDropDownMenu_AddButton(info)
 
+            info = UIDropDownMenu_CreateInfo()
+            info.text = "(spacer)"
+            info.func = function()
+                SDT.profileBars[barName].slots[i] = "(spacer)"
+                UIDropDownMenu_SetText(dd, "(spacer)")
+                if SDT.bars[barName] then SDT:RebuildSlots(SDT.bars[barName]) end
+            end
+            UIDropDownMenu_AddButton(info)
+
             for _, name in ipairs(SDT.cache.moduleNames) do
                 local moduleName = name
                 info.text = moduleName
