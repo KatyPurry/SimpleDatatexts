@@ -160,6 +160,22 @@ local earlyDefaults = CopyTable(charDefaultsTable)
 SDT.SDTDB_CharDB = (_G.SDTDB and _G.SDTDB[SDT:GetCharKey()]) or earlyDefaults
 
 -------------------------------------------------
+-- Helper Functions
+-------------------------------------------------
+local function MakeLabel(parent, text, point, x, y)
+    local t = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    t:SetPoint(point, x, y)
+    t:SetText(text)
+    return t
+end
+
+local function CreateSettingsDropdown(name, parent)
+    local dd = CreateFrame("Frame", name, parent, "UIDropDownMenuTemplate")
+    UIDropDownMenu_SetWidth(dd, 160)
+    return dd
+end
+
+-------------------------------------------------
 -- Settings Panel UI
 -------------------------------------------------
 local panel = CreateFrame("Frame", addonName .. "_Settings", UIParent)
@@ -174,15 +190,7 @@ local version = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 version:SetPoint("TOPRIGHT", -16, -17)
 version:SetText("v" .. SDT.cache.version)
 
-local function MakeLabel(parent, text, point, x, y)
-    local t = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    t:SetPoint(point, x, y)
-    t:SetText(text)
-    return t
-end
-
 local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
---category.ID = panel.name
 SDT.SettingsPanel.ID = category.ID
 Settings.RegisterAddOnCategory(category)
 
@@ -359,9 +367,8 @@ local fontLabel = globalSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNorma
 fontLabel:SetPoint("TOPLEFT", customColorCheckbox, "BOTTOMLEFT", 0, -20)
 fontLabel:SetText(L["Display Font:"])
 
-local fontDropdown = CreateFrame("Frame", addonName .. "_FontDropdown", globalSubPanel, "UIDropDownMenuTemplate")
+local fontDropdown = CreateSettingsDropdown(addonName .. "_FontDropdown", globalSubPanel)
 fontDropdown:SetPoint("TOPLEFT", fontLabel, "BOTTOMLEFT", -20, -4)
-UIDropDownMenu_SetWidth(fontDropdown, 160)
 
 local fontSizeSlider = CreateFrame("Slider", addonName.."_FontSizeSlider", globalSubPanel, "OptionsSliderTemplate")
 fontSizeSlider:SetPoint("TOPLEFT", fontDropdown, "BOTTOMLEFT", 20, -20)
@@ -393,7 +400,7 @@ fontSizeSlider:SetScript("OnValueChanged", function(self, value)
     SDT:ApplyFont()
 end)
     
-    -- Sync editbox -> slider
+-- Sync editbox -> slider
 fontSizeBox:SetScript("OnEnterPressed", function(self)
     local val = tonumber(self:GetText())
     if val then
@@ -419,9 +426,8 @@ addBarButton:SetText(L["Create New Panel"])
 local panelLabel = panelsSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 panelLabel:SetPoint("TOPLEFT", addBarButton, "BOTTOMLEFT", 0, -16)
 panelLabel:SetText(L["Select Panel:"])
-local panelDropdown = CreateFrame("Frame", addonName .. "_PanelDropdown", panelsSubPanel, "UIDropDownMenuTemplate")
+local panelDropdown = CreateSettingsDropdown(addonName .. "_PanelDropdown", panelsSubPanel)
 panelDropdown:SetPoint("TOPLEFT", panelLabel, "BOTTOMLEFT", -20, -6)
-UIDropDownMenu_SetWidth(panelDropdown, 160)
 
 -- Rename Panel
 local renameLabel = panelsSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -456,20 +462,45 @@ removeBarButton:SetPoint("LEFT", addBarButton, "RIGHT", 140, 0)
 removeBarButton:SetText(L["Remove Selected Panel"])
 removeBarButton:Hide()
 
-local slotSelectors = {}
-local function buildSlotSelectors(barName)
-    for _, f in ipairs(slotSelectors) do f:Hide() end
-    slotSelectors = {}
+local slotSelectorPool = {}
 
+local function GetSlotSelector(index)
+    if not slotSelectorPool[index] then
+        local lbl = MakeLabel(slotScrollChild, "", "TOPLEFT", 0, 0)
+        local dd = CreateFrame("Frame", addonName .. "_SlotSel_" .. index, slotScrollChild, "UIDropDownMenuTemplate")
+        UIDropDownMenu_SetWidth(dd, 140)
+        
+        slotSelectorPool[index] = { label = lbl, dropdown = dd }
+    end
+    return slotSelectorPool[index].label, slotSelectorPool[index].dropdown
+end
+
+local function ReleaseSlotSelector(index)
+    if slotSelectorPool[index] then
+        slotSelectorPool[index].label:Hide()
+        slotSelectorPool[index].dropdown:Hide()
+    end
+end
+
+local function buildSlotSelectors(barName)
     local b = SDT.profileBars[barName]
     if not b then return end
 
+    -- Hide unused selectors
+    for i = b.numSlots + 1, 12 do
+        ReleaseSlotSelector(i)
+    end
+
     for i = 1, b.numSlots do
-        local lbl = MakeLabel(slotScrollChild, format(L["Slot %d:"], i), "TOPLEFT", 320, -300 - ((i - 1) * 50))
-        local dd = CreateFrame("Frame", addonName .. "_SlotSel_" .. i, slotScrollChild, "UIDropDownMenuTemplate")
+        local lbl, dd = GetSlotSelector(i)
+
+        -- Update label
+        lbl:SetText(format(L["Slot %d:"], i))
         lbl:SetPoint("TOPLEFT", slotScrollChild, "TOPLEFT", 0, -((i - 1) * 50))
+        lbl:Show()
+
+        -- Update dropdown
         dd:SetPoint("TOPLEFT", lbl, "BOTTOMLEFT", -15, -6)
-        UIDropDownMenu_SetWidth(dd, 140)
 
         UIDropDownMenu_Initialize(dd, function(self, level)
             local info = UIDropDownMenu_CreateInfo()
@@ -494,8 +525,7 @@ local function buildSlotSelectors(barName)
         end)
 
         UIDropDownMenu_SetText(dd, b.slots[i] or L["(empty)"])
-        table.insert(slotSelectors, lbl)
-        table.insert(slotSelectors, dd)
+        dd:Show()
     end
 
     local totalHeight = b.numSlots * SLOT_HEIGHT + 10
@@ -621,9 +651,8 @@ local borderLabel = panelsSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNor
 borderLabel:SetPoint("TOPLEFT", nameEditBox, "BOTTOMLEFT", -5, -20)
 borderLabel:SetText(L["Select Border:"])
 borderLabel:Hide()
-local borderDropdown = CreateFrame("Frame", addonName .. "_BorderDropdown", panelsSubPanel, "UIDropDownMenuTemplate")
+local borderDropdown = CreateSettingsDropdown(addonName .. "_BorderDropdown", panelsSubPanel)
 borderDropdown:SetPoint("TOPLEFT", borderLabel, "BOTTOMLEFT", -20, -6)
-UIDropDownMenu_SetWidth(borderDropdown, 160)
 borderDropdown:Hide()
 
 local borderSizeSlider, borderSizeBox = CreateSliderWithBox(panelsSubPanel, "Border Size", L["Border Size"], 1, 40, 1, borderDropdown, 30, -20)
@@ -764,7 +793,9 @@ function SDT:UpdateSelectedBarControls()
         slotScrollFrame:Hide()
         slotScrollFrame.ScrollBar:Hide()
         slotScrollFrame:SetVerticalScroll(0)
-        for _, f in ipairs(slotSelectors) do f:Hide() end
+        for i = 1, 12 do
+            ReleaseSlotSelector(i)
+        end
         return
     end
 
@@ -881,9 +912,6 @@ StaticPopupDialogs["SDT_CONFIRM_DELETE_BAR"] = {
         UIDropDownMenu_SetText(panelDropdown, L["(none)"])
         UIDropDownMenu_Initialize(panelDropdown, PanelDropdown_Initialize)
 
-        for _, f in ipairs(slotSelectors) do f:Hide() end
-        slotSelectors = {}
-
         removeBarButton:Hide()
         borderLabel:Hide()
         borderDropdown:Hide()
@@ -923,7 +951,7 @@ local profileSelectLabel = profilesSubPanel:CreateFontString(nil, "OVERLAY", "Ga
 profileSelectLabel:SetPoint("LEFT", profileCreateLabel, "RIGHT", 100, 0)
 profileSelectLabel:SetText(L["Current Profile:"])
 
-local profileSelectDropdown = CreateFrame("Frame", addonName .. "_ProfileSelectDropdown", profilesSubPanel, "UIDropDownMenuTemplate")
+local profileSelectDropdown = CreateSettingsDropdown(addonName .. "_ProfileSelectDropdown", profilesSubPanel)
 profileSelectDropdown:SetPoint("LEFT", profileCreateName, "RIGHT", 20, -4)
 UIDropDownMenu_SetWidth(profileSelectDropdown, 140)
 
@@ -946,7 +974,7 @@ local specOneLabel = profilesSubPanel:CreateFontString(nil, "OVERLAY", "GameFont
 specOneLabel:SetPoint("TOPLEFT", perSpecCheck, "BOTTOMLEFT", 0, 0)
 specOneLabel:SetText("")
 
-local specOneDropdown = CreateFrame("Frame", addonName .. "_SpecOneDropdown", profilesSubPanel, "UIDropDownMenuTemplate")
+local specOneDropdown = CreateSettingsDropdown(addonName .. "_SpecOneDropdown", profilesSubPanel)
 specOneDropdown:SetPoint("TOPLEFT", specOneLabel, "BOTTOMLEFT", -20, -4)
 UIDropDownMenu_SetWidth(specOneDropdown, 120)
 
@@ -954,7 +982,7 @@ local specTwoLabel = profilesSubPanel:CreateFontString(nil, "OVERLAY", "GameFont
 specTwoLabel:SetPoint("LEFT", specOneLabel, "LEFT", 150, 0)
 specTwoLabel:SetText("")
 
-local specTwoDropdown = CreateFrame("Frame", addonName .. "_SpecTwoDropdown", profilesSubPanel, "UIDropDownMenuTemplate")
+local specTwoDropdown = CreateSettingsDropdown(addonName .. "_SpecTwoDropdown", profilesSubPanel)
 specTwoDropdown:SetPoint("LEFT", specOneDropdown, "RIGHT", -20, 0)
 UIDropDownMenu_SetWidth(specTwoDropdown, 120)
 
@@ -962,7 +990,7 @@ local specThreeLabel = profilesSubPanel:CreateFontString(nil, "OVERLAY", "GameFo
 specThreeLabel:SetPoint("LEFT", specTwoLabel, "LEFT", 150, 0)
 specThreeLabel:SetText("")
 
-local specThreeDropdown = CreateFrame("Frame", addonName .. "_SpecThreeDropdown", profilesSubPanel, "UIDropDownMenuTemplate")
+local specThreeDropdown = CreateSettingsDropdown(addonName .. "_SpecThreeDropdown", profilesSubPanel)
 specThreeDropdown:SetPoint("LEFT", specTwoDropdown, "RIGHT", -20, 0)
 UIDropDownMenu_SetWidth(specThreeDropdown, 120)
 
@@ -973,7 +1001,7 @@ if SDT.cache.playerClass == "DRUID" then
     specFourLabel:SetPoint("LEFT", specThreeLabel, "LEFT", 150, 0)
     specFourLabel:SetText("")
 
-    specFourDropdown = CreateFrame("Frame", addonName .. "_SpecFourDropdown", profilesSubPanel, "UIDropDownMenuTemplate")
+    specFourDropdown = CreateSettingsDropdown(addonName .. "_SpecFourDropdown", profilesSubPanel)
     specFourDropdown:SetPoint("LEFT", specThreeDropdown, "RIGHT", -20, 0)
     UIDropDownMenu_SetWidth(specFourDropdown, 120)
 end

@@ -65,7 +65,7 @@ function SDT:ApplyFont()
     local fontSize = SDT.SDTDB_CharDB.settings.fontSize or 12
 
     for _, bar in pairs(SDT.bars) do
-        for k, slot in pairs(bar.slots) do
+        for _, slot in ipairs(bar.slots) do
             if slot.text then
                 slot.text:SetFont(fontPath, fontSize, "")
             end

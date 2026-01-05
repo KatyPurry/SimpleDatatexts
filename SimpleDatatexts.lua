@@ -17,7 +17,6 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local format           = string.format
 local mathfloor        = math.floor
 local print            = print
-local strsplit         = strsplit
 local stringlower      = string.lower
 local tconcat          = table.concat
 local tinsert          = table.insert
@@ -246,24 +245,26 @@ end
 -- Slot Selection Dropdown
 -------------------------------------------------
 local dropdownFrame = CreateFrame("Frame", addonName .. "_SlotDropdown", UIParent, "UIDropDownMenuTemplate")
-function SDT:ShowSlotDropdown(slot, bar)
-    local function InitializeDropdown()
-        local info = UIDropDownMenu_CreateInfo()
-        info.notCheckable = true
+local function InitializeSlotDropdown(slot, bar)
+    local info = UIDropDownMenu_CreateInfo()
+    info.notCheckable = true
 
-        for _, moduleName in ipairs(SDT.cache.moduleNames) do
-            info.text = moduleName
-            info.func = function()
-                if SDT.profileBars[bar:GetName()] then
-                    SDT.profileBars[bar:GetName()].slots[slot.index] = moduleName
-                    SDT:RebuildSlots(bar)
-                end
+    for _, moduleName in ipairs(SDT.cache.moduleNames) do
+        info.text = moduleName
+        info.func = function()
+            if SDT.profileBars[bar:GetName()] then
+                SDT.profileBars[bar:GetName()].slots[slot.index] = moduleName
+                SDT:RebuildSlots(bar)
             end
-            UIDropDownMenu_AddButton(info)
         end
+        UIDropDownMenu_AddButton(info)
     end
+end
 
-    UIDropDownMenu_Initialize(dropdownFrame, InitializeDropdown)
+function SDT:ShowSlotDropdown(slot, bar)
+    UIDropDownMenu_Initialize(dropdownFrame, function()
+        InitializeSlotDropdown(slot, bar)
+    end)
     ToggleDropDownMenu(1, nil, dropdownFrame, "cursor", 0, 0)
 end
 
