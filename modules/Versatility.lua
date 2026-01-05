@@ -54,7 +54,7 @@ function mod.Create(slotFrame)
     local function UpdateVersatility()
         currentVers = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
         versReduction = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_TAKEN)
-        local textString = L["Vers: "] .. SDT:FormatPercent(currentVers)
+        local textString = format("%s %s", L["Vers:"], SDT:FormatPercent(currentVers))
         text:SetText(SDT:ColorText(textString))
     end
 

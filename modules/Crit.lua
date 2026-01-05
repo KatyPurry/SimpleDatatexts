@@ -77,7 +77,7 @@ function mod.Create(slotFrame)
 		    ratingIndex = CR_CRIT_MELEE
 	    end
 
-        local textString = L["Crit: "] .. SDT:FormatPercent(critChance)
+        local textString = format("%s: %s", L["Crit"], SDT:FormatPercent(critChance))
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateCrit

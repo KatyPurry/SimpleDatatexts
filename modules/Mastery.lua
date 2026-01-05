@@ -28,7 +28,7 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateMastery()
         currentMastery = GetMasteryEffect() or 0
-        local textString = L["Mastery: "] .. SDT:FormatPercent(currentMastery)
+        local textString = format("%s %s", L["Mastery:"], SDT:FormatPercent(currentMastery))
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateMastery

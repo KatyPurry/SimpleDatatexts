@@ -319,19 +319,19 @@ loader:SetScript("OnEvent", function(self, event, arg)
 end)
 
 local function SlashHelp()
-    SDT.Print(L["|cffffff00--[Options]--|r"])
-    SDT.Print(L["Lock/Unlock: |cff8888ff/sdt lock|r"])
-    SDT.Print(L["Width: |cff8888ff/sdt width <barName> <newWidth>|r"])
-    SDT.Print(L["Height: |cff8888ff/sdt height <barName> <newHeight>|r"])
-    SDT.Print(L["Scale: |cff8888ff/sdt scale <barName> <newScale>|r"])
-    SDT.Print(L["Settings: |cff8888ff/sdt config|r"])
-    SDT.Print(L["Version: |cff8888ff/sdt version|r"])
+    SDT.Print(format("|cffffff00--[%s]--|r", L["Options"]))
+    SDT.Print(format("%s: |cff8888ff%s|r", L["Lock/Unlock"], "/sdt lock"))
+    SDT.Print(format("%s: |cff8888ff%s <%s> <%s>|r", L["Width"], "/sdt width", L["barName"], L["value"]))
+    SDT.Print(format("%s: |cff8888ff%s <%s> <%s>|r", L["Height"], "/sdt height", L["barName"], L["value"]))
+    SDT.Print(format("%s: |cff8888ff%s <%s> <%s>|r", L["Scale"], "/sdt scale", L["barName"], L["value"]))
+    SDT.Print(format("%s: |cff8888ff%s|r", L["Settings"], "/sdt config"))
+    SDT.Print(format("%s: |cff8888ff%s|r", L["Version"], "/sdt version"))
 end
 
 local function BarAdjustments(adj, bar, num)
     -- Make sure we have all of our values
     if not adj or not bar or not num then
-        SDT.Print(format(L["Usage: /sdt %s <barName> <value>"], adj))
+        SDT.Print(format("%s: %s %s <%s> <%s>", L["Usage"], "/sdt", adj, L["barName"], L["value"]))
         SlashHelp()
         return
     end
@@ -415,13 +415,14 @@ SlashCmdList["SDT"] = function(msg)
         if SDT.UI and SDT.UI.lockCheckbox then
             SDT.UI.lockCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.locked)
         end
-        SDT.Print(L["SDT panels are now: "], SDT.SDTDB_CharDB.settings.locked and L["|cffff0000LOCKED|r"] or L["|cff00ff00UNLOCKED|r"])
+        local lockedColor = SDT.SDTDB_CharDB.settings.locked and "|cffff0000" or "|cff00ff00"
+        SDT.Print(format("%s: %s%s|r", L["SDT panels are now"], lockedColor, SDT.SDTDB_CharDB.settings.locked and L["LOCKED"] or L["UNLOCKED"]))
     elseif command == "width" or command == "height" or command == "scale" then
         BarAdjustments(command, bar, num)
     elseif command == "update" then
         SDT:UpdateAllModules()
     elseif command == "version" then
-        SDT.Print(format(L["Simple Datatexts Version: |cff8888ff%s|r"], tostring(SDT.cache.version)))
+        SDT.Print(format("%s: |cff8888ff%s|r", L["Simple Datatexts Version"], tostring(SDT.cache.version)))
     else
         SlashHelp()
     end

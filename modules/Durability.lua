@@ -137,7 +137,7 @@ function mod.Create(slotFrame)
         -- colorize percent
         local r, g, b = ColorGradient(totalDurability / 100)
         local durabilityHex = format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
-        local textString = SDT:ColorText(L["Durability: "]) .. format("%s%s|r", durabilityHex, SDT:FormatPercent(totalDurability))
+        local textString = format("%s %s%s|r", SDT:ColorText(L["Durability:"]), durabilityHex, SDT:FormatPercent(totalDurability))
         text:SetText(textString)
 
         -- pulse if below threshold
@@ -154,11 +154,11 @@ function mod.Create(slotFrame)
     -- Event Handler
     ----------------------------------------------------
     local function OnEvent(self, event, ...)
-        if event == "UPDATE_INVENTORY_DURABILITY" or event == "PLAYER_EQUIPMENT_CHANGED" then
-            UpdateDurability(self)
-        elseif event == "MERCHANT_SHOW" or event == "MERCHANT_CLOSED" then
-            UpdateDurability(self)
-        elseif event == "PLAYER_ENTERING_WORLD" then
+        if event == "UPDATE_INVENTORY_DURABILITY" 
+          or event == "PLAYER_EQUIPMENT_CHANGED"
+          or event == "MERCHANT_SHOW"
+          or event == "MERCHANT_CLOSED"
+          or event == "PLAYER_ENTERING_WORLD" then
             UpdateDurability(self)
         end
     end

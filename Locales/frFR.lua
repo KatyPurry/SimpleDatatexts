@@ -11,24 +11,26 @@ end
 -- Used in: Settings.lua, SimpleDatatexts.lua
 L["(empty)"] = "(vide)"
 L["Loaded. Total modules: %d"] = "Chargé. Nombre total de modules : %d"
-L["|cffffff00--[Options]--|r"] = "|cffffff00--[Options]--|r"
-L["Lock/Unlock: |cff8888ff/sdt lock|r"] = "Verrouiller/Déverrouiller : |cff8888ff/sdt lock|r"
-L["Width: |cff8888ff/sdt width <barName> <newWidth>|r"] = "Largeur : |cff8888ff/sdt width <barName> <newWidth>|r"
-L["Height: |cff8888ff/sdt height <barName> <newHeight>|r"] = "Hauteur : |cff8888ff/sdt height <barName> <newHeight>|r"
-L["Scale: |cff8888ff/sdt scale <barName> <newScale>|r"] = "Échelle : |cff8888ff/sdt scale <barName> <newScale>|r"
-L["Settings: |cff8888ff/sdt config|r"] = "Paramètres : |cff8888ff/sdt config|r"
-L["Version: |cff8888ff/sdt version|r"] = "Version : |cff8888ff/sdt version|r"
-L["Usage: /sdt %s <barName> <value>"] = "Utilisation : /sdt %s <nomBarre> <valeur>"
+L["Options"] = "Options"
+L["Lock/Unlock"] = "Verrouiller/Déverrouiller"
+L["Width"] = "Largeur"
+L["Height"] = "Hauteur"
+L["Scale"] = "Échelle"
+L["Settings"] = "Paramètres"
+L["Version"] = "Version"
+L["Usage"] = "Utilisation"
+L["barName"] = "Nom du bar"
+L["value"] = "valeur"
 L["Invalid panel name supplied. Valid panel names are:"] = "Nom de panneau invalide. Les noms valides sont :"
 L["A valid numeric value for the adjustment must be specified."] = "Une valeur numérique valide doit être spécifiée pour l’ajustement."
 L["Invalid panel width specified."] = "Largeur de panneau invalide."
 L["Invalid panel height specified."] = "Hauteur de panneau invalide."
 L["Invalid panel scale specified."] = "Échelle de panneau invalide."
 L["Invalid adjustment type specified."] = "Type d'ajustement invalide."
-L["SDT panels are now: "] = "Les panneaux SDT sont maintenant : "
-L["|cffff0000LOCKED|r"] = "|cffff0000VERROUILLÉS|r"
-L["|cff00ff00UNLOCKED|r"] = "|cff00ff00DÉVERROUILLÉS|r"
-L["Simple Datatexts Version: |cff8888ff%s|r"] = "Version de Simple Datatexts : |cff8888ff%s|r"
+L["SDT panels are now"] = "Les panneaux SDT sont maintenant"
+L["LOCKED"] = "VERROUILLÉS"
+L["UNLOCKED"] = "DÉVERROUILLÉS"
+L["Simple Datatexts Version"] = "Version de Simple Datatexts"
 
 -- ----------------------------
 -- Settings.lua
@@ -50,7 +52,7 @@ L["Create New Panel"] = "Créer un nouveau panneau"
 L["Select Panel:"] = "Sélectionner un panneau :"
 L["Rename Panel:"] = "Renommer le panneau :"
 L["Remove Selected Panel"] = "Supprimer le panneau sélectionné"
-L["Slot %d:"] = "Emplacement %d :"
+L["Slot %d:"] = "Emplacement %d:"
 L["Scale"] = "Échelle"
 L["Background Opacity"] = "Opacité de l’arrière-plan"
 L["Slots"] = "Emplacements"
@@ -99,7 +101,7 @@ L["Bags"] = "Sacs"
 -- ----------------------------
 -- modules/Crit.lua
 -- ----------------------------
-L["Crit: "] = "Crit : "
+L["Crit"] = "Crit"
 
 -- ----------------------------
 -- modules/Currency.lua
@@ -111,7 +113,7 @@ L["GOLD"] = "OR"
 -- ----------------------------
 -- modules/Durability.lua
 -- ----------------------------
-L["Durability: "] = "Durabilité : "
+L["Durability:"] = "Durabilité :"
 
 -- ----------------------------
 -- modules/Friends.lua
@@ -143,7 +145,7 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Objet LDB A
 -- ----------------------------
 -- modules/Haste.lua
 -- ----------------------------
-L["Haste: "] = "Hâte : "
+L["Haste:"] = "Hâte :"
 
 -- ----------------------------
 -- modules/LDBObjects.lua
@@ -159,7 +161,7 @@ L["No Mail"] = "Aucun courrier"
 -- ----------------------------
 -- modules/Mastery.lua
 -- ----------------------------
-L["Mastery: "] = "Maîtrise : "
+L["Mastery:"] = "Maîtrise :"
 
 -- ----------------------------
 -- modules/SpecSwitch.lua
@@ -199,7 +201,7 @@ L["Saved Dungeon(s)"] = "Donjons sauvegardés"
 -- ----------------------------
 -- modules/Versatility.lua
 -- ----------------------------
-L["Vers: "] = "Poly : "
+L["Vers:"] = "Poly :"
 
 -- ----------------------------
 -- modules/Volume.lua

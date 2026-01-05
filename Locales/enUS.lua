@@ -7,24 +7,26 @@ local L = SDT.L
 -- Used in: Settings.lua, SimpleDatatexts.lua
 L["(empty)"] = "(empty)"
 L["Loaded. Total modules: %d"] = "Loaded. Total modules: %d"
-L["|cffffff00--[Options]--|r"] = "|cffffff00--[Options]--|r"
-L["Lock/Unlock: |cff8888ff/sdt lock|r"] = "Lock/Unlock: |cff8888ff/sdt lock|r"
-L["Width: |cff8888ff/sdt width <barName> <newWidth>|r"] = "Width: |cff8888ff/sdt width <barName> <newWidth>|r"
-L["Height: |cff8888ff/sdt height <barName> <newHeight>|r"] = "Height: |cff8888ff/sdt height <barName> <newHeight>|r"
-L["Scale: |cff8888ff/sdt scale <barName> <newScale>|r"] = "Scale: |cff8888ff/sdt scale <barName> <newScale>|r"
-L["Settings: |cff8888ff/sdt config|r"] = "Settings: |cff8888ff/sdt config|r"
-L["Version: |cff8888ff/sdt version|r"] = "Version: |cff8888ff/sdt version|r"
-L["Usage: /sdt %s <barName> <value>"] = "Usage: /sdt %s <barName> <value>"
+L["Options"] = "Options"
+L["Lock/Unlock"] = "Lock/Unlock"
+L["Width"] = "Width"
+L["Height"] = "Height"
+L["Scale"] = "Scale"
+L["Settings"] = "Settings"
+L["Version"] = "Version"
+L["Usage"] = "Usage"
+L["barName"] = "barName"
+L["value"] = "value"
 L["Invalid panel name supplied. Valid panel names are:"] = "Invalid panel name supplied. Valid panel names are:"
 L["A valid numeric value for the adjustment must be specified."] = "A valid numeric value for the adjustment must be specified."
 L["Invalid panel width specified."] = "Invalid panel width specified."
 L["Invalid panel height specified."] = "Invalid panel height specified."
 L["Invalid panel scale specified."] = "Invalid panel scale specified."
 L["Invalid adjustment type specified."] = "Invalid adjustment type specified."
-L["SDT panels are now: "] = "SDT panels are now: "
+L["SDT panels are now"] = "SDT panels are now"
 L["|cffff0000LOCKED|r"] = "|cffff0000LOCKED|r"
 L["|cff00ff00UNLOCKED|r"] = "|cff00ff00UNLOCKED|r"
-L["Simple Datatexts Version: |cff8888ff%s|r"] = "Simple Datatexts Version: |cff8888ff%s|r"
+L["Simple Datatexts Version"] = "Simple Datatexts Version"
 
 -- ----------------------------
 -- Settings.lua
@@ -95,7 +97,7 @@ L["Bags"] = "Bags"
 -- ----------------------------
 -- modules/Crit.lua
 -- ----------------------------
-L["Crit: "] = "Crit: "
+L["Crit"] = "Crit"
 
 -- ----------------------------
 -- modules/Currency.lua
@@ -107,7 +109,7 @@ L["GOLD"] = "GOLD"
 -- ----------------------------
 -- modules/Durability.lua
 -- ----------------------------
-L["Durability: "] = "Durability: "
+L["Durability:"] = "Durability:"
 
 -- ----------------------------
 -- modules/Friends.lua
@@ -139,7 +141,7 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Ara Guild L
 -- ----------------------------
 -- modules/Haste.lua
 -- ----------------------------
-L["Haste: "] = "Haste: "
+L["Haste:"] = "Haste:"
 
 -- ----------------------------
 -- modules/LDBObjects.lua
@@ -155,7 +157,7 @@ L["No Mail"] = "No Mail"
 -- ----------------------------
 -- modules/Mastery.lua
 -- ----------------------------
-L["Mastery: "] = "Mastery: "
+L["Mastery:"] = "Mastery:"
 
 -- ----------------------------
 -- modules/SpecSwitch.lua
@@ -195,7 +197,7 @@ L["Saved Dungeon(s)"] = "Saved Dungeon(s)"
 -- ----------------------------
 -- modules/Versatility.lua
 -- ----------------------------
-L["Vers: "] = "Vers: "
+L["Vers:"] = "Vers:"
 
 -- ----------------------------
 -- modules/Volume.lua
@@ -216,7 +218,7 @@ L["Shift + Right Click: Select Output Audio Device"] = "Shift + Right Click: Sel
 -- ----------------------------
 L["Guild"] = "Guild"
 L["No Guild"] = "No Guild"
-L["Friends: "] = "Friends: "
+L["Friends"] = "Friends"
 L["<Mobile>"] = "<Mobile>"
 L["Hints [|cffffffffBlock|r]"] = "Hints [|cffffffffBlock|r]"
 L["|cffff8020Click|r to open panel."] = "|cffff8020Click|r to open panel."

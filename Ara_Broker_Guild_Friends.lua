@@ -205,7 +205,7 @@ end
 
 local function UpdateFriendBlockText(updatePanel)
 	local totalRF, onlineRF = BNGetNumFriends()
-	local friendsTag = config.showFriendsTag and L["Friends: "] or ""
+	local friendsTag = config.showFriendsTag and L["Friends"] .. ": " or ""
 	f.FriendsBlock.text = (config.showFriendsTotal and "%s%d/%d" or "%s%d"):format( friendsTag, onlineFriends + onlineRF, totalFriends + totalRF )
 	SDT:UpdateFriends()
 	if updatePanel then f:BN_FRIEND_INFO_CHANGED() end
