@@ -222,7 +222,7 @@ L["Shift + Right Click: Select Output Audio Device"] = "Maj + clic droit : séle
 -- ----------------------------
 L["Guild"] = "Guilde"
 L["No Guild"] = "Aucune guilde"
-L["Friends: "] = "Amis : "
+L["Friends"] = "Amis"
 L["<Mobile>"] = "<Mobile>"
 L["Hints"] = "Astuces"
 L["Block"] = "Bloc"
