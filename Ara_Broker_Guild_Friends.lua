@@ -286,16 +286,16 @@ local function UpdateBlockHints()
 		if config.showBlockHints then
 			tip:SetOwner(f, "ANCHOR_NONE")
 			tip:SetPoint( f.isTop and "TOP" or "BOTTOM", f, f.isTop and "BOTTOM" or "TOP" )
-			tip:AddLine(L["Hints [|cffffffffBlock|r]"])
-			if config.hbOpenPanel then tip:AddLine(L["|cffff8020Click|r to open panel."], 0.2, 1, 0.2) end
-			if config.hbConfig then tip:AddLine(L["|cffff8020RightClick|r to display config menu."], 0.2, 1, 0.2) end
+			tip:AddLine(format("%s |cffffffff%s|r", L["Hints"], L["Block"]))
+			if config.hbOpenPanel then tip:AddLine(format("|cffff8020%s|r %s", L["Click"], L["to open panel."]), 0.2, 1, 0.2) end
+			if config.hbConfig then tip:AddLine(format("|cffff8020%s|r %s", L["RightClick"], L["to display config menu."]), 0.2, 1, 0.2) end
 			if not isGuild then
 				if config.hbAddFriend then
-					tip:AddLine(L["|cffff8020MiddleClick|r to add a friend."], 0.2, 1, 0.2)
-					tip:AddLine(L["|cffff8020Modifier+Click|r to add a friend."], 0.2, 1, 0.2)
+					tip:AddLine(format("|cffff8020%s|r %s", L["MiddleClick"], L["to add a friend."]), 0.2, 1, 0.2)
+					tip:AddLine(format("|cffff8020%s|r %s", L["Modifier+Click"], L["to add a friend."]), 0.2, 1, 0.2)
 				end
 			end
-			if config.hbToggleNotes then tip:AddLine(L["|cffff8020Button4|r to toggle notes."], 0.2, 1, 0.2) end
+			if config.hbToggleNotes then tip:AddLine(format("|cffff8020%s|r %s", L["Button4"], L["to toggle notes."]), 0.2, 1, 0.2) end
 			if tip:NumLines() > 1 then tip:Show() else tip:Hide() end
 		else
 			tip:Hide()
@@ -310,21 +310,21 @@ local function ShowHints(btn,config)
 		tip:SetOwner(f, "ANCHOR_NONE")
 		tip:SetPoint(showBelow and "TOP" or "BOTTOM", f, showBelow and "BOTTOM" or "TOP")
 		tip:AddLine(L["Hints"])
-		if config.hWhisp then tip:AddLine(L["|cffff8020Click|r to whisper."], .2,1,.2) end
-		if config.hInvite and (not btn.presenceID or btn.sameRealm) then tip:AddLine(L["|cffff8020Alt+Click|r to invite."], .2,1,.2) end
-		if config.hQuery and not btn.presenceID then tip:AddLine(L["|cffff8020Shift+Click|r to query informations."], .2, 1, .2) end
-		if config.hNote and (not isGuild or CanEditPublicNote()) then tip:AddLine(L["|cffff8020Ctrl+Click|r to edit note."], .2, 1, .2) end
+		if config.hWhisp then tip:AddLine(format("|cffff8020%s|r %s", L["Click"], L["to whisper."]), .2,1,.2) end
+		if config.hInvite and (not btn.presenceID or btn.sameRealm) then tip:AddLine(format("|cffff8020%s|r %s", L["Alt+Click"], L["to invite."]), .2,1,.2) end
+		if config.hQuery and not btn.presenceID then tip:AddLine(format("|cffff8020%s|r %s", L["Shift+Click"], L["to query information."]), .2, 1, .2) end
+		if config.hNote and (not isGuild or CanEditPublicNote()) then tip:AddLine(format("|cffff8020%s|r %s", L["Ctrl+Click"], L["to edit note."]), .2, 1, .2) end
 		if isGuild then
-			if config.hONote and CanEditOfficerNote() then tip:AddLine(L["|cffff8020Ctrl+RightClick|r to edit officer note."], .2, 1, .2) end
+			if config.hONote and CanEditOfficerNote() then tip:AddLine(format("|cffff8020%s|r %s", L["Ctrl+RightClick"], L["to edit officer note."]), .2, 1, .2) end
 		else
-			if config.hRemoveFriend then tip:AddLine(L["|cffff8020MiddleClick|r to remove friend."], .2, 1, .2) end
+			if config.hRemoveFriend then tip:AddLine(format("|cffff8020%s|r %s", L["MiddleClick"], L["to remove friend."]), .2, 1, .2) end
 		end
 		if not btn.presenceID then
-			if config.hOrderA then tip:AddLine(L["|cffff8020RightClick|r to sort main column."], .2, 1, .2) end
-			if config.hOrderB then tip:AddLine(L["|cffff8020Shift+RightClick|r to sort second column."], .2, 1, .2) end
-			if config.hOrderC then tip:AddLine(L["|cffff8020Alt+RightClick|r to sort third column."], .2, 1, .2) end
+			if config.hOrderA then tip:AddLine(format("|cffff8020%s|r %s", L["RightClick"], L["to sort main column."]), .2, 1, .2) end
+			if config.hOrderB then tip:AddLine(format("|cffff8020%s|r %s", L["Shift+RightClick"], L["to sort second column."]), .2, 1, .2) end
+			if config.hOrderC then tip:AddLine(format("|cffff8020%s|r %s", L["Alt+RightClick"], L["to sort third column."]), .2, 1, .2) end
 		end
-		if config.hResizeTip then tip:AddLine(L["|cffff8020Ctrl+MouseWheel|r to resize tooltip."], .2, 1, .2) end
+		if config.hResizeTip then tip:AddLine(format("|cffff8020%s|r %s", L["Ctrl+MouseWheel"], L["to resize tooltip."]), .2, 1, .2) end
 		if tip:NumLines() > 1 then tip:Show() end
 	end
 end
@@ -1153,7 +1153,7 @@ function f:SetupConfigMenu()
 	}
 
 	options = {
-		{ text = format(L["|cffffb366Ara|r Guild & Friends (%s)"], GetAddOnMetadata( addonName, "Version" ) ), isTitle = true },
+		{ text = format("|cffffb366Ara|r %s (%s)", L["Guild & Friends"], GetAddOnMetadata( addonName, "Version" ) ), isTitle = true },
 		{ text = L["Show guild name"], check = "showGuildName" },
 		{ text = L["Show 'Guild' tag"], check = "showGuildTag" },
 		{ text = L["Show total number of guildmates"], check = "showGuildTotal" },
@@ -1211,7 +1211,7 @@ function f:SetupConfigMenu()
 			{ text = L["Ranks"], color = "rank" },
 			{ text = L["Friends broadcast"], color = "broadcast" },
 			{ text = L["Realms"], color = "realm" },
-			{ text = L["|cffaaaaffRestore default colors"], func=
+			{ text = format("|cffaaaaff%s|r", L["Restore default colors"]), func=
 				function()
 					for k, v in next, defaultConfig.colors do
 						local color = colors[k]
