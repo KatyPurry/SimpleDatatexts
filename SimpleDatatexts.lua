@@ -16,7 +16,6 @@ local LSM = LibStub("LibSharedMedia-3.0")
 ----------------------------------------------------
 local format           = string.format
 local mathfloor        = math.floor
-local print            = print
 local stringlower      = string.lower
 local tconcat          = table.concat
 local tinsert          = table.insert

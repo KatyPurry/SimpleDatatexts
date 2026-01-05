@@ -12,6 +12,7 @@ local L = SDT.L
 local format           = string.format
 local mathfloor        = math.floor
 local mathmax          = math.max
+local tinsert          = table.insert
 local tonumber         = tonumber
 local tostring         = tostring
 local tsort            = table.sort
@@ -1010,7 +1011,7 @@ local copyProfileLabel = profilesSubPanel:CreateFontString(nil, "OVERLAY", "Game
 copyProfileLabel:SetPoint("TOPLEFT", specOneDropdown, "BOTTOMLEFT", 20, -20)
 copyProfileLabel:SetText(L["Copy Profile:"])
 
-local copyProfileDropdown = CreateFrame("Frame", addonName .. "_CopyProfileDropdown", profilesSubPanel, "UIDropDownMenuTemplate")
+local copyProfileDropdown = CreateSettingsDropdown(addonName .. "_CopyProfileDropdown", profilesSubPanel)
 copyProfileDropdown:SetPoint("TOPLEFT", copyProfileLabel, "BOTTOMLEFT", -20, -4)
 UIDropDownMenu_SetWidth(copyProfileDropdown, 120)
 UIDropDownMenu_SetSelectedName(copyProfileDropdown, "")
@@ -1020,7 +1021,7 @@ local deleteProfileLabel = profilesSubPanel:CreateFontString(nil, "OVERLAY", "Ga
 deleteProfileLabel:SetPoint("TOPLEFT", copyProfileDropdown, "BOTTOMLEFT", 20, -20)
 deleteProfileLabel:SetText(L["Delete Profile:"])
 
-local deleteProfileDropdown = CreateFrame("Frame", addonName .. "_DeleteProfileDropdown", profilesSubPanel, "UIDropDownMenuTemplate")
+local deleteProfileDropdown = CreateSettingsDropdown(addonName .. "_DeleteProfileDropdown", profilesSubPanel)
 deleteProfileDropdown:SetPoint("TOPLEFT", deleteProfileLabel, "BOTTOMLEFT", -20, -4)
 UIDropDownMenu_SetWidth(deleteProfileDropdown, 120)
 UIDropDownMenu_SetSelectedName(deleteProfileDropdown, "")

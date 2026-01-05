@@ -183,8 +183,8 @@ function SDT:ProfileActivate(profileName, spec)
     SDT.SDTDB_CharDB.chosenProfile[spec] = profileName
     SDT.activeProfile = profileName
 
-    for bar in pairs(SDT.bars) do
-        SDT.bars[bar]:Hide()
+    for _, bar in pairs(SDT.bars) do
+        bar:Hide()
     end
     wipe(SDT.bars)
 
@@ -241,8 +241,8 @@ StaticPopupDialogs["SDT_CONFIRM_COPY_PROFILE"] = {
             return
         end
         local newProfile = CopyTable(src)
-        for bar in pairs(SDT.bars) do
-            SDT.bars[bar]:Hide()
+        for _, bar in pairs(SDT.bars) do
+            bar:Hide()
         end
         wipe(SDTDB.profiles[SDT.activeProfile])
         SDTDB.profiles[SDT.activeProfile] = newProfile
