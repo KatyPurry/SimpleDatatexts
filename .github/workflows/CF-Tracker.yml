@@ -28,7 +28,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: curseforge-state
-          path: .cf-state
+          path: cf-state
         continue-on-error: true
 
       - name: Scrape CurseForge comments and post to Discord
@@ -46,8 +46,8 @@ jobs:
             { slug: "emoteldb", name: "EmoteLDB" }
           ];
 
-          const stateDir = ".cf-state";
-          const stateFile = `${stateDir}/.curseforge-state.json`;
+          const stateDir = "cf-state";
+          const stateFile = `${stateDir}/curseforge-state.json`;
           fs.mkdirSync(stateDir, { recursive: true });
           
           let state = {};
@@ -129,10 +129,10 @@ jobs:
 
       # --- Upload the state file as an artifact ---
       - name: List state folder contents
-        run: ls -l .cf-state
+        run: ls -l cf-state
 
       - name: Upload CurseForge state artifact
         uses: actions/upload-artifact@v4
         with:
           name: curseforge-state
-          path: .cf-state
+          path: cf-state/curseforge-state.json
