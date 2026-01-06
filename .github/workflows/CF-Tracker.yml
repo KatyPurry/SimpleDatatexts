@@ -88,26 +88,23 @@ jobs:
             try {
               await page.goto(url, { waitUntil: "networkidle2" });
 
+              // Wait longer for dynamic content to load
+              await page.waitForTimeout(3000);
+
               // Debug: Log what elements exist on the page
               const debugInfo = await page.evaluate(() => {
-                const allElements = document.querySelectorAll("[class*='comment'], [class*='Comment'], [class*='COMMENT']");
-                const divs = Array.from(document.querySelectorAll("div[class]")).slice(0, 20).map(d => d.className);
+                const allElements = document.querySelectorAll("[class*='comment']");
+                const sampleElements = Array.from(allElements).slice(0, 3).map(el => ({
+                  tag: el.tagName,
+                  className: el.className,
+                  innerHTML: el.innerHTML.substring(0, 100)
+                }));
                 return {
                   commentElementsFound: allElements.length,
-                  sampleDivClasses: divs
+                  sampleElements: sampleElements
                 };
               });
-              console.log(`Debug info for ${project.name}:`, JSON.stringify(debugInfo));
-
-              // Wait for any element to appear (more flexible)
-              try {
-                await page.waitForFunction(
-                  () => document.body.children.length > 0,
-                  { timeout: 5000 }
-                );
-              } catch (e) {
-                console.log(`Page load timeout for ${project.name}`);
-              }
+              console.log(`Debug info for ${project.name}:`, JSON.stringify(debugInfo, null, 2));
 
               const comments = await page.evaluate(() => {
                 return Array.from(document.querySelectorAll("[class*='comment']"))
