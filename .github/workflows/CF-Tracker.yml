@@ -25,9 +25,6 @@ jobs:
       - name: Install dependencies
         run: npm install puppeteer node-fetch
 
-      - name: Restore state from GitHub Gist
-        run: mkdir -p cf-state
-
       - name: Scrape CurseForge comments and post to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
@@ -41,10 +38,6 @@ jobs:
 
           const GIST_ID = process.env.GIST_ID;
           const GH_TOKEN = process.env.GH_TOKEN;
-
-          const stateDir = "cf-state";
-          const stateFile = `${stateDir}/curseforge-state.json`;
-          fs.mkdirSync(stateDir, { recursive: true });
 
           let state = {};
           if (GIST_ID) {
