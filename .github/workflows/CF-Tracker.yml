@@ -24,12 +24,11 @@ jobs:
         run: npm install puppeteer node-fetch
         
       # --- Download previous state artifact if it exists ---
-      - name: Download previous CurseForge state
-        uses: actions/download-artifact@v4
+      - name: Restore CurseForge state cache
+        uses: actions/cache@v3
         with:
-          name: curseforge-state
-          path: cf-state
-        continue-on-error: true
+          path: cf-state/curseforge-state.json
+          key: curseforge-state-v1
 
       - name: Scrape CurseForge comments and post to Discord
         env:
@@ -131,8 +130,8 @@ jobs:
       - name: List state folder contents
         run: ls -l cf-state
 
-      - name: Upload CurseForge state artifact
-        uses: actions/upload-artifact@v4
+      - name: Save CurseForge state cache
+        uses: actions/cache@v3
         with:
-          name: curseforge-state
           path: cf-state/curseforge-state.json
+          key: curseforge-state-v1
