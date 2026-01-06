@@ -107,49 +107,29 @@ jobs:
               console.log(`Debug info for ${project.name}:`, JSON.stringify(debugInfo, null, 2));
 
               const comments = await page.evaluate(() => {
-                return Array.from(document.querySelectorAll("[class*='comment']"))
+                return Array.from(document.querySelectorAll(".comments-list li"))
                   .slice(0, 50) // Limit to recent 50
                   .map((node, index) => {
-                    // Try multiple ways to extract comment ID
-                    let commentNum = null;
+                    // Extract comment ID from .num div
+                    const commentNum = node.querySelector(".num")?.innerText?.trim();
                     
-                    // Method 1: Check element ID attribute
-                    if (node.id && node.id.match(/\d+/)) {
-                      commentNum = node.id.match(/\d+/)[0];
-                    }
+                    // Extract author from .author-name span
+                    const author = node.querySelector(".author-name .ellipsis")?.innerText?.trim() || "Unknown";
                     
-                    // Method 2: Look for data attributes
-                    if (!commentNum) {
-                      commentNum = node.getAttribute("data-comment-id") || 
-                                  node.getAttribute("data-id");
-                    }
+                    // Extract body from .text div
+                    const body = node.querySelector(".text")?.innerText?.trim() || "";
                     
-                    // Method 3: Find comment number in text content
-                    if (!commentNum) {
-                      const commentText = node.innerText;
-                      const match = commentText.match(/#(\d+)/);
-                      if (match) {
-                        commentNum = match[1];
-                      }
-                    }
-                    
-                    // Method 4: Use index-based ID (last resort, but at least consistent within a run)
-                    if (!commentNum) {
-                      commentNum = `comment-${index}`;
-                    }
-
-                    const author = node.querySelector("[class*='author']")?.innerText?.trim() || "Unknown";
-                    const body = node.querySelector("[class*='text'], [class*='body']")?.innerText?.trim() || "";
-                    const timestamp = node.querySelector("time")?.getAttribute("datetime") || new Date().toISOString();
+                    // Extract timestamp from .date span
+                    const timestamp = node.querySelector(".date span")?.innerText?.trim() || new Date().toISOString();
 
                     return {
-                      id: commentNum.toString(),
+                      id: commentNum,
                       author,
                       body,
                       timestamp
                     };
                   })
-                  .filter(c => c.id && !c.id.startsWith('comment-')); // Remove fallback IDs
+                  .filter(c => c.id); // Only keep comments with valid IDs
               });
 
               console.log(`Found ${comments.length} comments for ${project.name}`);
