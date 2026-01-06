@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: "*/10 * * * *" # every 10 minutes
   workflow_dispatch:
+  repository_dispatch:
+    types: [run-cf-tracker]
 
 jobs:
   scrape-comments:
@@ -192,13 +194,3 @@ jobs:
             console.log("State saved locally (no Gist configured)");
           }
           EOF
-
-      # --- Upload the state file as an artifact ---
-      - name: List state folder contents
-        run: ls -l cf-state
-
-      - name: Save CurseForge state cache
-        uses: actions/cache@v3
-        with:
-          path: cf-state/curseforge-state.json
-          key: sdt-lss-eldb-curseforge-state-v1
