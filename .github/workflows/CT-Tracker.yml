@@ -34,11 +34,11 @@ jobs:
 
           const PROJECTS = [
             { slug: "simpledatatexts", name: "SimpleDatatexts" },
-            { slug: "loot-spec-swapper", name: "Loot Spec Swapper" },
+            { slug: "lootspecswapper", name: "Loot Spec Swapper" },
             { slug: "emoteldb", name: "EmoteLDB" }
           ];
 
-          const stateFile = ".curseforge-state.json";
+          const stateFile = ".github/workflows/.curseforge-state.json";
           const state = fs.existsSync(stateFile)
             ? JSON.parse(fs.readFileSync(stateFile))
             : {};
@@ -60,32 +60,43 @@ jobs:
                   body: node.querySelector(".comment__content")?.innerText?.trim() || ""
                 }))
               );
+              
+              if (!comments.length) {
+                console.log(`No comments found for ${project.name}`);
+              }
 
               for (const comment of comments.reverse()) {
                 const lastId = state[project.slug] || 0;
                 if (parseInt(comment.id) <= lastId) continue;
 
-                const msg = {
-                  content: `💬 **New CurseForge comment on ${project.name}**\n` +
-                           `Author: **${comment.author}**\n` +
-                           `${comment.body.substring(0, 1800)}`
-                };
+                //const msg = {
+                //  content: `💬 **New CurseForge comment on ${project.name}**\n` +
+                //           `Author: **${comment.author}**\n` +
+                //           `${comment.body.substring(0, 1800)}`
+                //};
                 
-                function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+                //function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-                try {
-                  const res = await fetch(process.env.DISCORD_WEBHOOK, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(msg)
-                  });
-                  if (!res.ok) {
-                    console.log(`Failed to post to Discord for ${project.name}: ${res.status}`);
-                  }
-                  await sleep(1000);
-                } catch (e) {
-                  console.log(`Error posting to Discord for ${project.name}:`, e.message);
-                }
+                //try {
+                //  const res = await fetch(process.env.DISCORD_WEBHOOK, {
+                //    method: "POST",
+                //    headers: { "Content-Type": "application/json" },
+                //    body: JSON.stringify(msg)
+                //  });
+                //  if (!res.ok) {
+                //    console.log(`Failed to post to Discord for ${project.name}: ${res.status}`);
+                //  }
+                //  await sleep(1000);
+                //} catch (e) {
+                //  console.log(`Error posting to Discord for ${project.name}:`, e.message);
+                //}
+                
+                // Log the comment info instead of posting to Discord
+                console.log(`--- ${project.name} ---`);
+                console.log('ID:    ', comment.id);
+                console.log('Author:', comment.author);
+                console.log('Body:  ', comment.body);
+                console.log('-------------------');
 
                 state[project.slug] = parseInt(comment.id);
               }
@@ -103,6 +114,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add .curseforge-state.json
+          git add .github/workflows/.curseforge-state.json
           git commit -m "Update CurseForge comment state" || exit 0
           git push
