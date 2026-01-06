@@ -2,7 +2,7 @@ name: CurseForge Comment Notifications
 
 on:
   schedule:
-    - cron: "*/10 * * * *" # every 10 minutes
+    - cron: "*/10 * * * *" # every 10 minutes (GitHub may be unreliable)
   workflow_dispatch:
   repository_dispatch:
     types: [run-cf-tracker]
@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install puppeteer node-fetch
-        
+
       - name: Restore state from GitHub Gist
         run: mkdir -p cf-state
 
@@ -38,14 +38,14 @@ jobs:
           import puppeteer from "puppeteer";
           import fs from "fs";
           import fetch from "node-fetch";
-          
+
           const GIST_ID = process.env.GIST_ID;
           const GH_TOKEN = process.env.GH_TOKEN;
-          
+
           const stateDir = "cf-state";
           const stateFile = `${stateDir}/curseforge-state.json`;
           fs.mkdirSync(stateDir, { recursive: true });
-          
+
           let state = {};
           if (GIST_ID) {
             try {
@@ -57,14 +57,20 @@ jobs:
                 const stateContent = gist.files["curseforge-state.json"]?.content;
                 if (stateContent) {
                   state = JSON.parse(stateContent);
-                  console.log("State loaded from Gist");
+                  console.log("State loaded from Gist:", JSON.stringify(state));
+                } else {
+                  console.log("No state file found in Gist, starting fresh");
                 }
+              } else {
+                console.log(`Failed to fetch Gist: ${res.status}`);
               }
             } catch (e) {
               console.log("Could not fetch state from Gist, starting fresh:", e.message);
             }
+          } else {
+            console.log("GIST_ID not set, state will not persist");
           }
-          
+
           const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
           const page = await browser.newPage();
           page.setDefaultTimeout(10000);
@@ -78,10 +84,10 @@ jobs:
           for (const project of PROJECTS) {
             const url = `https://www.curseforge.com/wow/addons/${project.slug}/comments`;
             const newComments = [];
-            
+
             try {
               await page.goto(url, { waitUntil: "networkidle2" });
-              
+
               // Wait for comments with longer timeout
               await page.waitForFunction(
                 () => document.querySelectorAll("[class*='comment']").length > 0,
@@ -91,23 +97,49 @@ jobs:
               const comments = await page.evaluate(() => {
                 return Array.from(document.querySelectorAll("[class*='comment']"))
                   .slice(0, 50) // Limit to recent 50
-                  .map(node => {
-                    const commentNum = node.getAttribute("id") ||
-                                      node.querySelector("[class*='num']")?.innerText?.match(/\d+/)?.[0] ||
-                                      Date.now().toString();
+                  .map((node, index) => {
+                    // Try multiple ways to extract comment ID
+                    let commentNum = null;
+                    
+                    // Method 1: Check element ID attribute
+                    if (node.id && node.id.match(/\d+/)) {
+                      commentNum = node.id.match(/\d+/)[0];
+                    }
+                    
+                    // Method 2: Look for data attributes
+                    if (!commentNum) {
+                      commentNum = node.getAttribute("data-comment-id") || 
+                                  node.getAttribute("data-id");
+                    }
+                    
+                    // Method 3: Find comment number in text content
+                    if (!commentNum) {
+                      const commentText = node.innerText;
+                      const match = commentText.match(/#(\d+)/);
+                      if (match) {
+                        commentNum = match[1];
+                      }
+                    }
+                    
+                    // Method 4: Use index-based ID (last resort, but at least consistent within a run)
+                    if (!commentNum) {
+                      commentNum = `comment-${index}`;
+                    }
+
                     const author = node.querySelector("[class*='author']")?.innerText?.trim() || "Unknown";
                     const body = node.querySelector("[class*='text'], [class*='body']")?.innerText?.trim() || "";
                     const timestamp = node.querySelector("time")?.getAttribute("datetime") || new Date().toISOString();
 
                     return {
-                      id: commentNum,
+                      id: commentNum.toString(),
                       author,
                       body,
                       timestamp
                     };
-                  });
+                  })
+                  .filter(c => c.id && !c.id.startsWith('comment-')); // Remove fallback IDs
               });
-              
+
               console.log(`Found ${comments.length} comments for ${project.name}`);
               console.log(`Previous last ID for ${project.slug}: ${state[project.slug] || 'none'}`);
 
@@ -116,13 +148,13 @@ jobs:
                 const isNew = parseInt(comment.id) > parseInt(lastId);
                 
                 if (!isNew) {
-                  console.log(`Skipping comment ${comment.id} (not newer than ${lastId})');
+                  console.log(`Skipping comment ${comment.id} (not newer than ${lastId})`);
                   continue;
                 }
-                
+
                 newComments.push(comment);
                 state[project.slug] = comment.id;
-                
+
                 // Debug output for new comment
                 console.log(`\n--- NEW COMMENT: ${project.name} ---`);
                 console.log(`ID:        ${comment.id}`);
@@ -131,7 +163,7 @@ jobs:
                 console.log(`Body:      ${comment.body}`);
                 console.log(`-----------------------------------\n`);
               }
-              
+
               // Send batched message if there are new comments
               if (newComments.length > 0) {
                 const description = newComments
@@ -168,10 +200,11 @@ jobs:
           }
 
           await browser.close();
-          
+
           // Save updated state to Gist
           if (GIST_ID) {
             try {
+              console.log("Attempting to save state to Gist:", JSON.stringify(state));
               const updateRes = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
                 method: "PATCH",
                 headers: {
@@ -187,16 +220,16 @@ jobs:
                 })
               });
               if (updateRes.ok) {
-                console.log("State saved to Gist");
+                console.log("State saved to Gist successfully");
               } else {
                 console.log(`Failed to update Gist: ${updateRes.status}`);
+                const errorBody = await updateRes.text();
+                console.log(`Error details: ${errorBody}`);
               }
             } catch (e) {
               console.log("Failed to save state to Gist:", e.message);
             }
           } else {
-            // Fallback: save locally
-            fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
-            console.log("State saved locally (no Gist configured)");
+            console.log("GIST_ID not set, state will not persist");
           }
           EOF
