@@ -54,11 +54,13 @@ jobs:
               await page.waitForSelector(".comment", { timeout: 5000 });
 
               const comments = await page.$$eval(".comment", nodes =>
-                nodes.map(node => ({
-                  id: node.getAttribute("data-comment-id"),
-                  author: node.querySelector(".comment__author")?.innerText?.trim() || "Unknown",
-                  body: node.querySelector(".comment__content")?.innerText?.trim() || ""
-                }))
+                nodes.map(node => {
+                  const id = node.querySelector(".num")?.innerText?.trim() || "unknown";
+                  const author = node.querySelector(".author-name .ellipsis")?.innerText?.trim() || "Unknown";
+                  const body = node.querySelector(".text p")?.innerText?.trim() || "";
+                  
+                  return { id, author, body }
+                })
               );
               
               if (!comments.length) {
