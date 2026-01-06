@@ -83,7 +83,8 @@ jobs:
                 const msg = {
                   content: `💬 **New CurseForge comment on ${project.name}**\n` +
                            `Author: **${comment.author}**\n` +
-                           `${comment.body.substring(0, 1800)}`
+                           `${comment.body.substring(0, 1800)}` +
+                           `🔗 [View comments](${url})`
                 };
                 
                 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
