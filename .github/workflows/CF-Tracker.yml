@@ -22,6 +22,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install puppeteer node-fetch
+        
+      # --- Download previous state artifact if it exists ---
+      - name: Download previous CurseForge state
+        uses: actions/download-artifact@v3
+        with:
+          name: curseforge-state
+          path: .cf-state
 
       - name: Scrape CurseForge comments and post to Discord
         env:
@@ -38,16 +45,17 @@ jobs:
             { slug: "emoteldb", name: "EmoteLDB" }
           ];
 
-          const stateFile = ".github/workflows/.curseforge-state.json";
-          let state = {};
+          const stateDir = ".cf-state";
+          const stateFile = `${stateDir}/.curseforge-state.json`;
+          fs.mkdirSync(stateDir, { recursive: true });
           
-          // Only try to parse if file exists and has content
+          let state = {};
           if (fs.existsSync(stateFile)) {
             try {
               const content = fs.readFileSync(stateFile, "utf-8").trim();
               state = content ? JSON.parse(content) : {};
             } catch (e) {
-              console.log(`Warning: Failed to parse ${stateFile}, starting fresh.`);
+              console.log(`Warning: Failed to parse previous state, starting fresh.`);
               state = {};
             }
           }
@@ -59,7 +67,6 @@ jobs:
             const url = `https://www.curseforge.com/wow/addons/${project.slug}/comments`;
             try {
               await page.goto(url, { waitUntil: "networkidle2" });
-              // Wait for comment elements to load
               await page.waitForSelector(".comment", { timeout: 5000 });
 
               const comments = await page.$$eval(".comment", nodes =>
@@ -67,14 +74,11 @@ jobs:
                   const id = node.querySelector(".num")?.innerText?.trim() || "unknown";
                   const author = node.querySelector(".author-name .ellipsis")?.innerText?.trim() || "Unknown";
                   const body = node.querySelector(".text p")?.innerText?.trim() || "";
-                  
                   return { id, author, body }
                 })
               );
               
-              if (!comments.length) {
-                console.log(`No comments found for ${project.name}`);
-              }
+              if (!comments.length) console.log(`No comments found for ${project.name}`);
 
               for (const comment of comments.reverse()) {
                 const lastId = state[project.slug] || 0;
@@ -95,15 +99,13 @@ jobs:
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(msg)
                   });
-                  if (!res.ok) {
-                    console.log(`Failed to post to Discord for ${project.name}: ${res.status}`);
-                  }
+                  if (!res.ok) console.log(`Failed to post to Discord for ${project.name}: ${res.status}`);
                   await sleep(1000);
                 } catch (e) {
                   console.log(`Error posting to Discord for ${project.name}:`, e.message);
                 }
                 
-                // Log the comment info instead of posting to Discord
+                // Log comment for debugging
                 console.log(`--- ${project.name} ---`);
                 console.log('ID:    ', comment.id);
                 console.log('Author:', comment.author);
@@ -119,13 +121,14 @@ jobs:
           }
 
           await browser.close();
+          
+          // Save updated state
           fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
           EOF
 
-      - name: Commit state updates
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add .github/workflows/.curseforge-state.json
-          git commit -m "Update CurseForge comment state" || exit 0
-          git push
+      # --- Upload the state file as an artifact ---
+      - name: Upload CurseForge state artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: curseforge-state
+          path: .cf-state/.curseforge-state.json
