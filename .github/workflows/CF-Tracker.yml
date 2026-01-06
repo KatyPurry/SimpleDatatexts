@@ -109,10 +109,16 @@ jobs:
               });
               
               console.log(`Found ${comments.length} comments for ${project.name}`);
+              console.log(`Previous last ID for ${project.slug}: ${state[project.slug] || 'none'}`);
 
               for (const comment of comments.reverse()) {
                 const lastId = state[project.slug] || 0;
-                if (parseInt(comment.id) <= lastId) continue;
+                const isNew = parseInt(comment.id) > parseInt(lastId);
+                
+                if (!isNew) {
+                  console.log(`Skipping comment ${comment.id} (not newer than ${lastId})');
+                  continue;
+                }
                 
                 newComments.push(comment);
                 state[project.slug] = comment.id;
