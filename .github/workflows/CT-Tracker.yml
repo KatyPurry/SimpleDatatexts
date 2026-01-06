@@ -39,9 +39,18 @@ jobs:
           ];
 
           const stateFile = ".github/workflows/.curseforge-state.json";
-          const state = fs.existsSync(stateFile)
-            ? JSON.parse(fs.readFileSync(stateFile))
-            : {};
+          let state = {};
+          
+          // Only try to parse if file exists and has content
+          if (fs.existsSync(stateFile)) {
+            try {
+              const content = fs.readFileSync(stateFile, "utf-8").trim();
+              state = content ? JSON.parse(content) : {};
+            } catch (e) {
+              console.log(`Warning: Failed to parse ${stateFile}, starting fresh.`);
+              state = {};
+            }
+          }
 
           const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
           const page = await browser.newPage();
