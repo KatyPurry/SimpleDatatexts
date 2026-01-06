@@ -29,6 +29,7 @@ jobs:
         with:
           name: curseforge-state
           path: .cf-state
+        continue-on-error: true
 
       - name: Scrape CurseForge comments and post to Discord
         env:
