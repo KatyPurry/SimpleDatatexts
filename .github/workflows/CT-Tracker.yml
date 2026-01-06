@@ -58,11 +58,25 @@ jobs:
                   `${comment.commentBody.substring(0, 1800)}`
               };
 
-              await fetch(process.env.DISCORD_WEBHOOK, {
+              const res = await fetch(process.env.DISCORD_WEBHOOK, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(msg)
               });
+              
+              if (!res.ok) {
+                console.log(`Failed to fetch comments for ${project.name}: ${res.status}`);
+                continue;
+              }
+              
+              let data;
+              try {
+                const json = await res.json();
+                data = json.data || [];
+              } catch (e) {
+                console.log(`Failed to parse JSON for $(project.name):`, e.message);
+                continue;
+              }
 
               state[project.id] = comment.id;
             }
