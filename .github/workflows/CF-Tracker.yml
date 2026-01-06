@@ -128,8 +128,11 @@ jobs:
           EOF
 
       # --- Upload the state file as an artifact ---
+      - name: List state folder contents
+        run: ls -l .cf-state
+
       - name: Upload CurseForge state artifact
         uses: actions/upload-artifact@v4
         with:
           name: curseforge-state
-          path: .cf-state/.curseforge-state.json
+          path: .cf-state
