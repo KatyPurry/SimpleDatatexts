@@ -80,27 +80,27 @@ jobs:
                 const lastId = state[project.slug] || 0;
                 if (parseInt(comment.id) <= lastId) continue;
 
-                //const msg = {
-                //  content: `💬 **New CurseForge comment on ${project.name}**\n` +
-                //           `Author: **${comment.author}**\n` +
-                //           `${comment.body.substring(0, 1800)}`
-                //};
+                const msg = {
+                  content: `💬 **New CurseForge comment on ${project.name}**\n` +
+                           `Author: **${comment.author}**\n` +
+                           `${comment.body.substring(0, 1800)}`
+                };
                 
-                //function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+                function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-                //try {
-                //  const res = await fetch(process.env.DISCORD_WEBHOOK, {
-                //    method: "POST",
-                //    headers: { "Content-Type": "application/json" },
-                //    body: JSON.stringify(msg)
-                //  });
-                //  if (!res.ok) {
-                //    console.log(`Failed to post to Discord for ${project.name}: ${res.status}`);
-                //  }
-                //  await sleep(1000);
-                //} catch (e) {
-                //  console.log(`Error posting to Discord for ${project.name}:`, e.message);
-                //}
+                try {
+                  const res = await fetch(process.env.DISCORD_WEBHOOK, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(msg)
+                  });
+                  if (!res.ok) {
+                    console.log(`Failed to post to Discord for ${project.name}: ${res.status}`);
+                  }
+                  await sleep(1000);
+                } catch (e) {
+                  console.log(`Error posting to Discord for ${project.name}:`, e.message);
+                }
                 
                 // Log the comment info instead of posting to Discord
                 console.log(`--- ${project.name} ---`);
