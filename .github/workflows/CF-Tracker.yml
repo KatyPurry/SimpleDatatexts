@@ -89,7 +89,7 @@ jobs:
               await page.goto(url, { waitUntil: "networkidle2" });
 
               // Wait longer for dynamic content to load
-              await page.waitForTimeout(3000);
+              await new Promise(resolve => setTimeout(resolve, 3000));
 
               // Debug: Log what elements exist on the page
               const debugInfo = await page.evaluate(() => {
