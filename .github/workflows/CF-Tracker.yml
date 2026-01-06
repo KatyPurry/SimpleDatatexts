@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: cf-state/curseforge-state.json
-          key: curseforge-state-v1
+          key: sdt-lss-eldb-curseforge-state-v1
 
       - name: Scrape CurseForge comments and post to Discord
         env:
@@ -134,4 +134,4 @@ jobs:
         uses: actions/cache@v3
         with:
           path: cf-state/curseforge-state.json
-          key: curseforge-state-v1
+          key: sdt-lss-eldb-curseforge-state-v1
