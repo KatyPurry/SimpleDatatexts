@@ -23,21 +23,49 @@ jobs:
       - name: Install dependencies
         run: npm install puppeteer node-fetch
         
-      # --- Download previous state artifact if it exists ---
-      - name: Restore CurseForge state cache
-        uses: actions/cache@v3
-        with:
-          path: cf-state/curseforge-state.json
-          key: sdt-lss-eldb-curseforge-state-v1
+      - name: Restore state from GitHub Gist
+        run: mkdir -p cf-state
 
       - name: Scrape CurseForge comments and post to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           node <<'EOF'
           import puppeteer from "puppeteer";
           import fs from "fs";
           import fetch from "node-fetch";
+          
+          const GIST_ID = process.env.GIST_ID;
+          const GH_TOKEN = process.env.GH_TOKEN;
+          
+          const stateDir = "cf-state";
+          const stateFile = `${stateDir}/curseforge-state.json`;
+          fs.mkdirSync(stateDir, { recursive: true });
+          
+          let state = {};
+          if (GIST_ID) {
+            try {
+              const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                headers: { Authorization: `token ${GH_TOKEN}` }
+              });
+              if (res.ok) {
+                const gist = await res.json();
+                const stateContent = gist.files["curseforge-state.json"]?.content;
+                if (stateContent) {
+                  state = JSON.parse(stateContent);
+                  console.log("State loaded from Gist");
+                }
+              }
+            } catch (e) {
+              console.log("Could not fetch state from Gist, starting fresh:", e.message);
+            }
+          }
+          
+          const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+          const page = await browser.newPage();
+          page.setDefaultTimeout(10000);
 
           const PROJECTS = [
             { slug: "simpledatatexts", name: "SimpleDatatexts" },
@@ -45,53 +73,72 @@ jobs:
             { slug: "emoteldb", name: "EmoteLDB" }
           ];
 
-          const stateDir = "cf-state";
-          const stateFile = `${stateDir}/curseforge-state.json`;
-          fs.mkdirSync(stateDir, { recursive: true });
-          
-          let state = {};
-          if (fs.existsSync(stateFile)) {
-            try {
-              const content = fs.readFileSync(stateFile, "utf-8").trim();
-              state = content ? JSON.parse(content) : {};
-            } catch (e) {
-              console.log(`Warning: Failed to parse previous state, starting fresh.`);
-              state = {};
-            }
-          }
-
-          const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
-          const page = await browser.newPage();
-
           for (const project of PROJECTS) {
             const url = `https://www.curseforge.com/wow/addons/${project.slug}/comments`;
+            const newComments = [];
+            
             try {
               await page.goto(url, { waitUntil: "networkidle2" });
-              await page.waitForSelector(".comment", { timeout: 5000 });
-
-              const comments = await page.$$eval(".comment", nodes =>
-                nodes.map(node => {
-                  const id = node.querySelector(".num")?.innerText?.trim() || "unknown";
-                  const author = node.querySelector(".author-name .ellipsis")?.innerText?.trim() || "Unknown";
-                  const body = node.querySelector(".text p")?.innerText?.trim() || "";
-                  return { id, author, body }
-                })
-              );
               
-              if (!comments.length) console.log(`No comments found for ${project.name}`);
+              // Wait for comments with longer timeout
+              await page.waitForFunction(
+                () => document.querySelectorAll("[class*='comment']").length > 0,
+                { timeout: 10000 }
+              );
+
+              const comments = await page.evaluate(() => {
+                return Array.from(document.querySelectorAll("[class*='comment']"))
+                  .slice(0, 50) // Limit to recent 50
+                  .map(node => {
+                    const commentNum = node.getAttribute("id") ||
+                                      node.querySelector("[class*='num']")?.innerText?.match(/\d+/)?.[0] ||
+                                      Date.now().toString();
+                    const author = node.querySelector("[class*='author']")?.innerText?.trim() || "Unknown";
+                    const body = node.querySelector("[class*='text'], [class*='body']")?.innerText?.trim() || "";
+                    const timestamp = node.querySelector("time")?.getAttribute("datetime") || new Date().toISOString();
+
+                    return {
+                      id: commentNum,
+                      author,
+                      body,
+                      timestamp
+                    };
+                  });
+              });
+              
+              console.log(`Found ${comments.length} comments for ${project.name}`);
 
               for (const comment of comments.reverse()) {
                 const lastId = state[project.slug] || 0;
                 if (parseInt(comment.id) <= lastId) continue;
+                
+                newComments.push(comment);
+                state[project.slug] = comment.id;
+                
+                // Debug output for new comment
+                console.log(`\n--- NEW COMMENT: ${project.name} ---`);
+                console.log(`ID:        ${comment.id}`);
+                console.log(`Author:    ${comment.author}`);
+                console.log(`Timestamp: ${comment.timestamp}`);
+                console.log(`Body:      ${comment.body}`);
+                console.log(`-----------------------------------\n`);
+              }
+              
+              // Send batched message if there are new comments
+              if (newComments.length > 0) {
+                const description = newComments
+                  .map(c => `**${c.author}**: ${c.body.substring(0, 200)}${c.body.length > 200 ? '...' : ''}`)
+                  .join("\n\n");
 
                 const msg = {
-                  content: `💬 **New CurseForge comment on ${project.name}**\n` +
-                           `Author: **${comment.author}**\n` +
-                           `${comment.body.substring(0, 1800)}` +
-                           `🔗 [View comments](${url})`
+                  embeds: [{
+                    title: `💬 ${newComments.length} new comment(s) on ${project.name}`,
+                    description: description.substring(0, 2048),
+                    url: url,
+                    color: 0xFF6E00,
+                    footer: { text: `Latest: #${newComments[0].id}` }
+                  }]
                 };
-                
-                function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
                 try {
                   const res = await fetch(process.env.DISCORD_WEBHOOK, {
@@ -99,20 +146,12 @@ jobs:
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(msg)
                   });
-                  if (!res.ok) console.log(`Failed to post to Discord for ${project.name}: ${res.status}`);
-                  await sleep(1000);
+                  if (!res.ok) console.log(`Discord error (${project.name}): ${res.status}`);
                 } catch (e) {
-                  console.log(`Error posting to Discord for ${project.name}:`, e.message);
+                  console.log(`Failed to post to Discord for ${project.name}:`, e.message);
                 }
-                
-                // Log comment for debugging
-                console.log(`--- ${project.name} ---`);
-                console.log('ID:    ', comment.id);
-                console.log('Author:', comment.author);
-                console.log('Body:  ', comment.body);
-                console.log('-------------------');
-
-                state[project.slug] = parseInt(comment.id);
+              } else {
+                console.log(`No new comments for ${project.name}`);
               }
 
             } catch (e) {
@@ -122,8 +161,36 @@ jobs:
 
           await browser.close();
           
-          // Save updated state
-          fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+          // Save updated state to Gist
+          if (GIST_ID) {
+            try {
+              const updateRes = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                method: "PATCH",
+                headers: {
+                  Authorization: `token ${GH_TOKEN}`,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  files: {
+                    "curseforge-state.json": {
+                      content: JSON.stringify(state, null, 2)
+                    }
+                  }
+                })
+              });
+              if (updateRes.ok) {
+                console.log("State saved to Gist");
+              } else {
+                console.log(`Failed to update Gist: ${updateRes.status}`);
+              }
+            } catch (e) {
+              console.log("Failed to save state to Gist:", e.message);
+            }
+          } else {
+            // Fallback: save locally
+            fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+            console.log("State saved locally (no Gist configured)");
+          }
           EOF
 
       # --- Upload the state file as an artifact ---
