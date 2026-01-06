@@ -1389,7 +1389,7 @@ local orgGuildRoster = GuildRoster or C_GuildInfo.GuildRoster
 f.GuildBlock = ldb:NewDataObject( "|cFFFFB366Ara|r Guild", {
 	type = "data source",
 	text = GUILD,
-	icon = [[Interface\AddOns\Ara_Broker_Guild_Friends\guild]],
+	icon = [[Interface\AddOns\SimpleDatatexts\textures\guild]],
 	OnEnter = function(self)
 		isGuild = true
 		if IsInGuild() then orgGuildRoster() end
@@ -1416,7 +1416,7 @@ f.GuildBlock = ldb:NewDataObject( "|cFFFFB366Ara|r Guild", {
 f.FriendsBlock = ldb:NewDataObject( "|cFFFFB366Ara|r Friends", {
 	type = "data source",
 	text = FRIENDS,
-	icon = [[Interface\AddOns\Ara_Broker_Guild_Friends\friends]],
+	icon = [[Interface\AddOns\SimpleDatatexts\textures\friends]],
 	OnEnter = function(self)
 		isGuild = false
 		ShowFriends()
