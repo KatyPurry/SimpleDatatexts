@@ -1,0 +1,80 @@
+name: CurseForge Comment Notifications
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm install node-fetch@3
+
+      - name: Poll CurseForge comments
+        env:
+          CF_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          node <<'EOF'
+          import fetch from "node-fetch";
+          import fs from "fs";
+
+          const PROJECTS = [
+            { id: 1387001, name: "SimpleDatatexts" },
+            { id: 363570, name: "Loot Spec Swapper" },
+            { id: 2441, name: "EmoteLDB" }
+          ];
+
+          const stateFile = ".curseforge-state.json";
+          const state = fs.existsSync(stateFile)
+            ? JSON.parse(fs.readFileSync(stateFile))
+            : {};
+
+          for (const project of PROJECTS) {
+            const res = await fetch(
+              `https://api.curseforge.com/v1/mods/${project.id}/comments`,
+              { headers: { "x-api-key": process.env.CF_API_KEY } }
+            );
+            const data = (await res.json()).data || [];
+
+            for (const comment of data.reverse()) {
+              if ((state[project.id] || 0) >= comment.id) continue;
+
+              const msg = {
+                content:
+                  `💬 **New CurseForge comment on ${project.name}**\n` +
+                  `Author: **${comment.author.name}**\n` +
+                  `${comment.commentBody.substring(0, 1800)}`
+              };
+
+              await fetch(process.env.DISCORD_WEBHOOK, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(msg)
+              });
+
+              state[project.id] = comment.id;
+            }
+          }
+
+          fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+          EOF
+
+      - name: Commit state updates
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .curseforge-state.json
+          git commit -m "Update CurseForge comment state" || exit 0
+          git push
