@@ -36,8 +36,10 @@ local WARBANDBANK_TYPE                       = (Enum.BankType and Enum.BankType.
 -- State
 ----------------------------------------------------
 SDTDB.gold = SDTDB.gold or {}
-local Profit, Spent, Ticker = 0, 0, nil
+local Profit, Spent = 0, 0
+local Ticker = nil
 local myGold = {}
+local lastGoldDBHash = nil
 local totalGold, totalHorde, totalAlliance, warbandGold = 0, 0, 0, 0
 local iconStringName = '|T%s:16:16:0:0:64:64:4:60:4:60|t %s'
 local GOLD_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10:0:0:64:32:22:42:1:20|t"
@@ -48,6 +50,13 @@ local COPPER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10
 -- Helpers
 ----------------------------------------------------
 local function SortFunction(a,b) return (a.amount or 0) > (b.amount or 0) end
+
+local function InitTicker()
+    if not Ticker then
+        UpdateMarketPrice()
+        Ticker = C_Timer_NewTicker(60, UpdateMarketPrice)
+    end
+end
 
 local function UpdateTotal(faction, change)
     if faction == 'Alliance' then
@@ -211,15 +220,13 @@ function mod.Create(slotFrame)
     text:SetPoint("CENTER")
     slotFrame.text = text
 
+    InitTicker()
+
     ----------------------------------------------------
     -- Event Handler
     ----------------------------------------------------
     local function OnEvent(_, event)
         UpdateWarbandGold()
-        if not Ticker then
-            UpdateMarketPrice()
-            Ticker = C_Timer_NewTicker(60, UpdateMarketPrice)
-        end
         UpdateGold(slotFrame)
     end
     f.Update = function() OnEvent(f) end
