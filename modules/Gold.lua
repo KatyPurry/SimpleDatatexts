@@ -10,7 +10,6 @@ local mod = {}
 -- lua locals
 ----------------------------------------------------
 local format  = string.format
-local strjoin = strjoin
 local tinsert = table.insert
 local sort    = table.sort
 
@@ -39,7 +38,6 @@ SDTDB.gold = SDTDB.gold or {}
 local Profit, Spent = 0, 0
 local Ticker = nil
 local myGold = {}
-local lastGoldDBHash = nil
 local totalGold, totalHorde, totalAlliance, warbandGold = 0, 0, 0, 0
 local iconStringName = '|T%s:16:16:0:0:64:64:4:60:4:60|t %s'
 local GOLD_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10:0:0:64:32:22:42:1:20|t"
@@ -50,6 +48,10 @@ local COPPER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10
 -- Helpers
 ----------------------------------------------------
 local function SortFunction(a,b) return (a.amount or 0) > (b.amount or 0) end
+
+local function UpdateMarketPrice()
+    return C_WowTokenPublic_UpdateMarketPrice()
+end
 
 local function InitTicker()
     if not Ticker then
@@ -69,10 +71,6 @@ end
 
 local function UpdateWarbandGold()
     warbandGold = C_Bank_FetchDepositedMoney and C_Bank_FetchDepositedMoney(WARBANDBANK_TYPE) or 0
-end
-
-local function UpdateMarketPrice()
-    return C_WowTokenPublic_UpdateMarketPrice()
 end
 
 local function DisplayCurrencyInfo(tooltip)
@@ -103,35 +101,8 @@ local function FormatMoney(copper, classColor)
     end
 end
 
-----------------------------------------------------
--- Update logic
-----------------------------------------------------
-local function UpdateGold(self)
-    if not IsLoggedIn() then return end
-
-    local playerName = UnitName("player")
-    local realmName = GetRealmName()
-    local faction = UnitFactionGroup("player")
-    SDTDB.gold[realmName] = SDTDB.gold[realmName] or {}
-    SDTDB.gold[realmName][playerName] = SDTDB.gold[realmName][playerName] or {}
-    SDTDB.gold[realmName][playerName].faction = faction
-
-    local oldMoney = SDTDB.gold[realmName][playerName].amount
-    local newMoney = GetMoney()
-    local firstTime = (oldMoney == nil)
-    SDTDB.gold[realmName][playerName].amount = newMoney
-
-    local change = (oldMoney and (newMoney - oldMoney)) or 0
-    if not firstTime and change ~= 0 then
-        if change > 0 then
-            Profit = Profit + change
-        else
-            Spent = Spent - change
-        end
-    end
-
-    -- Rebuild myGold table
-    myGold = {}
+local function RebuildGoldCache()
+    wipe(myGold)
     totalGold, totalHorde, totalAlliance = 0, 0, 0
     for realm, chars in pairs(SDTDB.gold) do
         for name, charValues in pairs(chars) do
@@ -144,6 +115,45 @@ local function UpdateGold(self)
                 r = 1, g = 1, b = 1,
             })
             UpdateTotal(charValues.faction, charValues.amount)
+        end
+    end
+end
+
+----------------------------------------------------
+-- Update logic
+----------------------------------------------------
+local function UpdateGold(self)
+    if not IsLoggedIn() then return end
+
+    local playerName = SDT.cache.playerName
+    local realmName = SDT.cache.playerRealmProper
+    local faction = SDT.cache.playerFaction
+    SDTDB.gold[realmName] = SDTDB.gold[realmName] or {}
+    SDTDB.gold[realmName][playerName] = SDTDB.gold[realmName][playerName] or {}
+    SDTDB.gold[realmName][playerName].faction = faction
+
+    local oldMoney = SDTDB.gold[realmName][playerName].amount
+    local newMoney = GetMoney()
+    SDTDB.gold[realmName][playerName].amount = newMoney
+
+    local change = (oldMoney and (newMoney - oldMoney)) or 0
+    if change ~= 0 then
+        if change > 0 then
+            Profit = Profit + change
+        else
+            Spent = Spent - change
+        end
+
+        -- Update faction and overall totals
+        UpdateTotal(faction, change)
+
+        -- Update cache with new gold amount
+        for _, g in ipairs(myGold) do
+            if g.name == playerName and g.realm == realmName then
+                g.amount = newMoney
+                g.amountText = FormatMoney(newMoney)
+                break
+            end
         end
     end
 
@@ -203,8 +213,7 @@ local function ShowTooltip(self)
     DisplayCurrencyInfo()
 
     tooltip:AddLine(" ")
-    tooltip:AddLine(strjoin('', '|cffaaaaaa', L["Reset Session Data: Hold Ctrl + Right Click"], '|r'))
-    --tooltip:AddLine(strjoin('', '|cffaaaaaa', "Reset Character Data: Hold Shift + Right Click", '|r'))
+    tooltip:AddLine("|cffaaaaaa" .. L["Reset Session Data: Hold Ctrl + Right Click"] .. "|r")
     tooltip:Show()
 end
 
@@ -219,6 +228,11 @@ function mod.Create(slotFrame)
     local text = slotFrame.text or slotFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     text:SetPoint("CENTER")
     slotFrame.text = text
+
+    -- Build myGold cache
+    if not next(myGold) then
+        RebuildGoldCache()
+    end
 
     InitTicker()
 
