@@ -583,39 +583,31 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
         if self._lastValue == val then return end
         self._lastValue = val
 
+        if not panelsSubPanel.selectedBar then return end
+        local barData = SDT.profileBars[panelsSubPanel.selectedBar]
+        local bar = SDT.bars[panelsSubPanel.selectedBar]
+        if not barData or not bar then return end
+
         eb:SetText(val)
 
-        if panelsSubPanel.selectedBar then
-            local barData = SDT.profileBars[panelsSubPanel.selectedBar]
-            if name == "Slots" then
-                barData.numSlots = val
-            elseif name == "Width" then
-                barData.width = val
-            elseif name == "Height" then
-                barData.height = val
-            elseif name == "Scale" then
-                barData.scale = val
-                if SDT.bars[panelsSubPanel.selectedBar] then
-                    SDT.bars[panelsSubPanel.selectedBar]:SetScale(val / 100)
-                end
-            elseif name == "Background Opacity" then
-                barData.bgOpacity = val
-                if SDT.bars[panelsSubPanel.selectedBar] then
-                    SDT.bars[panelsSubPanel.selectedBar]:ApplyBackground()
-                end
-            elseif name == "Border Size" then
-                barData.borderSize = val
-                if SDT.bars[panelsSubPanel.selectedBar] then
-                    SDT.bars[panelsSubPanel.selectedBar]:ApplyBackground()
-                end
-            end
-            if SDT.bars[panelsSubPanel.selectedBar] then
-                SDT:RebuildSlots(SDT.bars[panelsSubPanel.selectedBar])
-            end
-            if name == "Slots" then
-                buildSlotSelectors(panelsSubPanel.selectedBar)
-            end
+        if name == "Slots" then
+            barData.numSlots = val
+            buildSlotSelectors(panelsSubPanel.selectedBar)
+        elseif name == "Width" then
+            barData.width = val
+        elseif name == "Height" then
+            barData.height = val
+        elseif name == "Scale" then
+            barData.scale = val
+            bar:SetScale(val / 100)
+        elseif name == "Background Opacity" then
+            barData.bgOpacity = val
+            bar:ApplyBackground()
+        elseif name == "Border Size" then
+            barData.borderSize = val
+            bar:ApplyBackground()
         end
+        SDT:RebuildSlots(bar)
     end)
     
     -- Sync editbox -> slider
