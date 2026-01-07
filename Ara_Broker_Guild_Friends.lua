@@ -243,7 +243,8 @@ end
 
 function f:FRIENDLIST_UPDATE()
 	--None bnet friends
-	for k,v in next,friendEntries do del(v) friendEntries[k]=nil end
+	for k,v in next,friendEntries do del(v) end
+	wipe(friendEntries)
 	onlineFriends = C_FriendList.GetNumOnlineFriends()
 	for i = 1, onlineFriends do	
 		local name, level, class, zone, connected, status, note
@@ -264,7 +265,8 @@ end
 
 
 function f:GUILD_ROSTER_UPDATE()
-	for k, v in next, guildEntries do del(v) guildEntries[k]=nil end
+	for k, v in next, guildEntries do del(v) end
+	wipe(guildEntries)
 	local r,g,b = unpack(colors.officerNote)
 	local officerColor = ("\124cff%.2x%.2x%.2x"):format( r*255, g*255, b*255 )
 	local totalMembers, onlineMembers = GetNumGuildMembers()
@@ -292,9 +294,9 @@ function f:PLAYER_GUILD_UPDATE(unit)
 	if IsInGuild() then GuildRoster() end
 end
 
-local hordeZones = "Orgrimmar,Undercity,Thunder Bluff,Silvermoon City,Durotar,Tirisfal Glades,Mulgore,Eversong Woods,Northern Barrens,Silverpine Forest,Ghostlands,Lost Isles,Kezan,Azshara,Shrine of Two Moons,Frostfire Ridge,Warspear,Zuldazar,Vol'dun,Zuldazar,Nazmir,"
+local hordeZones = "Orgrimmar,Undercity,Thunder Bluff,Durotar,Tirisfal Glades,Mulgore,Eversong Woods,Northern Barrens,Silverpine Forest,Ghostlands,Lost Isles,Kezan,Azshara,Shrine of Two Moons,Frostfire Ridge,Warspear,Zuldazar,Vol'dun,Nazmir,"
 local allianceZones = "Ironforge,Stormwind City,Darnassus,The Exodar,Redridge Mountains,Azuremyst Isle,Bloodmyst Isle,Darkshore,Deeprun Tram,Dun Morogh,Elwynn Forest,Loch Modan,Teldrassil,Westfall,Gilneas City,Gilneas,Shrine of Seven Stars,Shadowmoon Valley,Stormshield,Boralus Harbor,Drustvar,Stormsong Valley,Tiragarde Sound,"
-local sanctuaryZones = "Shattrath,Dalaran,Oribos,Valdrakken,"
+local sanctuaryZones = "Shattrath,Dalaran,Oribos,Valdrakken,Dornogal,Silvermoon City,"
 local zoneCache = {}
 
 local function GetZoneColor(zone)
@@ -303,7 +305,11 @@ local function GetZoneColor(zone)
 	end
 
 	local zoneType
-	if sanctuaryZones:find(zone..",") then
+	-- Remove me in Midnight
+	local _, _, _, TOC = GetBuildInfo()
+	if TOC < 120000 and zone == "Silvermoon City" then
+		zoneType = horde and "friendlyZone" or "enemyZone"
+	elseif sanctuaryZones:find(zone..",") then
 		zoneType = "friendlyZone"
 	elseif hordeZones:find(zone..",") then
 		zoneType = horde and "friendlyZone" or "enemyZone"
