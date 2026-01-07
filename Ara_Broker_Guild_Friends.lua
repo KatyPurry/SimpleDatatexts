@@ -74,7 +74,7 @@ local defaultConfig = {
 	hbAddFriend = true,
 	enableBnetFriendsBroadcasts = true,
 }
-local dontShow, block, horde, config, isGuild, tip = true
+local horde, config, isGuild, tip = true
 local guildEntries, friendEntries, motd, slider, nbEntries = {}, {}
 local sliderValue, hasSlider, UpdateTablet, extraHeight = 0
 local RAID_CLASS_COLORS = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
@@ -100,7 +100,31 @@ local clientsTable = {
 	["RTRO"] = 16,--Blizzard Arcane
 	["WLBY"] = 17,--Crash 4
 	["OSI"] = 18,--Diablo 2
-	["Fen"] = 19--Diablo 4
+	["Fen"] = 19,--Diablo 4
+	--["AUKS"] = 20,--COD BO6
+}
+local clientTextures = {
+	[0] = "Interface\\FriendsFrame\\Battlenet-Battleneticon",
+	[1] = "Interface\\FriendsFrame\\Battlenet-WoWicon",
+	[2] = "Interface\\FriendsFrame\\Battlenet-Sc2icon",
+	[3] = "Interface\\FriendsFrame\\Battlenet-D3icon",
+	[4] = "Interface\\FriendsFrame\\Battlenet-WTCGicon",
+	[5] = "Interface\\FriendsFrame\\Battlenet-Battleneticon",
+	[6] = "Interface\\FriendsFrame\\Battlenet-HotSicon",
+	[7] = "Interface\\FriendsFrame\\Battlenet-Overwatchicon",
+	[8] = "Interface\\FriendsFrame\\Battlenet-Battleneticon",
+	[9] = "Interface\\FriendsFrame\\Battlenet-SCicon",
+	[10] = "Interface\\FriendsFrame\\Battlenet-Destiny2icon",
+	[11] = "Interface\\FriendsFrame\\Battlenet-CallOfDutyBlackOps4icon",
+	[12] = "Interface\\FriendsFrame\\Battlenet-CallOfDutyMWicon",
+	[13] = "Interface\\FriendsFrame\\Battlenet-CallOfDutyMW2icon",
+	[14] = "Interface\\FriendsFrame\\Battlenet-CallOfDutyBlackOpsColdWaricon",
+	[15] = "Interface\\FriendsFrame\\Battlenet-Warcraft3Reforged",
+	[16] = "Interface\\FriendsFrame\\Battlenet-BlizzardArcadeCollectionicon",
+	[17] = "Interface\\FriendsFrame\\Battlenet-CrashBandicoot4icon",
+	[18] = "Interface\\FriendsFrame\\Battlenet-DiabloIIResurrectedicon",
+	[19] = "Cache\\TitleIcons\\225231c6bc737ca317db2e94565b1820d8a25a7e6c24f92f0e37fe2fbdb63f54.png",
+	--[20] = "Interface\\FriendsFrame\\Battlenet-CallOfDutyBlackOps6icon",
 }
 local configMenu, options, c, cname, SetOption, UpdateColor, ColorPickerChange, ColorPickerCancel, OpenColorPicker, ColorPickerOpacity, colors
 local preformatedStatusText, sortIndexes
@@ -271,14 +295,26 @@ end
 local hordeZones = "Orgrimmar,Undercity,Thunder Bluff,Silvermoon City,Durotar,Tirisfal Glades,Mulgore,Eversong Woods,Northern Barrens,Silverpine Forest,Ghostlands,Lost Isles,Kezan,Azshara,Shrine of Two Moons,Frostfire Ridge,Warspear,Zuldazar,Vol'dun,Zuldazar,Nazmir,"
 local allianceZones = "Ironforge,Stormwind City,Darnassus,The Exodar,Redridge Mountains,Azuremyst Isle,Bloodmyst Isle,Darkshore,Deeprun Tram,Dun Morogh,Elwynn Forest,Loch Modan,Teldrassil,Westfall,Gilneas City,Gilneas,Shrine of Seven Stars,Shadowmoon Valley,Stormshield,Boralus Harbor,Drustvar,Stormsong Valley,Tiragarde Sound,"
 local sanctuaryZones = "Shattrath,Dalaran,Oribos,Valdrakken,"
+local zoneCache = {}
 
 local function GetZoneColor(zone)
-	return unpack( colors[
-		sanctuaryZones:find(zone..",") and "friendlyZone" or
-		hordeZones:find(zone..",") and (horde and "friendlyZone" or "enemyZone") or
-		allianceZones:find(zone..",") and (horde and "enemyZone" or "friendlyZone") or
-		"contestedZone"
-	] )
+	if zoneCache[zone] then
+		return unpack(colors[zoneCache[zone]])
+	end
+
+	local zoneType
+	if sanctuaryZones:find(zone..",") then
+		zoneType = "friendlyZone"
+	elseif hordeZones:find(zone..",") then
+		zoneType = horde and "friendlyZone" or "enemyZone"
+	elseif allianceZones:find(zone..",") then
+		zoneType = horde and "enemyZone" or "friendlyZone"
+	else
+		zoneType = "contestedZone"
+	end
+
+	zoneCache[zone] = zoneType
+	return unpack(colors[zoneType])
 end
 
 local function UpdateBlockHints()
@@ -472,10 +508,6 @@ end
 
 
 local sep = f:CreateTexture()
-
---local function FriendBroadcast_OnClick()
-	-- TODO: detect URL and copy to input box
---end
 
 local broadcasts = setmetatable( {}, { __index = function( table, index )
 	local bc = CreateFrame( "Button", nil, f )
@@ -709,38 +741,8 @@ local function SetToastData( index, inGroup )
 		toast.zone:SetPoint("TOPLEFT", toast.name, "TOPRIGHT", GAP, 0)
 		toast.zone:SetTextColor( 1, .77, 0 )
 	else
-		if client == 2 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-Sc2icon"
-		elseif client == 3 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-D3icon"
-		elseif client == 4 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-WTCGicon"
-		elseif client == 6 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-HotSicon"
-		elseif client == 7 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-Overwatchicon"
-		elseif client == 9 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-SCicon"
-		elseif client == 10 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-Destiny2icon"
-		elseif client == 11 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-CallOfDutyBlackOps4icon"
-		elseif client == 12 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-CallOfDutyMWicon"
-		elseif client == 13 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-CallOfDutyMW2icon"
-		elseif client == 14 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-CallOfDutyBlackOpsColdWaricon"
-		elseif client == 15 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-Warcraft3Reforged"
-		elseif client == 16 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-BlizzardArcadeCollectionicon"
-		elseif client == 17 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-CrashBandicoot4icon"
-		elseif client == 18 then
-			toast.class:SetTexture"Interface\\FriendsFrame\\Battlenet-DiabloIIResurrectedicon"
-		elseif client == 19 then
-			toast.class:SetTexture"Cache\\TitleIcons\\225231c6bc737ca317db2e94565b1820d8a25a7e6c24f92f0e37fe2fbdb63f54.png"
+		if clientTextures[client] then
+			toast.class:SetTexture(clientTextures[client])
 		end
 		toast.class:SetTexCoord( .2, .8, .2, .8 )
 		toast.name:SetTextColor( .8, .8, .8 )
