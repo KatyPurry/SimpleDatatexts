@@ -10,8 +10,10 @@ local L = SDT.L
 -- Lua Locals
 ----------------------------------------------------
 local format           = string.format
+local ipairs           = ipairs
 local mathfloor        = math.floor
 local mathmax          = math.max
+local pairs            = pairs
 local tinsert          = table.insert
 local tonumber         = tonumber
 local tostring         = tostring
@@ -20,6 +22,7 @@ local tsort            = table.sort
 ----------------------------------------------------
 -- WoW API Locals
 ----------------------------------------------------
+local CopyTable        = CopyTable
 local CreateFrame      = CreateFrame
 local GetScreenWidth   = GetScreenWidth
 

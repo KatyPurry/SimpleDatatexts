@@ -15,6 +15,8 @@ local LSM = LibStub("LibSharedMedia-3.0")
 -- Lua Locals
 ----------------------------------------------------
 local format           = string.format
+local ipairs           = ipairs
+local pairs            = pairs
 local print            = print
 local tonumber         = tonumber
 local tostring         = tostring

@@ -15,7 +15,9 @@ local LSM = LibStub("LibSharedMedia-3.0")
 -- Lua Locals
 ----------------------------------------------------
 local format           = string.format
+local ipairs           = ipairs
 local mathfloor        = math.floor
+local pairs            = pairs
 local stringlower      = string.lower
 local tconcat          = table.concat
 local tinsert          = table.insert
@@ -27,7 +29,6 @@ local wipe             = table.wipe
 ----------------------------------------------------
 -- WoW API Locals
 ----------------------------------------------------
-local CopyTable                 = CopyTable
 local CreateFrame               = CreateFrame
 local Delay                     = C_Timer.After
 local GetAddOnInfo              = C_AddOns.GetAddOnInfo
@@ -305,11 +306,8 @@ end
 -- Create Addon List
 -------------------------------------------------
 local function CreateAddonList()
-    if SDT.cache.addonList then
-        wipe(SDT.cache.addonList)
-    else
-        SDT.cache.addonList = {}
-    end
+    SDT.cache.addonList = SDT.cache.addonList or {}
+    wipe(SDT.cache.addonList)
     local addOnCount = GetNumAddOns()
     local counter = 1
     for i = 1, addOnCount do
