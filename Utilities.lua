@@ -181,6 +181,18 @@ function SDT.Print(...)
 end
 
 -------------------------------------------------
+-- Utility: Local Bar Creation Helper
+-------------------------------------------------
+local function CreateBarsFromProfile()
+    for barName, barData in pairs(SDT.profileBars) do
+        local id = tonumber(barName:match("SDT_Bar(%d+)"))
+        local newBar = SDT:CreateDataBar(id, barData.numSlots)
+        SDT.bars[barName] = newBar
+        SDT.bars[barName]:Show()
+    end
+end
+
+-------------------------------------------------
 -- Utility: Profile Activate
 -------------------------------------------------
 function SDT:ProfileActivate(profileName, spec)
@@ -193,13 +205,7 @@ function SDT:ProfileActivate(profileName, spec)
     wipe(SDT.bars)
 
     SDT.profileBars = SDTDB.profiles[profileName].bars
-
-    for barName, barData in pairs(SDT.profileBars) do
-        local id = tonumber(barName:match("SDT_Bar(%d+)"))
-        local newBar = SDT:CreateDataBar(id, barData.numSlots)
-        SDT.bars[barName] = newBar
-        SDT.bars[barName]:Show()
-    end
+    CreateBarsFromProfile()
 
     SDT:RefreshProfileList()
     SDT:UpdateActiveProfile(profileName, spec)
@@ -251,12 +257,7 @@ StaticPopupDialogs["SDT_CONFIRM_COPY_PROFILE"] = {
         wipe(SDTDB.profiles[SDT.activeProfile])
         SDTDB.profiles[SDT.activeProfile] = newProfile
         SDT.profileBars = SDTDB.profiles[SDT.activeProfile].bars
-        for barName, barData in pairs(SDT.profileBars) do
-            local id = tonumber(barName:match("SDT_Bar(%d+)"))
-            local newBar = SDT:CreateDataBar(id, barData.numSlots)
-            SDT.bars[barName] = newBar
-            SDT.bars[barName]:Show()
-        end
+        CreateBarsFromProfile()
         SDT:RefreshProfileList()
         SDT:UpdateAllModules()
     end,

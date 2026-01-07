@@ -575,7 +575,7 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
     eb:SetAutoFocus(false)
     eb:SetJustifyH("CENTER")
     eb:SetJustifyV("MIDDLE")
-    eb:SetText(min)
+    eb:SetText(tostring(min))
     eb:Hide()
     
     -- Sync slider -> editbox
@@ -591,7 +591,7 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
         local bar = SDT.bars[panelsSubPanel.selectedBar]
         if not barData or not bar then return end
 
-        eb:SetText(val)
+        eb:SetText(tostring(val))
 
         if name == "Slots" then
             barData.numSlots = val
@@ -619,7 +619,7 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
         if val then
             val = mathmax(min, math.min(max, val))
             slider:SetValue(val)
-            self:SetText(val)
+            self:SetText(tostring(val))
             if name == "Scale" and SDT.bars[panelsSubPanel.selectedBar] then
                 SDT.bars[panelsSubPanel.selectedBar]:SetScale(val / 100)
             elseif name == "Background Opacity" and SDT.bars[panelsSubPanel.selectedBar] then

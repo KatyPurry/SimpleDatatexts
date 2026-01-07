@@ -52,9 +52,10 @@ local UnitName                  = UnitName
 -- Bar Position Helper
 -------------------------------------------------
 local function SaveBarPosition(bar)
+    local barName = bar:GetName()
     local point, _, relativePoint, xOfs, yOfs = bar:GetPoint()
-    if SDT.profileBars[bar:GetName()] then
-        SDT.profileBars[bar:GetName()].point = {
+    if SDT.profileBars[barName] then
+        SDT.profileBars[barName].point = {
             point = point,
             relativePoint = relativePoint,
             x = xOfs,
@@ -148,8 +149,8 @@ function SDT:RebuildSlots(bar)
     -- hide and clear existing slot frames
     for _, s in ipairs(bar.slots or {}) do
         if s.moduleFrame then
-            if s.moduleFrame.Hide then s.moduleFrame:Hide() end
-            if s.moduleFrame.SetParent then s.moduleFrame:SetParent(nil) end
+            s.moduleFrame:Hide()
+            s.moduleFrame:SetParent(nil)
             s.moduleFrame = nil
         end
         s:SetParent(nil)
@@ -157,7 +158,8 @@ function SDT:RebuildSlots(bar)
     end
     bar.slots = {}
 
-    local saved = SDT.profileBars[bar:GetName()]
+    local barName = bar:GetName()
+    local saved = SDT.profileBars[barName]
     if not saved then return end
     local numSlots = saved.numSlots or 3
 
@@ -169,7 +171,7 @@ function SDT:RebuildSlots(bar)
     bar:SetSize(totalW, totalH)
     
     for i = 1, numSlots do
-        local slotName = bar:GetName() .. "_Slot" .. i
+        local slotName = barName .. "_Slot" .. i
         local slot = CreateFrame("Button", slotName, bar)
         slot:SetSize(slotW, slotH)
         slot.index = i
@@ -184,15 +186,15 @@ function SDT:RebuildSlots(bar)
             -- Spacer: show nothing
             slot.module = "(spacer)"
             slot.text:SetText("")
-            if slot.moduleFrame and slot.moduleFrame.Hide then slot.moduleFrame:Hide() end
+            if slot.moduleFrame then slot.moduleFrame:Hide() end
         elseif assignedName and SDT.modules[assignedName] then
             local mod = SDT.modules[assignedName]
-            if slot.moduleFrame and slot.moduleFrame.Hide then slot.moduleFrame:Hide() end
+            if slot.moduleFrame then slot.moduleFrame:Hide() end
             slot.module = assignedName
             slot.moduleFrame = mod.Create(slot)
         else
             slot.module = nil
-            if slot.moduleFrame and slot.moduleFrame.Hide then slot.moduleFrame:Hide() end
+            if slot.moduleFrame then slot.moduleFrame:Hide() end
             slot.text:SetText(assignedName or L["(empty)"])
         end
 
@@ -251,13 +253,14 @@ end
 -------------------------------------------------
 local dropdownFrame = CreateFrame("Frame", addonName .. "_SlotDropdown", UIParent, "UIDropDownMenuTemplate")
 local function InitializeSlotDropdown(slot, bar)
+    local barName = bar:GetName()
     local info = UIDropDownMenu_CreateInfo()
     info.notCheckable = true
 
     info.text = L["(empty)"]
     info.func = function()
-        if SDT.profileBars[bar:GetName()] then
-            SDT.profileBars[bar:GetName()].slots[slot.index] = nil
+        if SDT.profileBars[barName] then
+            SDT.profileBars[barName].slots[slot.index] = nil
             SDT:RebuildSlots(bar)
         end
     end
@@ -265,8 +268,8 @@ local function InitializeSlotDropdown(slot, bar)
 
     info.text = "(spacer)"
     info.func = function()
-        if SDT.profileBars[bar:GetName()] then
-            SDT.profileBars[bar:GetName()].slots[slot.index] = "(spacer)"
+        if SDT.profileBars[barName] then
+            SDT.profileBars[barName].slots[slot.index] = "(spacer)"
             SDT:RebuildSlots(bar)
         end
     end
@@ -275,8 +278,8 @@ local function InitializeSlotDropdown(slot, bar)
     for _, moduleName in ipairs(SDT.cache.moduleNames) do
         info.text = moduleName
         info.func = function()
-            if SDT.profileBars[bar:GetName()] then
-                SDT.profileBars[bar:GetName()].slots[slot.index] = moduleName
+            if SDT.profileBars[barName] then
+                SDT.profileBars[barName].slots[slot.index] = moduleName
                 SDT:RebuildSlots(bar)
             end
         end
@@ -350,13 +353,6 @@ local function SlashHelp()
 end
 
 local function BarAdjustments(adj, bar, num)
-    -- Make sure we have all of our values
-    if not adj or not bar or not num then
-        SDT.Print(format("%s: %s %s <%s> <%s>", L["Usage"], "/sdt", adj, L["barName"], L["value"]))
-        SlashHelp()
-        return
-    end
-
     -- Check custom name if supplied instead of the bar key
     if not SDT.profileBars[bar] then
         local resolved = nil
@@ -374,13 +370,6 @@ local function BarAdjustments(adj, bar, num)
             return
         end
         bar = resolved
-    end
-
-    -- Validate the number supplied
-    if type(num) ~= "number" then
-        SDT.Print(L["A valid numeric value for the adjustment must be specified."])
-        SlashHelp()
-        return
     end
 
     -- Further validate the value is within parameters, then make the adjustment
@@ -416,6 +405,17 @@ local function BarAdjustments(adj, bar, num)
     end
 end
 
+local function HandleBarAdjustment(cmd, args)
+    local bar = tconcat(args, " ", 2, #args - 1)
+    local num = tonumber(args[#args])
+    if #args < 3 or not bar or type(num) ~= "number" then
+        SDT.Print(format("%s: %s %s <%s> <%s>", L["Usage"], "/sdt", cmd, L["barName"], L["value"]))
+        SlashHelp()
+        return
+    end
+    BarAdjustments(cmd, bar, num)
+end
+
 -- Slash command
 SLASH_SDT1 = "/sdt"
 SlashCmdList["SDT"] = function(msg)
@@ -424,11 +424,7 @@ SlashCmdList["SDT"] = function(msg)
         tinsert(args, word)
     end
     local command = args[1] and stringlower(args[1]) or ""
-    local bar, num
-    if #args > 2 then
-        num = tonumber(args[#args])
-        bar = tconcat(args, " ", 2, #args - 1)
-    end
+
     if command == "config" then
         Settings.OpenToCategory(SDT.SettingsPanel.ID)
     elseif command == "lock" then
@@ -439,7 +435,7 @@ SlashCmdList["SDT"] = function(msg)
         local lockedColor = SDT.SDTDB_CharDB.settings.locked and "|cffff0000" or "|cff00ff00"
         SDT.Print(format("%s: %s%s|r", L["SDT panels are now"], lockedColor, SDT.SDTDB_CharDB.settings.locked and L["LOCKED"] or L["UNLOCKED"]))
     elseif command == "width" or command == "height" or command == "scale" then
-        BarAdjustments(command, bar, num)
+        HandleBarAdjustment(command, args)
     elseif command == "update" then
         SDT:UpdateAllModules()
     elseif command == "version" then
