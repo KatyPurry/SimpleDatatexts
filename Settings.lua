@@ -568,8 +568,10 @@ end
 local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x, y)
     -- Slider
     local slider = CreateFrame("Slider", addonName.."_"..name.."Slider", parent, "OptionsSliderTemplate")
+    slider._minValue = min
+    slider._maxValue = max
     slider:SetPoint("TOPLEFT", attach, "BOTTOMLEFT", x, y)
-    slider:SetMinMaxValues(min, max)
+    slider:SetMinMaxValues(slider._minValue, slider._maxValue)
     slider:SetValueStep(step)
     slider:SetWidth(160)
     getglobal(slider:GetName().."Text"):SetText(text)
@@ -579,12 +581,14 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
     
     -- Edit Box
     local eb = CreateFrame("EditBox", addonName.."_"..name.."EditBox", parent, "InputBoxTemplate")
+    eb._minValue = min
+    eb._maxValue = max
     eb:SetSize(50, 20)
     eb:SetPoint("LEFT", slider, "RIGHT", 25, 0)
     eb:SetAutoFocus(false)
     eb:SetJustifyH("CENTER")
     eb:SetJustifyV("MIDDLE")
-    eb:SetText(tostring(min))
+    eb:SetText(tostring(eb._minValuemin))
     eb:Hide()
     
     -- Sync slider -> editbox
@@ -626,7 +630,7 @@ local function CreateSliderWithBox(parent, name, text, min, max, step, attach, x
     eb:SetScript("OnEnterPressed", function(self)
         local val = tonumber(self:GetText())
         if val then
-            val = mathmax(min, math.min(max, val))
+            val = mathmax(self._minValue, math.min(self._maxValue, val))
             slider:SetValue(val)
             self:SetText(tostring(val))
             if name == "Scale" and SDT.bars[panelsSubPanel.selectedBar] then
@@ -944,6 +948,9 @@ StaticPopupDialogs["SDT_CONFIRM_DELETE_BAR"] = {
         nameEditBox:Hide()
         scaleSlider:Hide()
         scaleBox:Hide()
+        for i = 1, 12 do
+            ReleaseSlotSelector(i)
+        end
     end,
 }
 
@@ -1221,9 +1228,11 @@ loader:RegisterEvent("PLAYER_ENTERING_WORLD")
 loader:SetScript("OnEvent", function(self, event, arg)
     if event == "PLAYER_ENTERING_WORLD" then
         -- Reset widthSlider's max width once the UI is initialized
-        local maxWidth = mathfloor(GetScreenWidth())
-        widthSlider:SetMinMaxValues(100, maxWidth)
-        getglobal(widthSlider:GetName().."High"):SetText(tostring(maxWidth))
+        local newMaxWidth = mathfloor(GetScreenWidth())
+        widthSlider:SetMinMaxValues(100, newMaxWidth)
+        widthSlider._maxValue = newMaxWidth
+        widthBox._maxValue = newMaxWidth
+        getglobal(widthSlider:GetName().."High"):SetText(tostring(newMaxWidth))
 
         -- Check our database
         checkDefaultDB()
