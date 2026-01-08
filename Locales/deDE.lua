@@ -42,6 +42,7 @@ L["Simple DataTexts - Panel Settings"] = "Simple Datatexts - Panel-Einstellungen
 L["Profiles"] = "Profile"
 L["Simple DataTexts - Profile Settings"] = "Simple Datatexts - Profileinstellungen"
 L["Lock Panels (disable movement)"] = "Panels sperren (Bewegung deaktivieren)"
+L["Show login message"] = "Anmeldemeldung anzeigen"
 L["Use Class Color"] = "Klassenfarbe verwenden"
 L["Use 24Hr Clock"] = "24-Stunden-Uhr verwenden"
 L["Use Custom Color"] = "Eigene Farbe verwenden"
