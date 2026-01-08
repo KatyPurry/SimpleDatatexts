@@ -6,7 +6,7 @@ local L = SDT.L
 -- ----------------------------
 -- Used in: Settings.lua, SimpleDatatexts.lua
 L["(empty)"] = "(empty)"
-L["Loaded. Total modules: %d"] = "Loaded. Total modules: %d"
+L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts loaded. Total modules:"
 L["Options"] = "Options"
 L["Lock/Unlock"] = "Lock/Unlock"
 L["Width"] = "Width"

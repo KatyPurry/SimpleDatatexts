@@ -9,7 +9,7 @@ end
 -- SimpleDatatexts.lua
 -- ----------------------------
 L["(empty)"] = "(leer)"
-L["Loaded. Total modules: %d"] = "Geladen. Gesamtanzahl Module: %d"
+L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts geladen. Gesamtanzahl Module:"
 L["Options"] = "Optionen"
 L["Lock/Unlock"] = "Sperren/Freigeben"
 L["Width"] = "Breite"

@@ -10,7 +10,7 @@ end
 -- ----------------------------
 -- Used in: Settings.lua, SimpleDatatexts.lua
 L["(empty)"] = "(vide)"
-L["Loaded. Total modules: %d"] = "Chargé. Nombre total de modules : %d"
+L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts chargé. Modules au total :"
 L["Options"] = "Options"
 L["Lock/Unlock"] = "Verrouiller/Déverrouiller"
 L["Width"] = "Largeur"

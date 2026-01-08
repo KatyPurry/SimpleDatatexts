@@ -10,7 +10,7 @@ end
 -- ----------------------------
 -- Used in: Settings.lua, SimpleDatatexts.lua
 L["(empty)"] = "(пусто)"
-L["Loaded. Total modules: %d"] = "Загружено. Всего модулей: %d"
+L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts загружен. Всего модулей:"
 L["Options"] = "Настройки"
 L["Lock/Unlock"] = "Заблокировать/Разблокировать"
 L["Width"] = "Ширина"
