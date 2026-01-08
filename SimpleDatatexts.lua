@@ -337,11 +337,11 @@ loader:SetScript("OnEvent", function(self, event, arg)
     SDT:UpdateAllModules()
 
     -- Init print
-    Delay(2, function()
-        if SDT.SDTDB_CharDB.settings.showLoginMessage then
+    if SDT.SDTDB_CharDB.settings.showLoginMessage then
+        Delay(2, function()
             SDT.Print(format(L["Loaded. Total modules: %d"], #SDT.cache.moduleNames))
-        end
-    end)
+        end)
+    end
 end)
 
 local function SlashHelp()
