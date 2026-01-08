@@ -76,6 +76,7 @@ local charDefaultsTable = {
         useCustomColor = false,
         customColorHex = "#ffffff",
         use24HourClock = false,
+        showLoginMessage = true,
         font = "Friz Quadrata TT",
         fontSize = 12,
         debug = false,
@@ -286,8 +287,16 @@ lockCheckbox:SetScript("OnClick", function(self)
     SDT.SDTDB_CharDB.settings.locked = self:GetChecked()
 end)
 
+local loginMessageCheckbox = CreateFrame("CheckButton", nil, globalSubPanel, "InterfaceOptionsCheckButtonTemplate")
+loginMessageCheckbox:SetPoint("TOPLEFT", lockCheckbox, "BOTTOMLEFT", 0, -20)
+loginMessageCheckbox.Text:SetText(L["Show login message"])
+loginMessageCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.showLoginMessage)
+loginMessageCheckbox:SetScript("OnClick", function(self)
+    SDT.SDTDB_CharDB.settings.showLoginMessage = self:GetChecked()
+end)
+
 local classColorCheckbox = CreateFrame("CheckButton", nil, globalSubPanel, "InterfaceOptionsCheckButtonTemplate")
-classColorCheckbox:SetPoint("TOPLEFT", lockCheckbox, "BOTTOMLEFT", 0, -20)
+classColorCheckbox:SetPoint("TOPLEFT", loginMessageCheckbox, "BOTTOMLEFT", 0, -20)
 classColorCheckbox.Text:SetText(L["Use Class Color"])
 classColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.useClassColor)
 
@@ -1301,6 +1310,7 @@ loader:SetScript("OnEvent", function(self, event, arg)
         UIDropDownMenu_Initialize(copyProfileDropdown, ProfileCopyDropdown_Init)
         UIDropDownMenu_Initialize(deleteProfileDropdown, ProfileDeleteDropdown_Init)
         lockCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.locked)
+        loginMessageCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.showLoginMessage)
         classColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.useClassColor)
         customColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.useCustomColor)
         colorPickerButton:SetText(SDT.SDTDB_CharDB.settings.customColorHex)

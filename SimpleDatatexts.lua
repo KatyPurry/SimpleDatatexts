@@ -338,7 +338,9 @@ loader:SetScript("OnEvent", function(self, event, arg)
 
     -- Init print
     Delay(2, function()
-        SDT.Print(format(L["Loaded. Total modules: %d"], #SDT.cache.moduleNames))
+        if SDT.SDTDB_CharDB.settings.showLoginMessage then
+            SDT.Print(format(L["Loaded. Total modules: %d"], #SDT.cache.moduleNames))
+        end
     end)
 end)
 
