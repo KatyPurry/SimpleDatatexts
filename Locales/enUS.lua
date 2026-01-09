@@ -36,6 +36,8 @@ L["Global"] = "Global"
 L["Simple DataTexts - Global Settings"] = "Simple DataTexts - Global Settings"
 L["Panels"] = "Panels"
 L["Simple DataTexts - Panel Settings"] = "Simple DataTexts - Panel Settings"
+L["Experience Module"] = "Experience Module"
+L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Experience Settings"
 L["Profiles"] = "Profiles"
 L["Simple DataTexts - Profile Settings"] = "Simple DataTexts - Profile Settings"
 L["Lock Panels (disable movement)"] = "Lock Panels (disable movement)"
@@ -58,11 +60,15 @@ L["Height"] = "Height"
 L["Select Border:"] = "Select Border:"
 L["Border Size"] = "Border Size"
 L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Are you sure you want to delete this bar?\nThis action cannot be undone."
--- Used in: Settings.lua, Utilities.lua
 L["Yes"] = "Yes"
--- Used in: Settings.lua, Utilities.lua
 L["No"] = "No"
 L["(none)"] = "(none)"
+L["Display Format:"] = "Display Format:"
+L["Show Bar"] = "Show Bar"
+L["Bar Height (%)"] = "Bar Height (%)"
+L["Bar Font Size"] = "Bar Font Size"
+L["Bar Color:"] = "Bar Color:"
+L["Bar Text Color:"] = "Bar Text Color:"
 L["Create New Profile:"] = "Create New Profile:"
 L["Current Profile:"] = "Current Profile:"
 L["Enable Per-Spec Profiles"] = "Enable Per-Spec Profiles"
@@ -70,7 +76,6 @@ L["Copy Profile:"] = "Copy Profile:"
 L["Delete Profile:"] = "Delete Profile:"
 L["NYI:"] = "NYI:"
 L["The profile name you have entered already exists. Please enter a new name."] = "The profile name you have entered already exists. Please enter a new name."
--- Used in: Settings.lua, Utilities.lua
 L["Ok"] = "Ok"
 L["Saved font not found. Resetting font to Friz Quadrata TT."] = "Saved font not found. Resetting font to Friz Quadrata TT."
 
@@ -111,6 +116,14 @@ L["GOLD"] = "GOLD"
 -- modules/Durability.lua
 -- ----------------------------
 L["Durability:"] = "Durability:"
+
+-------------------------------
+-- modules/Experience.lua
+-------------------------------
+L["Max Level"] = "Max Level"
+L["N/A"] = "N/A"
+L["Experience"] = "Experience"
+L["Configure in settings"] = "Configure in settings"
 
 -- ----------------------------
 -- modules/Friends.lua

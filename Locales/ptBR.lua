@@ -40,6 +40,8 @@ L["Global"] = "Global"
 L["Simple DataTexts - Global Settings"] = "Simple DataTexts - Configurações Globais"
 L["Panels"] = "Painéis"
 L["Simple DataTexts - Panel Settings"] = "Simple DataTexts - Configurações de Painéis"
+L["Experience Module"] = "Módulo de Experiência"
+L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Configurações de Experiência"
 L["Profiles"] = "Perfis"
 L["Simple DataTexts - Profile Settings"] = "Simple DataTexts - Configurações de Perfis"
 L["Lock Panels (disable movement)"] = "Bloquear painéis (desabilitar movimento)"
@@ -62,11 +64,15 @@ L["Height"] = "Altura"
 L["Select Border:"] = "Selecionar borda:"
 L["Border Size"] = "Tamanho da borda"
 L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Tem certeza de que deseja excluir esta barra?\nEsta ação não pode ser desfeita."
--- Used in: Settings.lua, Utilities.lua
 L["Yes"] = "Sim"
--- Used in: Settings.lua, Utilities.lua
 L["No"] = "Não"
 L["(none)"] = "(nenhum)"
+L["Display Format:"] = "Formato de Exibição:"
+L["Show Bar"] = "Mostrar Barra"
+L["Bar Height (%)"] = "Altura da Barra (%)"
+L["Bar Font Size"] = "Tamanho da Fonte da Barra"
+L["Bar Color:"] = "Cor da Barra:"
+L["Bar Text Color:"] = "Cor do Texto da Barra:"
 L["Create New Profile:"] = "Criar novo perfil:"
 L["Current Profile:"] = "Perfil atual:"
 L["Enable Per-Spec Profiles"] = "Ativar perfis por especialização"
@@ -74,7 +80,6 @@ L["Copy Profile:"] = "Copiar perfil:"
 L["Delete Profile:"] = "Excluir perfil:"
 L["NYI:"] = "Ainda não disponível:"
 L["The profile name you have entered already exists. Please enter a new name."] = "O nome do perfil já existe. Insira um novo nome."
--- Used in: Settings.lua, Utilities.lua
 L["Ok"] = "OK"
 L["Saved font not found. Resetting font to Friz Quadrata TT."] = "Fonte salva não encontrada. Restaurando para Friz Quadrata TT."
 
@@ -115,6 +120,14 @@ L["GOLD"] = "OURO"
 -- modules/Durability.lua
 -- ----------------------------
 L["Durability:"] = "Durabilidade:"
+
+-------------------------------
+-- modules/Experience.lua
+-------------------------------
+L["Max Level"] = "Nível Máximo"
+L["N/A"] = "N/D"
+L["Experience"] = "Experiência"
+L["Configure in settings"] = "Configurar nas definições"
 
 -- ----------------------------
 -- modules/Friends.lua

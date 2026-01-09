@@ -40,6 +40,8 @@ L["Global"] = "Глобальные"
 L["Simple DataTexts - Global Settings"] = "Simple DataTexts - Глобальные настройки"
 L["Panels"] = "Панели"
 L["Simple DataTexts - Panel Settings"] = "Simple DataTexts - Настройки панелей"
+L["Experience Module"] = "Модуль Опыта"
+L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Настройки Опыта"
 L["Profiles"] = "Профили"
 L["Simple DataTexts - Profile Settings"] = "Simple DataTexts - Настройки профилей"
 L["Lock Panels (disable movement)"] = "Блокировать панели (отключить перемещение)"
@@ -62,11 +64,15 @@ L["Height"] = "Высота"
 L["Select Border:"] = "Выбрать рамку:"
 L["Border Size"] = "Размер рамки"
 L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Вы уверены, что хотите удалить эту панель?\nЭто действие нельзя отменить."
--- Used in: Settings.lua, Utilities.lua
 L["Yes"] = "Да"
--- Used in: Settings.lua, Utilities.lua
 L["No"] = "Нет"
 L["(none)"] = "(нет)"
+L["Display Format:"] = "Формат Отображения:"
+L["Show Bar"] = "Показать Полосу"
+L["Bar Height (%)"] = "Высота Полосы (%)"
+L["Bar Font Size"] = "Размер Шрифта Полосы"
+L["Bar Color:"] = "Цвет Полосы:"
+L["Bar Text Color:"] = "Цвет Текста Полосы:"
 L["Create New Profile:"] = "Создать новый профиль:"
 L["Current Profile:"] = "Текущий профиль:"
 L["Enable Per-Spec Profiles"] = "Включить профили по специализации"
@@ -74,7 +80,6 @@ L["Copy Profile:"] = "Скопировать профиль:"
 L["Delete Profile:"] = "Удалить профиль:"
 L["NYI:"] = "Будет добавлено:"
 L["The profile name you have entered already exists. Please enter a new name."] = "Имя профиля уже существует. Введите новое имя."
--- Used in: Settings.lua, Utilities.lua
 L["Ok"] = "OK"
 L["Saved font not found. Resetting font to Friz Quadrata TT."] = "Сохранённый шрифт не найден. Сброс на Friz Quadrata TT."
 
@@ -115,6 +120,14 @@ L["GOLD"] = "ЗОЛОТО"
 -- modules/Durability.lua
 -- ----------------------------
 L["Durability:"] = "Прочность:"
+
+-------------------------------
+-- modules/Experience.lua
+-------------------------------
+L["Max Level"] = "Максимальный Уровень"
+L["N/A"] = "Н/Д"
+L["Experience"] = "Опыт"
+L["Configure in settings"] = "Настроить в параметрах"
 
 -- ----------------------------
 -- modules/Friends.lua

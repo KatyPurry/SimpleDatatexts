@@ -39,6 +39,8 @@ L["Global"] = "Global"
 L["Simple DataTexts - Global Settings"] = "Simple Datatexts - Globale Einstellungen"
 L["Panels"] = "Panels"
 L["Simple DataTexts - Panel Settings"] = "Simple Datatexts - Panel-Einstellungen"
+L["Experience Module"] = "Erfahrungsmodul"
+L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Erfahrungseinstellungen"
 L["Profiles"] = "Profile"
 L["Simple DataTexts - Profile Settings"] = "Simple Datatexts - Profileinstellungen"
 L["Lock Panels (disable movement)"] = "Panels sperren (Bewegung deaktivieren)"
@@ -64,6 +66,12 @@ L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = 
 L["Yes"] = "Ja"
 L["No"] = "Nein"
 L["(none)"] = "(keine)"
+L["Display Format:"] = "Anzeigeformat:"
+L["Show Bar"] = "Leiste anzeigen"
+L["Bar Height (%)"] = "Leistenhöhe (%)"
+L["Bar Font Size"] = "Leisten-Schriftgröße"
+L["Bar Color:"] = "Leistenfarbe:"
+L["Bar Text Color:"] = "Leisten-Textfarbe:"
 L["Create New Profile:"] = "Neues Profil erstellen:"
 L["Current Profile:"] = "Aktuelles Profil:"
 L["Enable Per-Spec Profiles"] = "Profile pro Spezialisierung aktivieren"
@@ -110,6 +118,14 @@ L["GOLD"] = "GOLD"
 -- modules/Durability.lua
 -- ----------------------------
 L["Durability:"] = "Haltbarkeit:"
+
+-------------------------------
+-- modules/Experience.lua
+-------------------------------
+L["Max Level"] = "Maximale Stufe"
+L["N/A"] = "N/V"
+L["Experience"] = "Erfahrung"
+L["Configure in settings"] = "In den Einstellungen konfigurieren"
 
 -- ----------------------------
 -- modules/Friends.lua

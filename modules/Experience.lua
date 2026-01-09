@@ -171,7 +171,7 @@ function mod.Create(slotFrame)
         maxXP = UnitXPMax("player")
 
         if maxXP <= 0 then
-            text:SetText(SDT:ColorText("N/A"))
+            text:SetText(SDT:ColorText(L["N/A"]))
             if barFrame then barFrame:Hide() end
             return
         end
@@ -278,9 +278,9 @@ function mod.Create(slotFrame)
         GameTooltip:ClearLines()
 
         local level = UnitLevel("player")
-        GameTooltip:AddLine("Experience", 1, 1, 1)
+        GameTooltip:AddLine(L["Experience"], 1, 1, 1)
         GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(format("Level %d", SDTC.playerLevel), 1, 1, 1)
+        GameTooltip:AddLine(format(L["Level %d"], SDTC.playerLevel), 1, 1, 1)
         GameTooltip:AddDoubleLine(
             "Progress:",
             format("%s / %s", 
@@ -299,7 +299,7 @@ function mod.Create(slotFrame)
             1, 0.82, 0, 1, 1, 1
         )
         GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Configure in settings", 0.7, 0.7, 0.7)
+        GameTooltip:AddLine(L["Configure in settings"], 0.7, 0.7, 0.7)
 
         GameTooltip:Show()
     end)
