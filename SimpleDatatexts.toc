@@ -38,6 +38,7 @@ modules/Coordinates.lua
 modules/Crit.lua
 modules/Currency.lua
 modules/Durability.lua
+modules/Experience.lua
 modules/Friends.lua
 modules/Gold.lua
 modules/Guild.lua

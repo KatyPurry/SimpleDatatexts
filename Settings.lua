@@ -77,6 +77,11 @@ local charDefaultsTable = {
         customColorHex = "#ffffff",
         use24HourClock = false,
         showLoginMessage = true,
+        expFormat = 1,
+        expBarUseClassColor = true,
+        expTextUseClassColor = true,
+        expBarColor = "#4080FF",
+        expTextColor = "#FFFFFF",
         font = "Friz Quadrata TT",
         fontSize = 12,
         debug = false,
@@ -259,6 +264,22 @@ panelsVersion:SetText("v" .. SDT.cache.version)
 
 local panelsCategory = Settings.RegisterCanvasLayoutSubcategory(category, panelsSubPanel, L["Panels"])
 Settings.RegisterAddOnCategory(panelsCategory)
+
+local experienceSubPanel = CreateFrame("Frame", addonName .. "_ExperienceSubPanel", UIParent)
+experienceSubPanel.name = L["Experience Module"]
+experienceSubPanel.parent = panel.name
+SDT.ExperienceSubPanel = experienceSubPanel
+
+local experienceTitle = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+experienceTitle:SetPoint("TOPLEFT", 16, -16)
+experienceTitle:SetText(L["Simple DataTexts - Experience Settings"])
+
+local experienceVersion = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+experienceVersion:SetPoint("TOPRIGHT", -16, -17)
+experienceVersion:SetText("v" .. SDT.cache.version)
+
+local experienceCategory = Settings.RegisterCanvasLayoutSubcategory(category, experienceSubPanel, L["Experience Module"])
+Settings.RegisterAddOnCategory(experienceCategory)
 
 local profilesSubPanel = CreateFrame("Frame", addonName .. "_ProfilesSubPanel", UIParent)
 profilesSubPanel.name = L["Profiles"]
@@ -954,6 +975,190 @@ StaticPopupDialogs["SDT_CONFIRM_DELETE_BAR"] = {
     end,
 }
 
+----------------------------------------------------
+-- Experience Format Selector
+----------------------------------------------------
+local formatLabel = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+formatLabel:SetPoint("TOPLEFT", experienceTitle, "BOTTOMLEFT", 0, -20)
+formatLabel:SetText(L["Display Format:"])
+
+local formatDropdown = CreateSettingsDropdown(addonName .. "_FormatDropdown", experienceSubPanel)
+formatDropdown:SetPoint("TOPLEFT", formatLabel, "BOTTOMLEFT", -20, -6)
+
+local function FormatDropdown_Initialize(self, level)
+    local info = UIDropDownMenu_CreateInfo()
+    local formatNames = {
+        "XP / Max",
+        "XP / Max (Percent)",
+        "XP / Max (Percent) (Remaining)",
+        "Graphical Bar"
+    }
+    for i = 1, 4 do
+        info = UIDropDownMenu_CreateInfo()
+        info.text = formatNames[i]
+        info.checked = SDT.SDTDB_CharDB.settings.expFormat == i
+        info.func = function()
+            SDT.SDTDB_CharDB.settings.expFormat = i
+            UIDropDownMenu_SetSelectedValue(formatDropdown, i)
+            UIDropDownMenu_SetText(formatDropdown, formatNames[i])
+            SDT:UpdateAllModules()
+        end
+        UIDropDownMenu_AddButton(info, level)
+    end
+end
+
+----------------------------------------------------
+-- Experience Bar Color Options
+----------------------------------------------------
+local expBarColorLabel = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+expBarColorLabel:SetPoint("TOPLEFT", formatDropdown, "BOTTOMLEFT", 20, -20)
+expBarColorLabel:SetText(L["Bar Color:"])
+
+local expBarClassColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
+expBarClassColorCheckbox:SetPoint("TOPLEFT", expBarColorLabel, "BOTTOMLEFT", 0, -16)
+expBarClassColorCheckbox.Text:SetText(L["Use Class Color"])
+expBarClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+
+local expBarCustomColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
+expBarCustomColorCheckbox:SetPoint("TOPLEFT", expBarClassColorCheckbox, "BOTTOMLEFT", 0, -16)
+expBarCustomColorCheckbox.Text:SetText(L["Use Custom Color"])
+expBarCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+
+expBarClassColorCheckbox:SetScript("OnClick", function(self)
+    local checked = self:GetChecked()
+    SDT.SDTDB_CharDB.settings.expBarUseClassColor = checked
+    expBarCustomColorCheckbox:SetChecked(not checked)
+    SDT:UpdateAllModules()
+end)
+
+expBarCustomColorCheckbox:SetScript("OnClick", function(self)
+    local checked = self:GetChecked()
+    SDT.SDTDB_CharDB.settings.expBarUseClassColor = not checked
+    expBarClassColorCheckbox:SetChecked(not checked)
+    SDT:UpdateAllModules()
+end)
+
+local expBarColorPickerButton = CreateFrame("Button", nil, experienceSubPanel, "UIPanelButtonTemplate")
+expBarColorPickerButton:SetPoint("LEFT", expBarCustomColorCheckbox, "RIGHT", 120, 0)
+expBarColorPickerButton:SetSize(80, 24)
+expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
+
+expBarColorPickerButton:Show()
+
+local function showExpBarColorPicker()
+    ColorPickerFrame:Hide()
+    
+    local initColor = SDT.SDTDB_CharDB.settings.expBarColor:gsub("#", "")
+    local initR = tonumber(initColor:sub(1, 2), 16) / 255
+    local initG = tonumber(initColor:sub(3, 4), 16) / 255
+    local initB = tonumber(initColor:sub(5, 6), 16) / 255
+
+    local function onColorPicked()
+        local r, g, b = ColorPickerFrame:GetColorRGB()
+        SDT.SDTDB_CharDB.settings.expBarColor = format("#%02X%02X%02X", r*255, g*255, b*255)
+        SDT:UpdateAllModules()
+        expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
+    end
+
+    local function onCancel()
+        SDT.SDTDB_CharDB.settings.expBarColor = format("#%02X%02X%02X", initR*255, initG*255, initB*255)
+        SDT:UpdateAllModules()
+        expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
+    end
+
+    local options = {
+        swatchFunc = onColorPicked,
+        cancelFunc = onCancel,
+        hasOpacity = false,
+        opacity = 1,
+        r = initR,
+        g = initG,
+        b = initB,
+    }
+    
+    ColorPickerFrame:SetupColorPickerAndShow(options)
+end
+
+expBarColorPickerButton:SetScript("OnClick", function()
+    showExpBarColorPicker()
+end)
+
+----------------------------------------------------
+-- Experience Text Color Options
+----------------------------------------------------
+local expTextColorLabel = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+expTextColorLabel:SetPoint("TOPLEFT", expBarCustomColorCheckbox, "BOTTOMLEFT", 0, -20)
+expTextColorLabel:SetText(L["Bar Text Color:"])
+
+local expTextClassColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
+expTextClassColorCheckbox:SetPoint("TOPLEFT", expTextColorLabel, "BOTTOMLEFT", 0, -16)
+expTextClassColorCheckbox.Text:SetText(L["Use Class Color"])
+expTextClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+
+local expTextCustomColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
+expTextCustomColorCheckbox:SetPoint("TOPLEFT", expTextClassColorCheckbox, "BOTTOMLEFT", 0, -16)
+expTextCustomColorCheckbox.Text:SetText(L["Use Custom Color"])
+expTextCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+
+expTextClassColorCheckbox:SetScript("OnClick", function(self)
+    local checked = self:GetChecked()
+    SDT.SDTDB_CharDB.settings.expTextUseClassColor = checked
+    expTextCustomColorCheckbox:SetChecked(not checked)
+    SDT:UpdateAllModules()
+end)
+
+expTextCustomColorCheckbox:SetScript("OnClick", function(self)
+    local checked = self:GetChecked()
+    SDT.SDTDB_CharDB.settings.expTextUseClassColor = not checked
+    expTextClassColorCheckbox:SetChecked(not checked)
+    SDT:UpdateAllModules()
+end)
+
+local expTextColorPickerButton = CreateFrame("Button", nil, experienceSubPanel, "UIPanelButtonTemplate")
+expTextColorPickerButton:SetPoint("LEFT", expTextCustomColorCheckbox, "RIGHT", 120, 0)
+expTextColorPickerButton:SetSize(80, 24)
+expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
+
+expTextColorPickerButton:Show()
+
+local function showExpTextColorPicker()
+    ColorPickerFrame:Hide()
+    
+    local initColor = SDT.SDTDB_CharDB.settings.expTextColor:gsub("#", "")
+    local initR = tonumber(initColor:sub(1, 2), 16) / 255
+    local initG = tonumber(initColor:sub(3, 4), 16) / 255
+    local initB = tonumber(initColor:sub(5, 6), 16) / 255
+
+    local function onColorPicked()
+        local r, g, b = ColorPickerFrame:GetColorRGB()
+        SDT.SDTDB_CharDB.settings.expTextColor = format("#%02X%02X%02X", r*255, g*255, b*255)
+        SDT:UpdateAllModules()
+        expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
+    end
+
+    local function onCancel()
+        SDT.SDTDB_CharDB.settings.expTextColor = format("#%02X%02X%02X", initR*255, initG*255, initB*255)
+        SDT:UpdateAllModules()
+        expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
+    end
+
+    local options = {
+        swatchFunc = onColorPicked,
+        cancelFunc = onCancel,
+        hasOpacity = false,
+        opacity = 1,
+        r = initR,
+        g = initG,
+        b = initB,
+    }
+    
+    ColorPickerFrame:SetupColorPickerAndShow(options)
+end
+
+expTextColorPickerButton:SetScript("OnClick", function()
+    showExpTextColorPicker()
+end)
+
 -------------------------------------------------
 -- Profiles Settings
 -------------------------------------------------
@@ -1288,6 +1493,15 @@ loader:SetScript("OnEvent", function(self, event, arg)
         UIDropDownMenu_SetSelectedValue(fontDropdown, currentFont)
         UIDropDownMenu_SetText(fontDropdown, currentFont)
         UIDropDownMenu_Initialize(borderDropdown, BorderDropdown_Initialize)
+        UIDropDownMenu_Initialize(formatDropdown, FormatDropdown_Initialize)
+        local expFormatNames = {
+            "XP / Max",
+            "XP / Max (Percent)",
+            "XP / Max (Percent) (Remaining)",
+            "Graphical Bar"
+        }
+        UIDropDownMenu_SetSelectedValue(formatDropdown, SDT.SDTDB_CharDB.settings.expFormat)
+        UIDropDownMenu_SetText(formatDropdown, expFormatNames[SDT.SDTDB_CharDB.settings.expFormat])
         UIDropDownMenu_Initialize(profileSelectDropdown, ProfileSelectDropdown_Init)
         local activeProfile
         if SDT.SDTDB_CharDB.useSpecProfiles then
@@ -1327,6 +1541,10 @@ loader:SetScript("OnEvent", function(self, event, arg)
         fontSizeBox:SetText(tostring(SDT.SDTDB_CharDB.settings.fontSize))
         fontSizeBox:SetCursorPosition(0)
         perSpecCheck:SetChecked(SDT.SDTDB_CharDB.useSpecProfiles)
+        expBarClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+        expBarCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+        expTextClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+        expTextCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expTextUseClassColor)
 
         -- Update modules to be safe
         SDT:UpdateAllModules()
