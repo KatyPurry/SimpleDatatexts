@@ -78,10 +78,13 @@ local charDefaultsTable = {
         use24HourClock = false,
         showLoginMessage = true,
         expFormat = 1,
+        expShowBar = true,
+        expBarHeightPercent = 100,
         expBarUseClassColor = true,
         expTextUseClassColor = true,
         expBarColor = "#4080FF",
         expTextColor = "#FFFFFF",
+        expTextFontSize = 12,
         font = "Friz Quadrata TT",
         fontSize = 12,
         debug = false,
@@ -978,72 +981,151 @@ StaticPopupDialogs["SDT_CONFIRM_DELETE_BAR"] = {
 ----------------------------------------------------
 -- Experience Format Selector
 ----------------------------------------------------
-local formatLabel = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-formatLabel:SetPoint("TOPLEFT", experienceTitle, "BOTTOMLEFT", 0, -20)
-formatLabel:SetText(L["Display Format:"])
+local expFormatLabel = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+expFormatLabel:SetPoint("TOPLEFT", experienceTitle, "BOTTOMLEFT", 0, -20)
+expFormatLabel:SetText(L["Display Format:"])
 
-local formatDropdown = CreateSettingsDropdown(addonName .. "_FormatDropdown", experienceSubPanel)
-formatDropdown:SetPoint("TOPLEFT", formatLabel, "BOTTOMLEFT", -20, -6)
+local expFormatDropdown = CreateSettingsDropdown(addonName .. "_FormatDropdown", experienceSubPanel)
+expFormatDropdown:SetPoint("TOPLEFT", expFormatLabel, "BOTTOMLEFT", -20, -6)
 
-local function FormatDropdown_Initialize(self, level)
-    local info = UIDropDownMenu_CreateInfo()
-    local formatNames = {
-        "XP / Max",
-        "XP / Max (Percent)",
-        "XP / Max (Percent) (Remaining)",
-        "Graphical Bar"
-    }
-    for i = 1, 4 do
-        info = UIDropDownMenu_CreateInfo()
-        info.text = formatNames[i]
-        info.checked = SDT.SDTDB_CharDB.settings.expFormat == i
-        info.func = function()
-            SDT.SDTDB_CharDB.settings.expFormat = i
-            UIDropDownMenu_SetSelectedValue(formatDropdown, i)
-            UIDropDownMenu_SetText(formatDropdown, formatNames[i])
-            SDT:UpdateAllModules()
-        end
-        UIDropDownMenu_AddButton(info, level)
+local expShowBarCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
+expShowBarCheckbox:SetPoint("LEFT", expFormatDropdown, "RIGHT", 0, 0)
+expShowBarCheckbox.Text:SetText(L["Show Bar"])
+expShowBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expShowGraphicalBar)
+
+----------------------------------------------------
+-- Experience Bar Height Slider
+----------------------------------------------------
+local expBarHeightSlider = CreateFrame("Slider", addonName.."_ExpBarHeightSlider", experienceSubPanel, "OptionsSliderTemplate")
+expBarHeightSlider:SetPoint("TOPLEFT", expFormatDropdown, "BOTTOMLEFT", 20, -20)
+expBarHeightSlider:SetMinMaxValues(10, 100)
+expBarHeightSlider:SetValueStep(5)
+expBarHeightSlider:SetWidth(160)
+getglobal(expBarHeightSlider:GetName().."Text"):SetText(L["Bar Height (%)"])
+getglobal(expBarHeightSlider:GetName().."Low"):SetText(tostring(10))
+getglobal(expBarHeightSlider:GetName().."High"):SetText(tostring(100))
+expBarHeightSlider:Hide()
+
+local expBarHeightBox = CreateFrame("EditBox", addonName.."_ExpBarHeightEditBox", experienceSubPanel, "InputBoxTemplate")
+expBarHeightBox:SetSize(50, 20)
+expBarHeightBox:SetPoint("LEFT", expBarHeightSlider, "RIGHT", 25, 0)
+expBarHeightBox:SetAutoFocus(false)
+expBarHeightBox:SetJustifyH("CENTER")
+expBarHeightBox:SetJustifyV("MIDDLE")
+expBarHeightBox:Hide()
+expBarHeightBox:SetScript("OnShow", function(self)
+    self:SetText(tostring(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100))
+end)
+
+-- Sync slider -> editbox
+expBarHeightSlider:SetScript("OnValueChanged", function(self, value)
+    local val = math.floor(value + 0.5)
+    expBarHeightBox:SetText(val)
+    SDT.SDTDB_CharDB.settings.expBarHeightPercent = val
+    SDT.ExperienceModuleUpdate()
+end)
+
+-- Sync editbox -> slider
+expBarHeightBox:SetScript("OnEnterPressed", function(self)
+    local val = tonumber(self:GetText())
+    if val then
+        val = math.max(10, math.min(100, val))
+        expBarHeightSlider:SetValue(val)
+        self:SetText(val)
+        SDT.SDTDB_CharDB.settings.expBarHeightPercent = val
+    else
+        self:SetText(tostring(math.floor(expBarHeightSlider:GetValue() + 0.5)))
     end
-end
+    SDT.ExperienceModuleUpdate()
+    self:ClearFocus()
+end)
+
+----------------------------------------------------
+-- Experience Bar Font Size Slider
+----------------------------------------------------
+local expTextFontSizeSlider = CreateFrame("Slider", addonName.."_ExpTextFontSizeSlider", experienceSubPanel, "OptionsSliderTemplate")
+expTextFontSizeSlider:SetPoint("TOPLEFT", expBarHeightSlider, "BOTTOMLEFT", 0, -30)
+expTextFontSizeSlider:SetMinMaxValues(8, 24)
+expTextFontSizeSlider:SetValueStep(1)
+expTextFontSizeSlider:SetWidth(160)
+getglobal(expTextFontSizeSlider:GetName().."Text"):SetText(L["Bar Font Size"])
+getglobal(expTextFontSizeSlider:GetName().."Low"):SetText(tostring(8))
+getglobal(expTextFontSizeSlider:GetName().."High"):SetText(tostring(24))
+expTextFontSizeSlider:Hide()
+
+local expTextFontSizeBox = CreateFrame("EditBox", addonName.."_ExpTextFontSizeEditBox", experienceSubPanel, "InputBoxTemplate")
+expTextFontSizeBox:SetSize(50, 20)
+expTextFontSizeBox:SetPoint("LEFT", expTextFontSizeSlider, "RIGHT", 25, 0)
+expTextFontSizeBox:SetAutoFocus(false)
+expTextFontSizeBox:SetJustifyH("CENTER")
+expTextFontSizeBox:SetJustifyV("MIDDLE")
+expTextFontSizeBox:Hide()
+expTextFontSizeBox:SetScript("OnShow", function(self)
+    self:SetText(tostring(SDT.SDTDB_CharDB.settings.expTextFontSize or 12))
+end)
+
+-- Sync slider -> editbox
+expTextFontSizeSlider:SetScript("OnValueChanged", function(self, value)
+    local val = math.floor(value + 0.5)
+    expTextFontSizeBox:SetText(val)
+    SDT.SDTDB_CharDB.settings.expTextFontSize = val
+    SDT.ExperienceModuleUpdate()
+end)
+
+-- Sync editbox -> slider
+expTextFontSizeBox:SetScript("OnEnterPressed", function(self)
+    local val = tonumber(self:GetText())
+    if val then
+        val = math.max(8, math.min(24, val))
+        expTextFontSizeSlider:SetValue(val)
+        self:SetText(val)
+        SDT.SDTDB_CharDB.settings.expTextFontSize = val
+    else
+        self:SetText(tostring(math.floor(expTextFontSizeSlider:GetValue() + 0.5)))
+    end
+    SDT.ExperienceModuleUpdate()
+    self:ClearFocus()
+end)
 
 ----------------------------------------------------
 -- Experience Bar Color Options
 ----------------------------------------------------
 local expBarColorLabel = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-expBarColorLabel:SetPoint("TOPLEFT", formatDropdown, "BOTTOMLEFT", 20, -20)
+expBarColorLabel:SetPoint("TOPLEFT", expTextFontSizeSlider, "BOTTOMLEFT", 0, -20)
 expBarColorLabel:SetText(L["Bar Color:"])
+expBarColorLabel:Hide()
 
 local expBarClassColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expBarClassColorCheckbox:SetPoint("TOPLEFT", expBarColorLabel, "BOTTOMLEFT", 0, -16)
 expBarClassColorCheckbox.Text:SetText(L["Use Class Color"])
 expBarClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+expBarClassColorCheckbox:Hide()
 
 local expBarCustomColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expBarCustomColorCheckbox:SetPoint("TOPLEFT", expBarClassColorCheckbox, "BOTTOMLEFT", 0, -16)
 expBarCustomColorCheckbox.Text:SetText(L["Use Custom Color"])
 expBarCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+expBarCustomColorCheckbox:Hide()
 
 expBarClassColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
     SDT.SDTDB_CharDB.settings.expBarUseClassColor = checked
     expBarCustomColorCheckbox:SetChecked(not checked)
-    SDT:UpdateAllModules()
+    SDT.ExperienceModuleUpdate()
 end)
 
 expBarCustomColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
     SDT.SDTDB_CharDB.settings.expBarUseClassColor = not checked
     expBarClassColorCheckbox:SetChecked(not checked)
-    SDT:UpdateAllModules()
+    SDT.ExperienceModuleUpdate()
 end)
 
 local expBarColorPickerButton = CreateFrame("Button", nil, experienceSubPanel, "UIPanelButtonTemplate")
 expBarColorPickerButton:SetPoint("LEFT", expBarCustomColorCheckbox, "RIGHT", 120, 0)
 expBarColorPickerButton:SetSize(80, 24)
 expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
-
-expBarColorPickerButton:Show()
+expBarColorPickerButton:Hide()
 
 local function showExpBarColorPicker()
     ColorPickerFrame:Hide()
@@ -1056,13 +1138,13 @@ local function showExpBarColorPicker()
     local function onColorPicked()
         local r, g, b = ColorPickerFrame:GetColorRGB()
         SDT.SDTDB_CharDB.settings.expBarColor = format("#%02X%02X%02X", r*255, g*255, b*255)
-        SDT:UpdateAllModules()
+        SDT.ExperienceModuleUpdate()
         expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
     end
 
     local function onCancel()
         SDT.SDTDB_CharDB.settings.expBarColor = format("#%02X%02X%02X", initR*255, initG*255, initB*255)
-        SDT:UpdateAllModules()
+        SDT.ExperienceModuleUpdate()
         expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
     end
 
@@ -1089,37 +1171,39 @@ end)
 local expTextColorLabel = experienceSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 expTextColorLabel:SetPoint("TOPLEFT", expBarCustomColorCheckbox, "BOTTOMLEFT", 0, -20)
 expTextColorLabel:SetText(L["Bar Text Color:"])
+expTextColorLabel:Hide()
 
 local expTextClassColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expTextClassColorCheckbox:SetPoint("TOPLEFT", expTextColorLabel, "BOTTOMLEFT", 0, -16)
 expTextClassColorCheckbox.Text:SetText(L["Use Class Color"])
 expTextClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+expTextClassColorCheckbox:Hide()
 
 local expTextCustomColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expTextCustomColorCheckbox:SetPoint("TOPLEFT", expTextClassColorCheckbox, "BOTTOMLEFT", 0, -16)
 expTextCustomColorCheckbox.Text:SetText(L["Use Custom Color"])
 expTextCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+expTextCustomColorCheckbox:Hide()
 
 expTextClassColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
     SDT.SDTDB_CharDB.settings.expTextUseClassColor = checked
     expTextCustomColorCheckbox:SetChecked(not checked)
-    SDT:UpdateAllModules()
+    SDT.ExperienceModuleUpdate()
 end)
 
 expTextCustomColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
     SDT.SDTDB_CharDB.settings.expTextUseClassColor = not checked
     expTextClassColorCheckbox:SetChecked(not checked)
-    SDT:UpdateAllModules()
+    SDT.ExperienceModuleUpdate()
 end)
 
 local expTextColorPickerButton = CreateFrame("Button", nil, experienceSubPanel, "UIPanelButtonTemplate")
 expTextColorPickerButton:SetPoint("LEFT", expTextCustomColorCheckbox, "RIGHT", 120, 0)
 expTextColorPickerButton:SetSize(80, 24)
 expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
-
-expTextColorPickerButton:Show()
+expTextColorPickerButton:Hide()
 
 local function showExpTextColorPicker()
     ColorPickerFrame:Hide()
@@ -1132,13 +1216,13 @@ local function showExpTextColorPicker()
     local function onColorPicked()
         local r, g, b = ColorPickerFrame:GetColorRGB()
         SDT.SDTDB_CharDB.settings.expTextColor = format("#%02X%02X%02X", r*255, g*255, b*255)
-        SDT:UpdateAllModules()
+        SDT.ExperienceModuleUpdate()
         expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
     end
 
     local function onCancel()
         SDT.SDTDB_CharDB.settings.expTextColor = format("#%02X%02X%02X", initR*255, initG*255, initB*255)
-        SDT:UpdateAllModules()
+        SDT.ExperienceModuleUpdate()
         expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
     end
 
@@ -1157,6 +1241,81 @@ end
 
 expTextColorPickerButton:SetScript("OnClick", function()
     showExpTextColorPicker()
+end)
+
+local function UpdateBarOptionsVisibility()
+    local isGraphicalBar = SDT.SDTDB_CharDB.settings.expShowGraphicalBar
+    
+    if isGraphicalBar then
+        -- Bar color section
+        expBarColorLabel:Show()
+        expBarClassColorCheckbox:Show()
+        expBarCustomColorCheckbox:Show()
+        expBarColorPickerButton:Show()
+    
+        -- Text color section
+        expTextColorLabel:Show()
+        expTextClassColorCheckbox:Show()
+        expTextCustomColorCheckbox:Show()
+        expTextColorPickerButton:Show()
+
+        -- Text font size section
+        expTextFontSizeSlider:Show()
+        expTextFontSizeBox:Show()
+        expTextFontSizeBox:SetText(SDT.SDTDB_CharDB.settings.expTextFontSize or 12)
+    
+        -- Bar height section
+        expBarHeightSlider:Show()
+        expBarHeightBox:Show()
+        expBarHeightBox:SetText(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100)
+    else
+        -- Bar color section
+        expBarColorLabel:Hide()
+        expBarClassColorCheckbox:Hide()
+        expBarCustomColorCheckbox:Hide()
+        expBarColorPickerButton:Hide()
+
+        -- Text color section
+        expTextColorLabel:Hide()
+        expTextClassColorCheckbox:Hide()
+        expTextCustomColorCheckbox:Hide()
+        expTextColorPickerButton:Hide()
+
+        -- Text font size section
+        expTextFontSizeSlider:Hide()
+        expTextFontSizeBox:Hide()
+    
+        -- Bar height section
+        expBarHeightSlider:Hide()
+        expBarHeightBox:Hide()
+    end
+end
+
+local function expFormatDropdown_Initialize(self, level)
+    local info = UIDropDownMenu_CreateInfo()
+    local formatNames = {
+        "XP / Max",
+        "XP / Max (Percent)",
+        "XP / Max (Percent) (Remaining)"
+    }
+    for i = 1, 3 do
+        info = UIDropDownMenu_CreateInfo()
+        info.text = formatNames[i]
+        info.checked = SDT.SDTDB_CharDB.settings.expFormat == i
+        info.func = function()
+            SDT.SDTDB_CharDB.settings.expFormat = i
+            UIDropDownMenu_SetSelectedValue(expFormatDropdown, i)
+            UIDropDownMenu_SetText(expFormatDropdown, formatNames[i])
+            SDT.ExperienceModuleUpdate()
+        end
+        UIDropDownMenu_AddButton(info, level)
+    end
+end
+
+expShowBarCheckbox:SetScript("OnClick", function(self)
+    SDT.SDTDB_CharDB.settings.expShowGraphicalBar = self:GetChecked()
+    UpdateBarOptionsVisibility()
+    SDT.ExperienceModuleUpdate()
 end)
 
 -------------------------------------------------
@@ -1493,15 +1652,14 @@ loader:SetScript("OnEvent", function(self, event, arg)
         UIDropDownMenu_SetSelectedValue(fontDropdown, currentFont)
         UIDropDownMenu_SetText(fontDropdown, currentFont)
         UIDropDownMenu_Initialize(borderDropdown, BorderDropdown_Initialize)
-        UIDropDownMenu_Initialize(formatDropdown, FormatDropdown_Initialize)
+        UIDropDownMenu_Initialize(expFormatDropdown, expFormatDropdown_Initialize)
         local expFormatNames = {
             "XP / Max",
             "XP / Max (Percent)",
-            "XP / Max (Percent) (Remaining)",
-            "Graphical Bar"
+            "XP / Max (Percent) (Remaining)"
         }
-        UIDropDownMenu_SetSelectedValue(formatDropdown, SDT.SDTDB_CharDB.settings.expFormat)
-        UIDropDownMenu_SetText(formatDropdown, expFormatNames[SDT.SDTDB_CharDB.settings.expFormat])
+        UIDropDownMenu_SetSelectedValue(expFormatDropdown, SDT.SDTDB_CharDB.settings.expFormat)
+        UIDropDownMenu_SetText(expFormatDropdown, expFormatNames[SDT.SDTDB_CharDB.settings.expFormat])
         UIDropDownMenu_Initialize(profileSelectDropdown, ProfileSelectDropdown_Init)
         local activeProfile
         if SDT.SDTDB_CharDB.useSpecProfiles then
@@ -1541,10 +1699,16 @@ loader:SetScript("OnEvent", function(self, event, arg)
         fontSizeBox:SetText(tostring(SDT.SDTDB_CharDB.settings.fontSize))
         fontSizeBox:SetCursorPosition(0)
         perSpecCheck:SetChecked(SDT.SDTDB_CharDB.useSpecProfiles)
+        expShowBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expShowGraphicalBar)
+        expBarHeightSlider:SetValue(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100)
+        expBarHeightBox:SetText(tostring(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100))
         expBarClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expBarUseClassColor)
         expBarCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+        expTextFontSizeSlider:SetValue(SDT.SDTDB_CharDB.settings.expTextFontSize or 12)
+        expTextFontSizeBox:SetText(tostring(SDT.SDTDB_CharDB.settings.expTextFontSize or 12))
         expTextClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expTextUseClassColor)
         expTextCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+        UpdateBarOptionsVisibility()
 
         -- Update modules to be safe
         SDT:UpdateAllModules()

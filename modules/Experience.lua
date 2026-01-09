@@ -7,6 +7,11 @@ local L = SDT.L
 local mod = {}
 
 ----------------------------------------------------
+-- Library Instances
+----------------------------------------------------
+local LSM = LibStub("LibSharedMedia-3.0")
+
+----------------------------------------------------
 -- Lua Locals
 ----------------------------------------------------
 local CreateFrame = CreateFrame
@@ -64,19 +69,21 @@ function mod.Create(slotFrame)
 
         -- Background
         barBg = barFrame:CreateTexture(nil, "BACKGROUND")
-        barBg:SetAllPoints(barFrame)
         barBg:SetColorTexture(0, 0, 0, 0.5)
 
         -- Fill
         barFill = barFrame:CreateTexture(nil, "ARTWORK")
-        barFill:SetPoint("LEFT", barFrame, "LEFT", 2, 0)
-        barFill:SetHeight(barFrame:GetHeight() - 4)
-
+        barFill:SetColorTexture(1, 1, 1, 0.8)
+    
         -- Text overlay
         barText = barFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
         barText:SetPoint("CENTER", barFrame, "CENTER")
         barText:SetShadowColor(0, 0, 0, 1)
         barText:SetShadowOffset(1, -1)
+
+        -- Text font size
+        local fontSize = SDT.SDTDB_CharDB.settings.expTextFontSize or 12
+        barText:SetFont(barText:GetFont(), fontSize, "OUTLINE")
 
         -- Dividers (every 10%)
         barDividers = {}
@@ -91,13 +98,37 @@ function mod.Create(slotFrame)
         barFrame:Hide()
     end
 
+    local function UpdateBarHeight()
+        if not barFill then return end
+    
+        local heightPercent = SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100
+        local slotHeight = slotFrame:GetHeight()
+        local barHeight = (slotHeight * heightPercent) / 100
+        local slotWidth = slotFrame:GetWidth()
+    
+        -- Position background - centered
+        barBg:SetHeight(barHeight)
+        barBg:SetWidth(slotWidth)
+        barBg:SetPoint("CENTER", barFrame, "CENTER", 0, 0)
+        
+        -- Position fill - anchor to left center
+        barFill:SetHeight(barHeight)
+        barFill:SetWidth(1)  -- Will be set by UpdateExperience
+        barFill:SetPoint("LEFT", barFrame, "LEFT", 0, 0)
+    end
+
     local function UpdateBarDividers()
         if not barDividers then return end
-        local slotWidth = slotFrame:GetWidth() - 4
+    
+        local heightPercent = SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100
+        local slotHeight = slotFrame:GetHeight()
+        local barHeight = (slotHeight * heightPercent) / 100
+    
+        local slotWidth = slotFrame:GetWidth()
         for i, divider in ipairs(barDividers) do
             local xPos = (slotWidth * (i / 10))
-            divider:SetPoint("LEFT", barFrame, "LEFT", 2 + xPos, 0)
-            divider:SetHeight(barFrame:GetHeight() - 4)
+            divider:SetPoint("CENTER", barFrame, "CENTER", xPos - slotWidth / 2, 0)
+            divider:SetHeight(barHeight)
         end
     end
 
@@ -151,13 +182,13 @@ function mod.Create(slotFrame)
         local textString = ""
         local format_mode = SDT.SDTDB_CharDB.settings.expFormat or 1
 
+        local showingBar = SDT.SDTDB_CharDB.settings.expShowGraphicalBar
+
         -- Format mode 1: XP / XPMax
         if format_mode == 1 then
             textString = format("%s / %s", 
                 FormatValue(currentXP), 
                 FormatValue(maxXP))
-            text:SetText(SDT:ColorText(textString))
-            if barFrame then barFrame:Hide() end
 
         -- Format mode 2: XP / XPMax (Percent %)
         elseif format_mode == 2 then
@@ -165,8 +196,6 @@ function mod.Create(slotFrame)
                 FormatValue(currentXP), 
                 FormatValue(maxXP),
                 xpPercent)
-            text:SetText(SDT:ColorText(textString))
-            if barFrame then barFrame:Hide() end
 
         -- Format mode 3: XP / XPMax (Percent %) (Remaining)
         elseif format_mode == 3 then
@@ -175,42 +204,50 @@ function mod.Create(slotFrame)
                 FormatValue(maxXP),
                 xpPercent,
                 FormatValue(xpRemaining))
-            text:SetText(SDT:ColorText(textString))
-            if barFrame then barFrame:Hide() end
+        end
 
-        -- Format mode 4: Graphical bar with text overlay
-        elseif format_mode == 4 then
-            if not barFrame then CreateBarDisplay() end
+        if showingBar and barFrame then
             barFrame:Show()
-            text:SetText("")
+        elseif barFrame then
+            barFrame:Hide()
+        end
+
+        -- If bar should be shown, render it
+        if not barFrame then CreateBarDisplay(); barFrame:Show() end
+        if showingBar and barFrame:IsShown() then
+            -- Update bar height based on setting
+            UpdateBarHeight()
+            UpdateBarDividers()
 
             -- Update bar fill width
             local slotWidth = slotFrame:GetWidth()
-            local fillWidth = (slotWidth - 4) * (currentXP / maxXP)
+            local fillWidth = (slotWidth) * (currentXP / maxXP)
             barFill:SetWidth(fillWidth)
 
             -- Apply color
             local r, g, b, a = GetBarColor()
-            if type(r) == "string" then
-                -- It's a hex color string from GetTagColor
-                barFill:SetColorTexture(0.2, 0.6, 1, 0.8)
-            else
-                barFill:SetColorTexture(r, g, b, 0.8)
-            end
+            barFill:SetColorTexture(r, g, b, 0.8)
+            
+            -- Update font size from settings
+            local fontPath = LSM:Fetch("font", SDT.SDTDB_CharDB.settings.font) or STANDARD_TEXT_FONT
+            local fontSize = SDT.SDTDB_CharDB.settings.expTextFontSize or 12
+            barText:SetFont(fontPath, fontSize, "")
+        elseif barFrame then
+            barFrame:Hide()
+        end
 
-            -- Update divider positions
-            UpdateBarDividers()
-
-            -- Bar text
-            textString = format("%s / %s (%.1f%%)", 
-                FormatValue(currentXP), 
-                FormatValue(maxXP),
-                xpPercent)
-            barText:SetText(GetColoredText(textString))
+        local textOutput = showingBar and GetColoredText(textString) or SDT:ColorText(textString)
+        if showingBar then
+            text:SetText("")
+            barText:SetText(textOutput)
+        else
+            barText:SetText("")
+            text:SetText(textOutput)
         end
     end
 
     f.Update = UpdateExperience
+    SDT.ExperienceModuleUpdate = UpdateExperience
 
     -- Event Handlers
     local function OnEvent(self, event, ...)
@@ -241,19 +278,24 @@ function mod.Create(slotFrame)
         GameTooltip:ClearLines()
 
         local level = UnitLevel("player")
-        GameTooltip:AddLine(format("Level %d Experience", level), 1, 1, 1)
+        GameTooltip:AddLine("Experience", 1, 1, 1)
         GameTooltip:AddLine(" ")
+        GameTooltip:AddLine(format("Level %d", SDTC.playerLevel), 1, 1, 1)
         GameTooltip:AddDoubleLine(
             "Progress:",
-            format("%s / %s (%.2f%%)", 
+            format("%s / %s", 
                 FormatValue(currentXP), 
-                FormatValue(maxXP),
-                xpPercent),
+                FormatValue(maxXP)),
             1, 0.82, 0, 1, 1, 1
         )
         GameTooltip:AddDoubleLine(
             "Remaining:",
             FormatValue(maxXP - currentXP),
+            1, 0.82, 0, 1, 1, 1
+        )
+        GameTooltip:AddDoubleLine(
+            "Percentage:",
+            format("%.2f%%", xpPercent),
             1, 0.82, 0, 1, 1, 1
         )
         GameTooltip:AddLine(" ")
