@@ -47,6 +47,7 @@ SDT.cache.playerClass = select(2, UnitClass("player"))
 SDT.cache.playerRealmProper = GetRealmName()
 SDT.cache.playerRealm = SDT.cache.playerRealmProper:gsub("[^%w]", ""):lower()
 SDT.cache.playerFaction = UnitFactionGroup("player")
+SDT.cache.playerLevel = UnitLevel("player")
 SDT.cache.charKey = SDT.cache.playerNameLower.."-"..SDT.cache.playerRealm
 local colors = { GetClassColor(SDT.cache.playerClass):GetRGB() }
 SDT.cache.colorR = colors[1]
