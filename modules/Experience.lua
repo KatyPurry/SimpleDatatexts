@@ -244,6 +244,19 @@ function mod.Create(slotFrame)
             barText:SetText("")
             text:SetText(textOutput)
         end
+
+        -- Hide Blizzard XP bar
+        if SDT.SDTDB_CharDB.settings.expHideBlizzardBar then
+            StatusTrackingBarManager:UnregisterAllEvents()
+		    StatusTrackingBarManager:Hide()
+            SDT.BlizzardXPBarHidden = true
+        else
+            if SDT.BlizzardXPBarHidden then
+                StatusTrackingBarManager:Show()
+                StatusTrackingBarManager:OnLoad()
+                SDT.BlizzardXPBarHidden = false
+            end
+        end
     end
 
     f.Update = UpdateExperience

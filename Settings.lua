@@ -79,6 +79,7 @@ local charDefaultsTable = {
         showLoginMessage = true,
         expFormat = 1,
         expShowBar = true,
+        expHideBlizzardBar = false,
         expBarHeightPercent = 100,
         expBarUseClassColor = true,
         expTextUseClassColor = true,
@@ -993,6 +994,17 @@ expShowBarCheckbox:SetPoint("LEFT", expFormatDropdown, "RIGHT", 0, 0)
 expShowBarCheckbox.Text:SetText(L["Show Bar"])
 expShowBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expShowGraphicalBar)
 
+local expHideBlizzardBarCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
+expHideBlizzardBarCheckbox:SetPoint("LEFT", expShowBarCheckbox, "RIGHT", 40, 0)
+expHideBlizzardBarCheckbox.Text:SetText(L["Hide Blizzard XP Bar"])
+expHideBlizzardBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expHideBlizzardBar)
+expHideBlizzardBarCheckbox:SetScript("OnClick", function(self)
+    SDT.SDTDB_CharDB.settings.expHideBlizzardBar = self:GetChecked()
+    if SDT.ExperienceModuleUpdate then
+        SDT.ExperienceModuleUpdate()
+    end
+end)
+
 ----------------------------------------------------
 -- Experience Bar Height Slider
 ----------------------------------------------------
@@ -1728,6 +1740,7 @@ loader:SetScript("OnEvent", function(self, event, arg)
         fontSizeBox:SetCursorPosition(0)
         perSpecCheck:SetChecked(SDT.SDTDB_CharDB.useSpecProfiles)
         expShowBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expShowGraphicalBar)
+        expHideBlizzardBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expHideBlizzardBar)
         expBarHeightSlider:SetValue(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100)
         expBarHeightBox:SetText(tostring(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100))
         expBarClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expBarUseClassColor)
