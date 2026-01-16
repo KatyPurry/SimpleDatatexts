@@ -171,7 +171,7 @@ function mod.Create(slotFrame)
     local function UpdateText()
         local fps = floor(GetFramerate())
         local _, _, homePing, worldPing = GetNetStats()
-        local latency = homePing
+        local latency = worldPing
         local textString = SDT:ColorText(L["FPS"] .. ": ") .. StatusColor(fps) .. SDT:ColorText(" " .. L["MS"] .. ": ") .. StatusColor(nil, latency)
         text:SetText(textString)
     end
