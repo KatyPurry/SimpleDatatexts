@@ -159,7 +159,7 @@ function mod.Create(slotFrame)
     local function UpdateExperience()
         -- Check if player is max level
         local _, _, _, TOC = GetBuildInfo()
-        local isMaxLevel = TOC < 120000 and SDTC.playerLevel >= 80 or SDTC.playerLevel >= 90
+        local isMaxLevel = TOC < 120001 and SDTC.playerLevel >= 80 or SDTC.playerLevel >= 90
         
         if isMaxLevel then
             text:SetText(SDT:ColorText(L["Max Level"]))
