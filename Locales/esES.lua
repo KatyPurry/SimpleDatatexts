@@ -39,6 +39,10 @@ L["Global"] = "Global"
 L["Simple DataTexts - Global Settings"] = "Simple Datatexts - Configuración Global"
 L["Panels"] = "Paneles"
 L["Simple DataTexts - Panel Settings"] = "Simple Datatexts - Configuración de Panel"
+L["Module Settings"] = "Configuración del módulo"
+L["Configure settings for the "] = "Configurar ajustes para el "
+L["module."] = "módulo."
+L["Configuration"] = "Configuración"
 L["Experience Module"] = "Módulo de Experiencia"
 L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Configuración de Experiencia"
 L["Profiles"] = "Perfiles"
@@ -93,11 +97,21 @@ L["You cannot delete the active profile. Please change your active profile first
 L["Are you sure you want to delete this profile?\nThis action cannot be undone."] = "¿Estás seguro de que deseas eliminar este perfil?\nEsta acción no se puede deshacer."
 
 -- ----------------------------
+-- modules/Agility.lua
+-- ----------------------------
+L["Agi"] = "Agi"
+
+-- ----------------------------
 -- modules/Armor.lua
 -- ----------------------------
 L["Mitigation By Level:"] = "Mitigación por nivel:"
 L["Level %d"] = "Nivel %d"
 L["Target Mitigation"] = "Mitigación del objetivo"
+
+-- ----------------------------
+-- modules/AttackPower.lua
+-- ----------------------------
+L["AP"] = "AP"
 
 -- ----------------------------
 -- modules/Bags.lua
@@ -161,6 +175,11 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Objeto Ara 
 L["Haste:"] = "Celeridad:"
 
 -- ----------------------------
+-- modules/Intellect.lua
+-- ----------------------------
+L["Int"] = "Int"
+
+-- ----------------------------
 -- modules/LDBObjects.lua
 -- ----------------------------
 L["NO TEXT"] = "SIN TEXTO"
@@ -189,6 +208,11 @@ L["Left Click: Change Talent Specialization"] = "Clic izquierdo: Cambiar especia
 L["Control + Left Click: Change Loadout"] = "Ctrl + clic izquierdo: Cambiar Loadout"
 L["Shift + Left Click: Show Talent Specialization UI"] = "Shift + clic izquierdo: Mostrar UI de especialización"
 L["Shift + Right Click: Change Loot Specialization"] = "Shift + clic derecho: Cambiar especialización de botín"
+
+-- ----------------------------
+-- modules/Strength.lua
+-- ----------------------------
+L["Str"] = "Str"
 
 -- ----------------------------
 -- modules/System.lua

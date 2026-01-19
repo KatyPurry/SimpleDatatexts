@@ -36,6 +36,10 @@ L["Global"] = "Global"
 L["Simple DataTexts - Global Settings"] = "Simple DataTexts - Global Settings"
 L["Panels"] = "Panels"
 L["Simple DataTexts - Panel Settings"] = "Simple DataTexts - Panel Settings"
+L["Module Settings"] = "Module Settings"
+L["Configure settings for the "] = "Configure settings for the "
+L["module."] = "module."
+L["Configuration"] = "Configuration"
 L["Experience Module"] = "Experience Module"
 L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Experience Settings"
 L["Profiles"] = "Profiles"
@@ -90,11 +94,21 @@ L["You cannot delete the active profile. Please change your active profile first
 L["Are you sure you want to delete this profile?\nThis action cannot be undone."] = "Are you sure you want to delete this profile?\nThis action cannot be undone."
 
 -- ----------------------------
+-- modules/Agility.lua
+-- ----------------------------
+L["Agi"] = "Agi"
+
+-- ----------------------------
 -- modules/Armor.lua
 -- ----------------------------
 L["Mitigation By Level:"] = "Mitigation By Level:"
 L["Level %d"] = "Level %d"
 L["Target Mitigation"] = "Target Mitigation"
+
+-- ----------------------------
+-- modules/AttackPower.lua
+-- ----------------------------
+L["AP"] = "AP"
 
 -- ----------------------------
 -- modules/Bags.lua
@@ -159,6 +173,11 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Ara Guild L
 L["Haste:"] = "Haste:"
 
 -- ----------------------------
+-- modules/Intellect.lua
+-- ----------------------------
+L["Int"] = "Int"
+
+-- ----------------------------
 -- modules/LDBObjects.lua
 -- ----------------------------
 L["NO TEXT"] = "NO TEXT"
@@ -187,6 +206,11 @@ L["Left Click: Change Talent Specialization"] = "Left Click: Change Talent Speci
 L["Control + Left Click: Change Loadout"] = "Control + Left Click: Change Loadout"
 L["Shift + Left Click: Show Talent Specialization UI"] = "Shift + Left Click: Show Talent Specialization UI"
 L["Shift + Right Click: Change Loot Specialization"] = "Shift + Right Click: Change Loot Specialization"
+
+-- ----------------------------
+-- modules/Strength.lua
+-- ----------------------------
+L["Str"] = "Str"
 
 -- ----------------------------
 -- modules/System.lua
