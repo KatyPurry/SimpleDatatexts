@@ -1412,7 +1412,7 @@ f.GuildBlock = ldb:NewDataObject( "|cFFFFB366Ara|r Guild", {
 				GuildFrameTab2:Click()
 				f.GuildBlock.OnLeave(self)
 			else	f.GuildBlock.OnEnter(self) end
-		elseif button == "RightButton" then
+		elseif button == "RightButton" and not IsControlKeyDown() then
 			DisplayConfigMenu(self)
 		elseif button == "Button4" then
 			config.showGuildNotes = not config.showGuildNotes
@@ -1432,7 +1432,7 @@ f.FriendsBlock = ldb:NewDataObject( "|cFFFFB366Ara|r Friends", {
 	end,
 	OnLeave = Block_OnLeave,
 	OnClick = function(self, button)
-		if button == "MiddleButton" or IsModifierKeyDown() then
+		if button == "MiddleButton" or IsModifierKeyDown() and not IsControlKeyDown() then
 			f:Hide() tip:Hide()
 			FriendsFrameAddFriendButton:Click()
 		elseif button == "LeftButton" then
@@ -1442,7 +1442,7 @@ f.FriendsBlock = ldb:NewDataObject( "|cFFFFB366Ara|r Friends", {
 				f.FriendsBlock.OnEnter(self)
 			end
 			ToggleFriendsFrame(1)
-		elseif button == "RightButton" then
+		elseif button == "RightButton" and not IsControlKeyDown() then
 			DisplayConfigMenu(self)
 		elseif button == "Button4" then
 			config.showFriendNotes = not config.showFriendNotes

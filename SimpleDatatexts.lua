@@ -201,7 +201,7 @@ function SDT:RebuildSlots(bar)
         slot:EnableMouse(true)
         slot:RegisterForClicks("AnyUp")
         slot:SetScript("OnMouseUp", function(self, btn)
-            if btn == "RightButton" and not IsShiftKeyDown() and not IsControlKeyDown() then
+            if btn == "RightButton" and IsControlKeyDown() then
                 SDT:ShowSlotDropdown(self, bar)
             end
         end)
