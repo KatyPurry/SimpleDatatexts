@@ -51,6 +51,15 @@ local function ColorGradient(p)
 end
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Bags", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -91,7 +100,8 @@ function mod.Create(slotFrame)
             end
         end
 
-        local textString = L["Bags"] .. ": " .. (totalNormal - freeNormal) .. "/" .. totalNormal
+        local showLabel = SDT:GetModuleSetting("Bags", "showLabel", true)
+        local textString = (showLabel and L["Bags"] .. ": " or "") .. (totalNormal - freeNormal) .. "/" .. totalNormal
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateBags
