@@ -110,7 +110,7 @@ local function HandleLDBObject(name, obj)
     ----------------------------------------------------
     -- Register with SDT
     ----------------------------------------------------
-    SDT:RegisterDataText(cleanName, mod)
+    SDT:RegisterDataText("LDB: " .. cleanName, mod)
 
     return mod
 end
