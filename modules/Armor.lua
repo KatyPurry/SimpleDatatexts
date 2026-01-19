@@ -26,6 +26,15 @@ local ARMOR                    = ARMOR
 local STAT_CATEGORY_ATTRIBUTES = STAT_CATEGORY_ATTRIBUTES
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Armor", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -45,7 +54,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateArmor()
         local _, currentArmor = UnitArmor("player")
-        local textString = ARMOR..": "..currentArmor
+        local showLabel = SDT:GetModuleSetting("Armor", "showLabel", true)
+        local textString = (showLabel and ARMOR..": " or "")..currentArmor
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateArmor
