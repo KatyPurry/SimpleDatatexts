@@ -2,6 +2,7 @@
 -- Agility datatext adapted from ElvUI for Simple DataTexts (SDT)
 local SDT = SimpleDatatexts
 local SDTC = SDT.cache
+local L = SDT.L
 
 local mod = {}
 
@@ -20,6 +21,16 @@ local UnitStat = UnitStat
 ----------------------------------------------------
 local ITEM_MOD_AGILITY_SHORT = ITEM_MOD_AGILITY_SHORT
 local LE_UNIT_STAT_AGILITY = LE_UNIT_STAT_AGILITY
+
+----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Agility", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Agility", "checkbox", "Show Short Label", "showShortLabel", true)
+end
+
+SetupModuleConfig()
 
 ----------------------------------------------------
 -- Module Creation
@@ -43,7 +54,9 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateAgility()
         currentAgi = UnitStat("player", LE_UNIT_STAT_AGILITY)
-        local textString = ITEM_MOD_AGILITY_SHORT..": "..currentAgi
+        local showLabel = SDT:GetModuleSetting("Agility", "showLabel", true)
+        local showShortLabel = SDT:GetModuleSetting("Agility", "showShortLabel", true)
+        local textString = (showLabel and (showShortLabel and L["Agi"] or ITEM_MOD_AGILITY_SHORT)..": " or "")..currentAgi
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateAgility
