@@ -2,6 +2,7 @@
 -- AttackPower datatext adapted from ElvUI for Simple DataTexts (SDT)
 local SDT = SimpleDatatexts
 local SDTC = SDT.cache
+local L = SDT.L
 
 local mod = {}
 
@@ -38,6 +39,16 @@ local isHunter = SDTC.playerClass == 'HUNTER'
 local totalAP  = 0
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Attack Power", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Attack Power", "checkbox", "Show Short Label", "showShortLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -58,7 +69,9 @@ function mod.Create(slotFrame)
     local function UpdateAP()
         local base, posBuff, negBuff = (isHunter and UnitRangedAttackPower or UnitAttackPower)("player")
         totalAP = base + posBuff + negBuff
-        local textString = ATTACK_POWER..": "..totalAP
+        local showLabel = SDT:GetModuleSetting("Attack Power", "showLabel", true)
+        local showShortLabel = SDT:GetModuleSetting("Attack Power", "showShortLabel", true)
+        local textString = (showLabel and (showShortLabel and L["AP"] or ATTACK_POWER)..": " or "")..totalAP
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateAP
