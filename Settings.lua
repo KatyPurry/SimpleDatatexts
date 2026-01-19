@@ -24,6 +24,7 @@ local tsort            = table.sort
 ----------------------------------------------------
 local CopyTable        = CopyTable
 local CreateFrame      = CreateFrame
+local Delay            = C_Timer.After
 local GetScreenWidth   = GetScreenWidth
 
 ----------------------------------------------------
@@ -209,7 +210,7 @@ SDT.SettingsPanel.ID = category.ID
 Settings.RegisterAddOnCategory(category)
 
 -------------------------------------------------
--- Settings Sub-Panels
+-- Global Sub-Panel
 -------------------------------------------------
 local globalSubPanel = CreateFrame("Frame", addonName .. "_GlobalSubPanel", UIParent)
 globalSubPanel.name = L["Global"]
@@ -227,6 +228,9 @@ globalVersion:SetText("v" .. SDT.cache.version)
 local globalCategory = Settings.RegisterCanvasLayoutSubcategory(category, globalSubPanel, L["Global"])
 Settings.RegisterAddOnCategory(globalCategory)
 
+-------------------------------------------------
+-- Panels Sub-Panel
+-------------------------------------------------
 local panelsSubPanel = CreateFrame("Frame", addonName .. "_PanelsSubPanel", UIParent)
 panelsSubPanel.name = L["Panels"]
 panelsSubPanel.parent = panel.name
@@ -269,6 +273,28 @@ panelsVersion:SetText("v" .. SDT.cache.version)
 local panelsCategory = Settings.RegisterCanvasLayoutSubcategory(category, panelsSubPanel, L["Panels"])
 Settings.RegisterAddOnCategory(panelsCategory)
 
+-------------------------------------------------
+-- Configuration Sub-Panel
+-------------------------------------------------
+local configSubPanel = CreateFrame("Frame", addonName .. "_ConfigSubPanel", UIParent)
+configSubPanel.name = L["Configuration"]
+configSubPanel.parent = panel.name
+SDT.ConfigSubPanel = configSubPanel
+
+local configTitle = configSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+configTitle:SetPoint("TOPLEFT", 16, -16)
+configTitle:SetText(L["Simple DataTexts - Module Configuration"])
+
+local configVersion = configSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+configVersion:SetPoint("TOPRIGHT", -16, -17)
+configVersion:SetText("v" .. SDT.cache.version)
+
+local configCategory = Settings.RegisterCanvasLayoutSubcategory(category, configSubPanel, L["Configuration"])
+Settings.RegisterAddOnCategory(configCategory)
+
+-------------------------------------------------
+-- Experience Sub-Panel
+-------------------------------------------------
 local experienceSubPanel = CreateFrame("Frame", addonName .. "_ExperienceSubPanel", UIParent)
 experienceSubPanel.name = L["Experience Module"]
 experienceSubPanel.parent = panel.name
@@ -285,6 +311,9 @@ experienceVersion:SetText("v" .. SDT.cache.version)
 local experienceCategory = Settings.RegisterCanvasLayoutSubcategory(category, experienceSubPanel, L["Experience Module"])
 Settings.RegisterAddOnCategory(experienceCategory)
 
+-------------------------------------------------
+-- Profiles Sub-Panel
+-------------------------------------------------
 local profilesSubPanel = CreateFrame("Frame", addonName .. "_ProfilesSubPanel", UIParent)
 profilesSubPanel.name = L["Profiles"]
 profilesSubPanel.parent = panel.name
@@ -979,6 +1008,59 @@ StaticPopupDialogs["SDT_CONFIRM_DELETE_BAR"] = {
     end,
 }
 
+-------------------------------------------------
+-- Module Configuration Settings
+-------------------------------------------------
+SDT.ModuleConfigPanels = SDT.ModuleConfigPanels or {}
+
+-- Function to create a module configuration sub-panel
+local function CreateModuleConfigPanel(moduleName)
+    local panelFrame = CreateFrame("Frame", addonName .. "_Config_" .. moduleName:gsub("%s+", ""), UIParent)
+    panelFrame.name = moduleName
+    panelFrame.parent = configSubPanel.name
+    
+    local panelTitle = panelFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    panelTitle:SetPoint("TOPLEFT", 16, -16)
+    panelTitle:SetText(L["Simple DataTexts - "] .. moduleName .. L[" Configuration"])
+    
+    local panelVersion = panelFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    panelVersion:SetPoint("TOPRIGHT", -16, -17)
+    panelVersion:SetText("v" .. SDT.cache.version)
+    
+    -- Add a description label
+    local descLabel = panelFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    descLabel:SetPoint("TOPLEFT", panelTitle, "BOTTOMLEFT", 0, -20)
+    descLabel:SetWidth(600)
+    descLabel:SetJustifyH("LEFT")
+    descLabel:SetText(L["Configure settings for the "] .. moduleName .. L[" module."])
+    
+    -- Store reference for module to add its own settings
+    panelFrame.contentAnchor = descLabel
+    
+    -- Register the sub-panel under Configuration
+    local moduleCategory = Settings.RegisterCanvasLayoutSubcategory(configCategory, panelFrame, moduleName)
+    Settings.RegisterAddOnCategory(moduleCategory)
+    
+    SDT.ModuleConfigPanels[moduleName] = panelFrame
+    
+    return panelFrame
+end
+
+-- Function to initialize all module config panels
+function SDT:InitializeModuleConfigPanels()
+    -- Wait for modules to be registered
+    if not SDT.cache.moduleNames or #SDT.cache.moduleNames == 0 then
+        return
+    end
+    
+    -- Create a config panel for each module
+    for _, moduleName in ipairs(SDT.cache.moduleNames) do
+        if not SDT.ModuleConfigPanels[moduleName] then
+            CreateModuleConfigPanel(moduleName)
+        end
+    end
+end
+
 ----------------------------------------------------
 -- Experience Format Selector
 ----------------------------------------------------
@@ -1611,6 +1693,7 @@ function SDT:RefreshProfileList()
     UIDropDownMenu_SetSelectedName(deleteProfileDropdown, "")
     UIDropDownMenu_SetText(deleteProfileDropdown, "")
 end
+
 -------------------------------------------------
 -- Spec Switch Watcher
 -------------------------------------------------
@@ -1622,6 +1705,32 @@ specSwitchWatcher:SetScript("OnEvent", function(self, event, arg)
         local _, specName = GetSpecializationInfo(GetSpecialization())
         SDT:ProfileActivate(dbInfo.chosenProfile[specName], specName)
     end
+end)
+
+-------------------------------------------------
+-- Process Queued Module Settings
+-------------------------------------------------
+local function ProcessQueuedSettings()
+    if not SDT.queuedModuleSettings then return end
+    
+    for moduleName, settings in pairs(SDT.queuedModuleSettings) do
+        for _, setting in ipairs(settings) do
+            SDT:AddModuleConfigSetting(
+                moduleName,
+                setting.settingType,
+                setting.label,
+                setting.settingKey,
+                setting.defaultValue
+            )
+        end
+    end
+    
+    SDT.queuedModuleSettings = nil
+end
+
+-- Hook into initialization
+hooksecurefunc(SDT, "InitializeModuleConfigPanels", function()
+    C_Timer.After(0.2, ProcessQueuedSettings)
 end)
 
 -------------------------------------------------
@@ -1750,6 +1859,11 @@ loader:SetScript("OnEvent", function(self, event, arg)
         expTextClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expTextUseClassColor)
         expTextCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expTextUseClassColor)
         UpdateBarOptionsVisibility()
+
+        -- Initialize module config panels
+        Delay(0.1, function()
+            SDT:InitializeModuleConfigPanels()
+        end)
 
         -- Update modules to be safe
         SDT:UpdateAllModules()

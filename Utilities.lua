@@ -63,6 +63,63 @@ SDT.cache.moduleNames = {}
 local noop = function() end
 
 -------------------------------------------------
+-- Utility: Add Module Config
+-------------------------------------------------
+-- Modules can call this function to add settings to their config panel
+-- Example usage in a module:
+-- SDT:AddModuleConfigSetting("Agility", "checkbox", "Show Icon", "showIcon", true)
+function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, defaultValue)
+    local panel = SDT.ModuleConfigPanels[moduleName]
+    if not panel then
+        -- Panel doesn't exist yet, queue it
+        SDT.queuedModuleSettings = SDT.queuedModuleSettings or {}
+        SDT.queuedModuleSettings[moduleName] = SDT.queuedModuleSettings[moduleName] or {}
+        table.insert(SDT.queuedModuleSettings[moduleName], {
+            settingType = settingType,
+            label = label,
+            settingKey = settingKey,
+            defaultValue = defaultValue
+        })
+        return
+    end
+    
+    -- Initialize module settings in saved variables
+    SDT.SDTDB_CharDB.moduleSettings = SDT.SDTDB_CharDB.moduleSettings or {}
+    SDT.SDTDB_CharDB.moduleSettings[moduleName] = SDT.SDTDB_CharDB.moduleSettings[moduleName] or {}
+    if SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] == nil then
+        SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = defaultValue
+    end
+    
+    -- Track last anchor point
+    panel.lastAnchor = panel.lastAnchor or panel.contentAnchor
+    
+    if settingType == "checkbox" then
+        local checkbox = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
+        checkbox:SetPoint("TOPLEFT", panel.lastAnchor, "BOTTOMLEFT", 0, -20)
+        checkbox.Text:SetText(label)
+        checkbox:SetChecked(SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey])
+        checkbox:SetScript("OnClick", function(self)
+            SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = self:GetChecked()
+            -- Trigger module update if it has an Update function
+            local module = SDT.modules[moduleName]
+            if module and module.OnConfigChanged then
+                module.OnConfigChanged()
+            end
+            SDT:UpdateAllModules()
+        end)
+        panel.lastAnchor = checkbox
+        
+    elseif settingType == "slider" then
+        -- Add slider implementation here if needed
+        -- This is a placeholder for future expansion
+        
+    elseif settingType == "dropdown" then
+        -- Add dropdown implementation here if needed
+        -- This is a placeholder for future expansion
+    end
+end
+
+-------------------------------------------------
 -- Utility: Apply Chosen Font
 -------------------------------------------------
 function SDT:ApplyFont()
@@ -122,6 +179,20 @@ function SDT:GetCharKey()
     return SDT.cache.charKey
 end
 
+----------------------------------------------------
+-- Utility: Get Module Setting
+----------------------------------------------------
+function SDT:GetModuleSetting(moduleName, key, default)
+    if not SDT.SDTDB_CharDB or not SDT.SDTDB_CharDB.moduleSettings then
+        return default
+    end
+    local settings = SDT.SDTDB_CharDB.moduleSettings[moduleName]
+    if not settings then return default end
+    local value = settings[key]
+    if value == nil then return default end
+    return value
+end
+
 -------------------------------------------------
 -- Utility: Get Tag Color
 -------------------------------------------------
@@ -159,6 +230,23 @@ function SDT:HandleMenuList(root, menuList, submenu, depth)
 
         if list.menuList then -- loop it
             HandleMenuList(root, list.menuList, list.hasArrow and previous, depth + 1)
+        end
+    end
+end
+
+-------------------------------------------------
+-- Utility: Initialize Module Config Panels
+-------------------------------------------------
+function SDT:InitializeModuleConfigPanels()
+    -- Wait for modules to be registered
+    if not SDT.cache.moduleNames or #SDT.cache.moduleNames == 0 then
+        return
+    end
+    
+    -- Create a config panel for each module
+    for _, moduleName in ipairs(SDT.cache.moduleNames) do
+        if not SDT.ModuleConfigPanels[moduleName] then
+            CreateModuleConfigPanel(moduleName)
         end
     end
 end
