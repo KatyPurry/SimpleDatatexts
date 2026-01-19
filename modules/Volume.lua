@@ -69,6 +69,15 @@ local deviceMenu = {{ text = L["Output Audio Device"], isTitle = true, notChecka
 local SOUND = SOUND
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Volume", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -92,7 +101,10 @@ function mod.Create(slotFrame)
 	    local color = GetCVarBool(AudioStreams[1].Enabled) and GetCVarBool(stream.Enabled) and '00FF00' or 'FF3333'
 	    local level = (GetCVar(stream.Volume) or 0) * 100
 
-	    return (tooltip and format('|cFF%s%.f%%|r', color, level)) or format('%s: |cFF%s%.f%%|r', stream.Name, color, level)
+		local showLabel = SDT:GetModuleSetting("Volume", "showLabel", true)
+		local label = showLabel and stream.Name..": " or ""
+
+	    return (tooltip and format('|cFF%s%.f%%|r', color, level)) or format('%s|cFF%s%.f%%|r', label, color, level)
     end
 
     local function SelectStream(_, arg1)

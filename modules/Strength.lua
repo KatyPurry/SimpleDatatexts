@@ -2,6 +2,7 @@
 -- Strength datatext adapted from ElvUI for Simple DataTexts (SDT)
 local SDT = SimpleDatatexts
 local SDTC = SDT.cache
+local L = SDT.L
 
 local mod = {}
 
@@ -20,6 +21,16 @@ local UnitStat = UnitStat
 ----------------------------------------------------
 local ITEM_MOD_STRENGTH_SHORT = ITEM_MOD_STRENGTH_SHORT
 local LE_UNIT_STAT_STRENGTH = LE_UNIT_STAT_STRENGTH
+
+----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Strength", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Strength", "checkbox", "Show Short Label", "showShortLabel", true)
+end
+
+SetupModuleConfig()
 
 ----------------------------------------------------
 -- Module Creation
@@ -43,7 +54,9 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateStrength()
         currentStr = UnitStat("player", LE_UNIT_STAT_STRENGTH)
-        local textString = ITEM_MOD_STRENGTH_SHORT..": "..currentStr
+        local showLabel = SDT:GetModuleSetting("Strength", "showLabel", true)
+        local showShortLabel = SDT:GetModuleSetting("Strength", "showShortLabel", true)
+        local textString = (showLabel and (showShortLabel and L["Str"] or ITEM_MOD_STRENGTH_SHORT)..": " or "")..currentStr
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateStrength

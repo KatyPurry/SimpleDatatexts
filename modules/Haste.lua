@@ -31,6 +31,15 @@ local STAT_HASTE_TOOLTIP = STAT_HASTE_TOOLTIP
 local ATTACK_SPEED = ATTACK_SPEED
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Haste", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -52,7 +61,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateHaste()
         currentHaste = GetHaste() or 0
-        local textString = format("%s %s", L["Haste:"], SDT:FormatPercent(currentHaste))
+        local showLabel = SDT:GetModuleSetting("Haste", "showLabel", true)
+        local textString = (showLabel and L["Haste:"].." " or "") .. SDT:FormatPercent(currentHaste)
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateHaste

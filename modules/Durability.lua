@@ -78,6 +78,15 @@ local function ColorGradient(p)
 end
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Durability", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -137,7 +146,9 @@ function mod.Create(slotFrame)
         -- colorize percent
         local r, g, b = ColorGradient(totalDurability / 100)
         local durabilityHex = format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
-        local textString = format("%s %s%s|r", SDT:ColorText(L["Durability:"]), durabilityHex, SDT:FormatPercent(totalDurability))
+        local showLabel = SDT:GetModuleSetting("Durability", "showLabel", true)
+        local labelString = (showLabel and SDT:ColorText(L["Durability:"]) or "")
+        local textString = format("%s%s%s|r", labelString.." ", durabilityHex, SDT:FormatPercent(totalDurability))
         text:SetText(textString)
 
         -- pulse if below threshold

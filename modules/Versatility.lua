@@ -32,6 +32,15 @@ local STAT_VERSATILITY            = STAT_VERSATILITY
 local VERSATILITY_TOOLTIP_FORMAT  = VERSATILITY_TOOLTIP_FORMAT
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Versatility", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -54,7 +63,8 @@ function mod.Create(slotFrame)
     local function UpdateVersatility()
         currentVers = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
         versReduction = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_TAKEN)
-        local textString = format("%s %s", L["Vers:"], SDT:FormatPercent(currentVers))
+        local showLabel = SDT:GetModuleSetting("Versatility", "showLabel", true)
+        local textString = (showLabel and L["Vers:"].." " or "") .. SDT:FormatPercent(currentVers)
         text:SetText(SDT:ColorText(textString))
     end
 

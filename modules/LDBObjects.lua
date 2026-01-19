@@ -43,6 +43,24 @@ local function HandleLDBObject(name, obj)
 
     local mod = {}
 
+    local moduleName = "LDB: " .. cleanName
+    local modulesWithSettings = {
+        ["LDB: BugSack"] = true,
+        ["LDB: WIM"] = true,
+        ["LDB: Core Loot Manager"] = true,
+    }
+
+    ----------------------------------------------------
+    -- Module Config Settings
+    ----------------------------------------------------
+    local function SetupModuleConfig()
+        if modulesWithSettings[moduleName] then
+            SDT:AddModuleConfigSetting(moduleName, "checkbox", "Show Label", "showLabel", true)
+        end
+    end
+
+    SetupModuleConfig()
+
     function mod.Create(slotFrame)
         local f = CreateFrame("Frame", nil, slotFrame)
         f:SetAllPoints(slotFrame)
@@ -59,13 +77,21 @@ local function HandleLDBObject(name, obj)
         ----------------------------------------------------
         local function Update()
             local cleanObjText = obj.text and StripColorCodes(obj.text)
+            local showLabel = true
+            if modulesWithSettings[moduleName] then
+                showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+            end
             local txt = ""
             if cleanName == "BugSack" then
-                txt = cleanName .. ": " .. (cleanObjText or "")
+                txt = (showLabel and cleanName .. ": " or "") .. (cleanObjText or "")
             elseif cleanName == "WIM" then
-                txt = cleanName .. (cleanObjText and (": " .. cleanObjText) or "")
+                local label = (showLabel and cleanName or "")
+                local objText = (cleanObjText and ((label ~= "" and ": " or "") .. cleanObjText) or "")
+                txt = label .. objText
             elseif cleanName == "Core Loot Manager" then
-                txt = "CLM" .. (cleanObjText and (": " .. cleanObjText) or "")
+                local label = (showLabel and "CLM" or "")
+                local objText = (cleanObjText and ((label ~= "" and ": " or "") .. cleanObjText) or "")
+                txt = label .. objText
             else
                 txt = cleanObjText or cleanName or L["NO TEXT"]
             end

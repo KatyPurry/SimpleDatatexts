@@ -7,6 +7,15 @@ local L = SDT.L
 local mod = {}
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Mastery", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -28,7 +37,8 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateMastery()
         currentMastery = GetMasteryEffect() or 0
-        local textString = format("%s %s", L["Mastery:"], SDT:FormatPercent(currentMastery))
+        local showLabel = SDT:GetModuleSetting("Mastery", "showLabel", true)
+        local textString = (showLabel and L["Mastery:"].." " or "") .. SDT:FormatPercent(currentMastery)
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateMastery

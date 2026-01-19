@@ -33,6 +33,15 @@ local MAX_SPELL_SCHOOLS    = MAX_SPELL_SCHOOLS
 local MELEE_CRIT_CHANCE    = MELEE_CRIT_CHANCE
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Crit", "checkbox", "Show Label", "showLabel", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -77,7 +86,8 @@ function mod.Create(slotFrame)
 		    ratingIndex = CR_CRIT_MELEE
 	    end
 
-        local textString = format("%s: %s", L["Crit"], SDT:FormatPercent(critChance))
+        local showLabel = SDT:GetModuleSetting("Crit", "showLabel", true)
+        local textString = (showLabel and L["Crit"] .. ": " or "") .. SDT:FormatPercent(critChance)
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateCrit

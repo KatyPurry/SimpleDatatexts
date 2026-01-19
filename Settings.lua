@@ -90,7 +90,8 @@ local charDefaultsTable = {
         font = "Friz Quadrata TT",
         fontSize = 12,
         debug = false,
-    }
+    },
+    moduleSettings = {}
 }
 
 local function checkDefaultDB()
@@ -277,19 +278,19 @@ Settings.RegisterAddOnCategory(panelsCategory)
 -- Configuration Sub-Panel
 -------------------------------------------------
 local configSubPanel = CreateFrame("Frame", addonName .. "_ConfigSubPanel", UIParent)
-configSubPanel.name = L["Configuration"]
+configSubPanel.name = L["Module Settings"]
 configSubPanel.parent = panel.name
 SDT.ConfigSubPanel = configSubPanel
 
 local configTitle = configSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 configTitle:SetPoint("TOPLEFT", 16, -16)
-configTitle:SetText(L["Simple DataTexts - Module Configuration"])
+configTitle:SetText(L["Simple DataTexts"] .. " - " .. L["Module Settings"])
 
 local configVersion = configSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 configVersion:SetPoint("TOPRIGHT", -16, -17)
 configVersion:SetText("v" .. SDT.cache.version)
 
-local configCategory = Settings.RegisterCanvasLayoutSubcategory(category, configSubPanel, L["Configuration"])
+local configCategory = Settings.RegisterCanvasLayoutSubcategory(category, configSubPanel, L["Module Settings"])
 Settings.RegisterAddOnCategory(configCategory)
 
 -------------------------------------------------
@@ -1021,7 +1022,7 @@ local function CreateModuleConfigPanel(moduleName)
     
     local panelTitle = panelFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     panelTitle:SetPoint("TOPLEFT", 16, -16)
-    panelTitle:SetText(L["Simple DataTexts - "] .. moduleName .. L[" Configuration"])
+    panelTitle:SetText(L["Simple DataTexts"] .. " - " .. moduleName .. " " .. L["Configuration"])
     
     local panelVersion = panelFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     panelVersion:SetPoint("TOPRIGHT", -16, -17)
@@ -1032,7 +1033,7 @@ local function CreateModuleConfigPanel(moduleName)
     descLabel:SetPoint("TOPLEFT", panelTitle, "BOTTOMLEFT", 0, -20)
     descLabel:SetWidth(600)
     descLabel:SetJustifyH("LEFT")
-    descLabel:SetText(L["Configure settings for the "] .. moduleName .. L[" module."])
+    descLabel:SetText(L["Configure settings for the "] .. moduleName .. " " .. L["module."])
     
     -- Store reference for module to add its own settings
     panelFrame.contentAnchor = descLabel
@@ -1052,11 +1053,46 @@ function SDT:InitializeModuleConfigPanels()
     if not SDT.cache.moduleNames or #SDT.cache.moduleNames == 0 then
         return
     end
+
+    -- Create a table of modules to exclude (aka modules that have no settings)
+    local excludedModules = {
+        ["Coordinates"] = true,
+        ["Currency"] = true,
+        ["Experience"] = true,
+        ["Friends"] = true,
+        ["Gold"] = true,
+        ["Guild"] = true,
+        ["HidingBar1"] = true,
+        ["Mail"] = true,
+        ["System"] = true,
+        ["Talent/Loot Specialization"] = true,
+        ["Time"] = true,
+    }
+
+    local allowedLDBModules = {
+        ["LDB: BugSack"] = true,
+        ["LDB: WIM"] = true,
+        ["LDB: Core Loot Manager"] = true,
+    }
+
+    local function isExcluded(moduleName)
+        if excludedModules[moduleName] then
+            return true
+        end
+
+        if moduleName:sub(1, 3) == "LDB" and not allowedLDBModules[moduleName] then
+            return true
+        end
+
+        return false
+    end
     
     -- Create a config panel for each module
     for _, moduleName in ipairs(SDT.cache.moduleNames) do
-        if not SDT.ModuleConfigPanels[moduleName] then
-            CreateModuleConfigPanel(moduleName)
+        if not isExcluded(moduleName) then
+            if not SDT.ModuleConfigPanels[moduleName] then
+                CreateModuleConfigPanel(moduleName)
+            end
         end
     end
 end
