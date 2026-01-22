@@ -27,7 +27,7 @@ local LE_UNIT_STAT_STRENGTH = LE_UNIT_STAT_STRENGTH
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Strength", "checkbox", "Show Label", "showLabel", true)
-    SDT:AddModuleConfigSetting("Strength", "checkbox", "Show Short Label", "showShortLabel", true)
+    SDT:AddModuleConfigSetting("Strength", "checkbox", "Show Short Label", "showShortLabel", false)
 end
 
 SetupModuleConfig()

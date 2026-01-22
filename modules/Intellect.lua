@@ -27,7 +27,7 @@ local LE_UNIT_STAT_INTELLECT = LE_UNIT_STAT_INTELLECT
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Intellect", "checkbox", "Show Label", "showLabel", true)
-    SDT:AddModuleConfigSetting("Intellect", "checkbox", "Show Short Label", "showShortLabel", true)
+    SDT:AddModuleConfigSetting("Intellect", "checkbox", "Show Short Label", "showShortLabel", false)
 end
 
 SetupModuleConfig()

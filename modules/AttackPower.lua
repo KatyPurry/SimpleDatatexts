@@ -43,7 +43,7 @@ local totalAP  = 0
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Attack Power", "checkbox", "Show Label", "showLabel", true)
-    SDT:AddModuleConfigSetting("Attack Power", "checkbox", "Show Short Label", "showShortLabel", true)
+    SDT:AddModuleConfigSetting("Attack Power", "checkbox", "Show Short Label", "showShortLabel", false)
 end
 
 SetupModuleConfig()
