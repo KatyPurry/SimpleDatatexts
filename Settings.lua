@@ -1063,6 +1063,7 @@ function SDT:InitializeModuleConfigPanels()
         ["Guild"] = true,
         ["HidingBar1"] = true,
         ["Mail"] = true,
+        ["QuaziiUI"] = true,
         ["System"] = true,
         ["Talent/Loot Specialization"] = true,
         ["Time"] = true,
