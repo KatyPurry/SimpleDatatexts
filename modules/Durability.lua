@@ -82,6 +82,7 @@ end
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Durability", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Durability", "checkbox", "Show Short Label", "showShortLabel", false)
 end
 
 SetupModuleConfig()
@@ -147,7 +148,8 @@ function mod.Create(slotFrame)
         local r, g, b = ColorGradient(totalDurability / 100)
         local durabilityHex = format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
         local showLabel = SDT:GetModuleSetting("Durability", "showLabel", true)
-        local labelString = (showLabel and SDT:ColorText(L["Durability:"]) or "")
+        local showShortLabel = SDT:GetModuleSetting("Durability", "showShortLabel", false)
+        local labelString = (showLabel and SDT:ColorText(showShortLabel and L["Dur:"] or L["Durability:"]) or "")
         local textString = format("%s%s%s|r", labelString.." ", durabilityHex, SDT:FormatPercent(totalDurability))
         text:SetText(textString)
 
