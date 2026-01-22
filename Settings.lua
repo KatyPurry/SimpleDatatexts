@@ -1060,7 +1060,6 @@ function SDT:InitializeModuleConfigPanels()
         ["Currency"] = true,
         ["Experience"] = true,
         ["Friends"] = true,
-        ["Gold"] = true,
         ["Guild"] = true,
         ["HidingBar1"] = true,
         ["Mail"] = true,

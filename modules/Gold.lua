@@ -45,6 +45,17 @@ local SILVER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10
 local COPPER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10:0:0:64:32:0:21:1:20|t"
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Gold", "checkbox", "Show Silver", "showSilver", true)
+    SDT:AddModuleConfigSetting("Gold", "checkbox", "Show Copper", "showCopper", true)
+    SDT:AddModuleConfigSetting("Gold", "checkbox", "Use Coin Icons", "useCoinIcons", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Helpers
 ----------------------------------------------------
 local function SortFunction(a,b) return (a.amount or 0) > (b.amount or 0) end
@@ -79,7 +90,7 @@ local function DisplayCurrencyInfo(tooltip)
     local _, _, _, toc = GetBuildInfo()
     while info and info.name do
         if index == 1 then GameTooltip:AddLine(" ") end
-        if (info.name ~= "Valorstones" or toc < 120000) and info.quantity then
+        if (info.name ~= "Valorstones" or toc < 120001) and info.quantity then
             GameTooltip:AddDoubleLine(format(iconStringName, info.iconFileID, info.name), BreakUpLargeNumbers(info.quantity), 1,1,1, 1,1,1)
         end
         index = index + 1
@@ -88,16 +99,33 @@ local function DisplayCurrencyInfo(tooltip)
 end
 
 local function FormatMoney(copper, classColor)
+    local showCopper = SDT:GetModuleSetting("Gold", "showCopper", true)
+    local showSilver = SDT:GetModuleSetting("Gold", "showSilver", true)
+    local useCoinIcons = SDT:GetModuleSetting("Gold", "useCoinIcons", true)
     local g = BreakUpLargeNumbers(floor(copper / 10000))
     local s = floor((copper % 10000) / 100)
     local c = copper % 100
     if classColor then
-        local goldPart = SDT:ColorText(g) .. GOLD_ICON
-        local silverPart = SDT:ColorText(s) .. SILVER_ICON
-        local copperPart = SDT:ColorText(c) .. COPPER_ICON
-        return goldPart.." "..silverPart.." "..copperPart
+        local goldPart = SDT:ColorText(g) .. (useCoinIcons and GOLD_ICON or SDT:ColorText("g"))
+        local silverPart = SDT:ColorText(s) .. (useCoinIcons and SILVER_ICON or SDT:ColorText("s"))
+        local copperPart = SDT:ColorText(c) .. (useCoinIcons and COPPER_ICON or SDT:ColorText("c"))
+        local retString = goldPart
+        if showSilver then
+            retString = retString .. " " .. silverPart
+        end
+        if showCopper then
+            retString = retString .. " " .. copperPart
+        end
+        return retString
     else
-        return format("|cffffd700%s|r%s |cffc7c7c7%d|r%s |cffeda55f%d|r%s", g, GOLD_ICON, s, SILVER_ICON, c, COPPER_ICON)
+        local retString = "|cffffd700" .. g .. "|r" .. (useCoinIcons and GOLD_ICON or "|cffffd700g|r")
+        if showSilver then
+            retString = retString .. " |cffc7c7c7" .. s .. "|r" .. (useCoinIcons and SILVER_ICON or "|cffc7c7c7s|r")
+        end
+        if showCopper then
+            retString = retString .. " |cffeda55f" .. c .. "|r" .. (useCoinIcons and COPPER_ICON or "|cffeda55fc|r")
+        end
+        return retString
     end
 end
 
