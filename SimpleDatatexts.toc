@@ -48,6 +48,7 @@ modules/LDBObjects.lua
 modules/Mail.lua
 modules/Mastery.lua
 modules/SpecSwitch.lua
+modules/Speed.lua
 modules/Strength.lua
 modules/System.lua
 modules/Time.lua
