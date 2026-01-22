@@ -97,6 +97,16 @@ L["You cannot delete the active profile. Please change your active profile first
 L["Are you sure you want to delete this profile?\nThis action cannot be undone."] = "Willst du dieses Profil wirklich löschen?\nDieser Vorgang kann nicht rückgängig gemacht werden."
 
 -- ----------------------------
+-- Module Settings
+-- ----------------------------
+L["Show Label"] = "Beschriftung anzeigen"
+L["Show Short Label"] = "Kurze Beschriftung anzeigen"
+L["Show Silver"] = "Silber anzeigen"
+L["Show Copper"] = "Kupfer anzeigen"
+L["Use Coin Icons"] = "Münzsymbole verwenden"
+L["Show as Percentage"] = "Als Prozentsatz anzeigen"
+
+-- ----------------------------
 -- modules/Agility.lua
 -- ----------------------------
 L["Agi"] = "Agi"
@@ -210,6 +220,11 @@ L["Shift + Left Click: Show Talent Specialization UI"] = "Shift + Linksklick: Ta
 L["Shift + Right Click: Change Loot Specialization"] = "Shift + Rechtsklick: Beutespezialisierung ändern"
 
 -- ----------------------------
+-- modules/Speed.lua
+-- ----------------------------
+L["Speed: "] = "Geschwindigkeit: "
+
+-- ----------------------------
 -- modules/Strength.lua
 -- ----------------------------
 L["Str"] = "Str"
@@ -253,6 +268,11 @@ L["Middle Click: Toggle Mute Master Stream"] = "Mittelklick: Masterstream stumms
 L["Shift + Middle Click: Toggle Volume Stream"] = "Shift + Mittelklick: Audiostream umschalten"
 L["Shift + Left Click: Open System Audio Panel"] = "Shift + Linksklick: System-Audio-Panel öffnen"
 L["Shift + Right Click: Select Output Audio Device"] = "Shift + Rechtsklick: Ausgabegerät auswählen"
+L["M. Vol"] = "Haupt"
+L["FX"] = "Eff"
+L["Amb"] = "Umg"
+L["Dlg"] = "Dlg"
+L["Mus"] = "Mus"
 
 -- ----------------------------
 -- Ara_Broker_Guild_Friends.lua
