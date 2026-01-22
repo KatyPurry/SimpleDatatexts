@@ -73,6 +73,7 @@ local SOUND = SOUND
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Volume", "checkbox", "Show Label", "showLabel", true)
+	SDT:AddModuleConfigSetting("Volume", "checkbox", "Show Short Label", "showShortLabel", false)
 end
 
 SetupModuleConfig()
@@ -102,7 +103,15 @@ function mod.Create(slotFrame)
 	    local level = (GetCVar(stream.Volume) or 0) * 100
 
 		local showLabel = SDT:GetModuleSetting("Volume", "showLabel", true)
-		local label = showLabel and stream.Name..": " or ""
+		local showShortLabel = SDT:GetModuleSetting("Volume", "showShortLabel", false)
+		local shortLabels = {
+			["Master Volume"] = L["M. Vol"],
+			["Effects"] = L["FX"],
+			["Ambience"] = L["Amb"],
+			["Dialog"] = L["Dia"],
+			["Music"] = L["Mus"]
+		}
+		local label = showLabel and (showShortLabel and shortLabels[stream.Name] or stream.Name) .. ": " or ""
 
 	    return (tooltip and format('|cFF%s%.f%%|r', color, level)) or format('%s|cFF%s%.f%%|r', label, color, level)
     end
