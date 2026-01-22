@@ -55,7 +55,7 @@ function mod.Create(slotFrame)
     local function UpdateStrength()
         currentStr = UnitStat("player", LE_UNIT_STAT_STRENGTH)
         local showLabel = SDT:GetModuleSetting("Strength", "showLabel", true)
-        local showShortLabel = SDT:GetModuleSetting("Strength", "showShortLabel", true)
+        local showShortLabel = SDT:GetModuleSetting("Strength", "showShortLabel", false)
         local textString = (showLabel and (showShortLabel and L["Str"] or ITEM_MOD_STRENGTH_SHORT)..": " or "")..currentStr
         text:SetText(SDT:ColorText(textString))
     end

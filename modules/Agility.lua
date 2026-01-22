@@ -55,7 +55,7 @@ function mod.Create(slotFrame)
     local function UpdateAgility()
         currentAgi = UnitStat("player", LE_UNIT_STAT_AGILITY)
         local showLabel = SDT:GetModuleSetting("Agility", "showLabel", true)
-        local showShortLabel = SDT:GetModuleSetting("Agility", "showShortLabel", true)
+        local showShortLabel = SDT:GetModuleSetting("Agility", "showShortLabel", false)
         local textString = (showLabel and (showShortLabel and L["Agi"] or ITEM_MOD_AGILITY_SHORT)..": " or "")..currentAgi
         text:SetText(SDT:ColorText(textString))
     end

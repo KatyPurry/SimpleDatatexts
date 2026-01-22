@@ -70,7 +70,7 @@ function mod.Create(slotFrame)
         local base, posBuff, negBuff = (isHunter and UnitRangedAttackPower or UnitAttackPower)("player")
         totalAP = base + posBuff + negBuff
         local showLabel = SDT:GetModuleSetting("Attack Power", "showLabel", true)
-        local showShortLabel = SDT:GetModuleSetting("Attack Power", "showShortLabel", true)
+        local showShortLabel = SDT:GetModuleSetting("Attack Power", "showShortLabel", false)
         local textString = (showLabel and (showShortLabel and L["AP"] or ATTACK_POWER)..": " or "")..totalAP
         text:SetText(SDT:ColorText(textString))
     end
