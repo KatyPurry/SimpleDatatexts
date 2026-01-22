@@ -34,7 +34,7 @@ local ATTACK_SPEED = ATTACK_SPEED
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Haste", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Haste", "checkbox", L["Show Label"], "showLabel", true)
 end
 
 SetupModuleConfig()

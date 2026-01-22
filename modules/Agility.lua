@@ -26,8 +26,8 @@ local LE_UNIT_STAT_AGILITY = LE_UNIT_STAT_AGILITY
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Agility", "checkbox", "Show Label", "showLabel", true)
-    SDT:AddModuleConfigSetting("Agility", "checkbox", "Show Short Label", "showShortLabel", false)
+    SDT:AddModuleConfigSetting("Agility", "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting("Agility", "checkbox", L["Show Short Label"], "showShortLabel", false)
 end
 
 SetupModuleConfig()

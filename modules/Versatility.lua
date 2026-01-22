@@ -35,7 +35,7 @@ local VERSATILITY_TOOLTIP_FORMAT  = VERSATILITY_TOOLTIP_FORMAT
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Versatility", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Versatility", "checkbox", L["Show Label"], "showLabel", true)
 end
 
 SetupModuleConfig()

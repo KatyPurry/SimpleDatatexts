@@ -28,8 +28,8 @@ local BASE_MOVEMENT_SPEED = 7 -- Base player run speed in yards per second
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Speed", "checkbox", "Show Label", "showLabel", true)
-    SDT:AddModuleConfigSetting("Speed", "checkbox", "Show as Percentage", "showAsPercentage", true)
+    SDT:AddModuleConfigSetting("Speed", "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting("Speed", "checkbox", L["Show as Percentage"], "showAsPercentage", true)
 end
 
 SetupModuleConfig()

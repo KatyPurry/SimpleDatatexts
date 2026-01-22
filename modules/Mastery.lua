@@ -10,7 +10,7 @@ local mod = {}
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Mastery", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Mastery", "checkbox", L["Show Label"], "showLabel", true)
 end
 
 SetupModuleConfig()

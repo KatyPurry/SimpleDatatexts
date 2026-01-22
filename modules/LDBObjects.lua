@@ -55,7 +55,7 @@ local function HandleLDBObject(name, obj)
     ----------------------------------------------------
     local function SetupModuleConfig()
         if modulesWithSettings[moduleName] then
-            SDT:AddModuleConfigSetting(moduleName, "checkbox", "Show Label", "showLabel", true)
+            SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
         end
     end
 

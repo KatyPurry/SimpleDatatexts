@@ -105,11 +105,11 @@ function mod.Create(slotFrame)
 		local showLabel = SDT:GetModuleSetting("Volume", "showLabel", true)
 		local showShortLabel = SDT:GetModuleSetting("Volume", "showShortLabel", false)
 		local shortLabels = {
-			["Master Volume"] = L["M. Vol"],
-			["Effects"] = L["FX"],
-			["Ambience"] = L["Amb"],
-			["Dialog"] = L["Dia"],
-			["Music"] = L["Mus"]
+			[L["Master Volume"]] = L["M. Vol"],
+			[L["Effects"]] = L["FX"],
+			[L["Ambience"]] = L["Amb"],
+			[L["Dialog"]] = L["Dlg"],
+			[L["Music"]] = L["Mus"]
 		}
 		local label = showLabel and (showShortLabel and shortLabels[stream.Name] or stream.Name) .. ": " or ""
 

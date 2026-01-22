@@ -81,8 +81,8 @@ end
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Durability", "checkbox", "Show Label", "showLabel", true)
-    SDT:AddModuleConfigSetting("Durability", "checkbox", "Show Short Label", "showShortLabel", false)
+    SDT:AddModuleConfigSetting("Durability", "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting("Durability", "checkbox", L["Show Short Label"], "showShortLabel", false)
 end
 
 SetupModuleConfig()

@@ -48,9 +48,9 @@ local COPPER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Gold", "checkbox", "Show Silver", "showSilver", true)
-    SDT:AddModuleConfigSetting("Gold", "checkbox", "Show Copper", "showCopper", true)
-    SDT:AddModuleConfigSetting("Gold", "checkbox", "Use Coin Icons", "useCoinIcons", true)
+    SDT:AddModuleConfigSetting("Gold", "checkbox", L["Show Silver"], "showSilver", true)
+    SDT:AddModuleConfigSetting("Gold", "checkbox", L["Show Copper"], "showCopper", true)
+    SDT:AddModuleConfigSetting("Gold", "checkbox", L["Use Coin Icons"], "useCoinIcons", true)
 end
 
 SetupModuleConfig()

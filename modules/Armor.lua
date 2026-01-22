@@ -29,7 +29,7 @@ local STAT_CATEGORY_ATTRIBUTES = STAT_CATEGORY_ATTRIBUTES
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Armor", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Armor", "checkbox", L["Show Label"], "showLabel", true)
 end
 
 SetupModuleConfig()

@@ -36,7 +36,7 @@ local MELEE_CRIT_CHANCE    = MELEE_CRIT_CHANCE
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Crit", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting("Crit", "checkbox", L["Show Label"], "showLabel", true)
 end
 
 SetupModuleConfig()
