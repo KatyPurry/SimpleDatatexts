@@ -89,6 +89,7 @@ local charDefaultsTable = {
         expTextFontSize = 12,
         font = "Friz Quadrata TT",
         fontSize = 12,
+        fontOutline = "NONE",
         debug = false,
     },
     moduleSettings = {}
@@ -207,7 +208,7 @@ version:SetPoint("TOPRIGHT", -16, -17)
 version:SetText("v" .. SDT.cache.version)
 
 local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
-SDT.SettingsPanel.ID = category.ID
+--SDT.SettingsPanel.ID = category.ID
 Settings.RegisterAddOnCategory(category)
 
 -------------------------------------------------
@@ -227,6 +228,7 @@ globalVersion:SetPoint("TOPRIGHT", -16, -17)
 globalVersion:SetText("v" .. SDT.cache.version)
 
 local globalCategory = Settings.RegisterCanvasLayoutSubcategory(category, globalSubPanel, L["Global"])
+SDT.SettingsPanel.ID = globalCategory.ID
 Settings.RegisterAddOnCategory(globalCategory)
 
 -------------------------------------------------
@@ -438,8 +440,15 @@ fontLabel:SetText(L["Display Font:"])
 local fontDropdown = CreateSettingsDropdown(addonName .. "_FontDropdown", globalSubPanel)
 fontDropdown:SetPoint("TOPLEFT", fontLabel, "BOTTOMLEFT", -20, -4)
 
+local fontOutlineLabel = globalSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+fontOutlineLabel:SetPoint("TOPLEFT", fontDropdown, "BOTTOMLEFT", 20, -20)
+fontOutlineLabel:SetText(L["Font Outline:"])
+
+local fontOutlineDropdown = CreateSettingsDropdown(addonName .. "_FontOutlineDropdown", globalSubPanel)
+fontOutlineDropdown:SetPoint("TOPLEFT", fontOutlineLabel, "BOTTOMLEFT", -20, -4)
+
 local fontSizeSlider = CreateFrame("Slider", addonName.."_FontSizeSlider", globalSubPanel, "OptionsSliderTemplate")
-fontSizeSlider:SetPoint("TOPLEFT", fontDropdown, "BOTTOMLEFT", 20, -20)
+fontSizeSlider:SetPoint("TOPLEFT", fontOutlineDropdown, "BOTTOMLEFT", 20, -24)
 fontSizeSlider:SetMinMaxValues(4, 40)
 fontSizeSlider:SetValueStep(1)
 fontSizeSlider:SetWidth(160)
@@ -821,6 +830,32 @@ local function PanelDropdown_Initialize(self, level)
             SDT:UpdateSelectedBarControls()
         end
         UIDropDownMenu_AddButton(info)
+    end
+end
+
+-- Font outline dropdown initializer
+local function FontOutlineDropdown_Initialize(self, level)
+    local outlineOptions = {
+        { value = "NONE", text = L["None"] },
+        { value = "OUTLINE", text = L["Outline"] },
+        { value = "THICKOUTLINE", text = L["Thick Outline"] },
+        { value = "MONOCHROME", text = L["Monochrome"] },
+        { value = "OUTLINE, MONOCHROME", text = L["Outline + Monochrome"] },
+        { value = "THICKOUTLINE, MONOCHROME", text = L["Thick Outline + Monochrome"] },
+    }
+    
+    for _, option in ipairs(outlineOptions) do
+        local info = UIDropDownMenu_CreateInfo()
+        info.notCheckable = true
+        info.text = option.text
+        info.value = option.value
+        info.func = function()
+            SDT.SDTDB_CharDB.settings.fontOutline = option.value
+            UIDropDownMenu_SetSelectedValue(fontOutlineDropdown, option.value)
+            UIDropDownMenu_SetText(fontOutlineDropdown, option.text)
+            SDT:ApplyFont()
+        end
+        UIDropDownMenu_AddButton(info, level)
     end
 end
 
@@ -1805,6 +1840,16 @@ loader:SetScript("OnEvent", function(self, event, arg)
         UIDropDownMenu_Initialize(fontDropdown, FontDropdown_Initialize)
         UIDropDownMenu_SetSelectedValue(fontDropdown, currentFont)
         UIDropDownMenu_SetText(fontDropdown, currentFont)
+        UIDropDownMenu_Initialize(fontOutlineDropdown, FontOutlineDropdown_Initialize)
+        local currentOutline = SDT.SDTDB_CharDB.settings.fontOutline or "NONE"
+        local outlineText = currentOutline == "NONE" and "None" or 
+            currentOutline == "OUTLINE" and "Outline" or 
+            currentOutline == "THICKOUTLINE" and "Thick Outline" or
+            currentOutline == "MONOCHROME" and "Monochrome" or
+            currentOutline == "OUTLINE, MONOCHROME" and "Outline + Monochrome" or
+            currentOutline == "THICKOUTLINE, MONOCHROME" and "Thick Outline + Monochrome" or "None"
+        UIDropDownMenu_SetSelectedValue(fontOutlineDropdown, currentOutline)
+        UIDropDownMenu_SetText(fontOutlineDropdown, outlineText)
         UIDropDownMenu_Initialize(borderDropdown, BorderDropdown_Initialize)
         UIDropDownMenu_Initialize(expFormatDropdown, expFormatDropdown_Initialize)
         local expFormatNames = {

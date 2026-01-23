@@ -162,14 +162,18 @@ end
 function SDT:ApplyFont()
     local fontPath = LSM:Fetch("font", SDT.SDTDB_CharDB.settings.font) or STANDARD_TEXT_FONT
     local fontSize = SDT.SDTDB_CharDB.settings.fontSize or 12
+    local fontOutline = SDT.SDTDB_CharDB.settings.fontOutline or "NONE"
+
+    -- Convert "NONE" to empty string for SetFont
+    local outline = (fontOutline == "NONE") and "" or fontOutline
 
     for _, bar in pairs(SDT.bars) do
         for _, slot in ipairs(bar.slots) do
             if slot.text then
-                slot.text:SetFont(fontPath, fontSize, "")
+                slot.text:SetFont(fontPath, fontSize, outline)
             end
             if slot.moduleFrame and slot.moduleFrame.text and slot.moduleFrame.text.SetFont then
-                slot.moduleFrame.text:SetFont(fontPath, fontSize, "")
+                slot.moduleFrame.text:SetFont(fontPath, fontSize, outline)
             end
         end
     end
