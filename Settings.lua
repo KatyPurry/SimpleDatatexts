@@ -1053,43 +1053,10 @@ function SDT:InitializeModuleConfigPanels()
     if not SDT.cache.moduleNames or #SDT.cache.moduleNames == 0 then
         return
     end
-
-    -- Create a table of modules to exclude (aka modules that have no settings)
-    local excludedModules = {
-        ["Coordinates"] = true,
-        ["Currency"] = true,
-        ["Experience"] = true,
-        ["Friends"] = true,
-        ["Guild"] = true,
-        ["HidingBar1"] = true,
-        ["Mail"] = true,
-        ["QuaziiUI"] = true,
-        ["System"] = true,
-        ["Talent/Loot Specialization"] = true,
-        ["Time"] = true,
-    }
-
-    local allowedLDBModules = {
-        ["LDB: BugSack"] = true,
-        ["LDB: WIM"] = true,
-        ["LDB: Core Loot Manager"] = true,
-    }
-
-    local function isExcluded(moduleName)
-        if excludedModules[moduleName] then
-            return true
-        end
-
-        if moduleName:sub(1, 3) == "LDB" and not allowedLDBModules[moduleName] then
-            return true
-        end
-
-        return false
-    end
     
     -- Create a config panel for each module
     for _, moduleName in ipairs(SDT.cache.moduleNames) do
-        if not isExcluded(moduleName) then
+        if not SDT:ExcludedModule(moduleName) then
             if not SDT.ModuleConfigPanels[moduleName] then
                 CreateModuleConfigPanel(moduleName)
             end
@@ -1750,14 +1717,16 @@ local function ProcessQueuedSettings()
     if not SDT.queuedModuleSettings then return end
     
     for moduleName, settings in pairs(SDT.queuedModuleSettings) do
-        for _, setting in ipairs(settings) do
-            SDT:AddModuleConfigSetting(
-                moduleName,
-                setting.settingType,
-                setting.label,
-                setting.settingKey,
-                setting.defaultValue
-            )
+        if not SDT:ExcludedModule(moduleName) then
+            for _, setting in ipairs(settings) do
+                SDT:AddModuleConfigSetting(
+                    moduleName,
+                    setting.settingType,
+                    setting.label,
+                    setting.settingKey,
+                    setting.defaultValue
+                )
+            end
         end
     end
     

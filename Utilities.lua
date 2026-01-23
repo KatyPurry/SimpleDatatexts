@@ -63,6 +63,43 @@ SDT.cache.moduleNames = {}
 local noop = function() end
 
 -------------------------------------------------
+-- Utility: Module Settings Exclusions
+-------------------------------------------------
+-- Create a table of modules to exclude (aka modules that have no settings)
+SDT.excludedModules = {
+    ["Coordinates"] = true,
+    ["Currency"] = true,
+    ["Experience"] = true,
+    ["Friends"] = true,
+    ["Guild"] = true,
+    ["HidingBar1"] = true,
+    ["Mail"] = true,
+    ["System"] = true,
+    ["Talent/Loot Specialization"] = true,
+    ["Time"] = true,
+    -- Some LDB modules aren't getting tagged with "LDB:". Needs investigated.
+    ["Core Loot Manager"] = true,
+    ["QuaziiUI"] = true,
+}
+
+SDT.allowedLDBModules = {
+    ["LDB: BugSack"] = true,
+    ["LDB: WIM"] = true,
+}
+
+function SDT:ExcludedModule(moduleName)
+    if SDT.excludedModules[moduleName] then
+        return true
+    end
+
+    if moduleName:sub(1, 3) == "LDB" and not SDT.allowedLDBModules[moduleName] then
+        return true
+    end
+
+    return false
+end
+
+-------------------------------------------------
 -- Utility: Add Module Config
 -------------------------------------------------
 -- Modules can call this function to add settings to their config panel
