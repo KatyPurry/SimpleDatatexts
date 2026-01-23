@@ -120,8 +120,8 @@ function mod.Create(slotFrame)
         GameTooltip:ClearLines()
 
         local critical = GetCombatRating(ratingIndex)
-        GameTooltip:AddLine(format('|cffFFFFFF%s:|r |cffFFFFFF%.2f%%|r', MELEE_CRIT_CHANCE, critChance))
-		GameTooltip:AddDoubleLine(format(CR_CRIT_TOOLTIP, critical , GetCombatRatingBonus(ratingIndex)))
+        SDT:AddTooltipHeader(GameTooltip, 14, format('%s: |cffFFFFFF%.2f%%|r', MELEE_CRIT_CHANCE, critChance), 1, 0.82, 0)
+        SDT:AddTooltipLine(GameTooltip, 12, format(CR_CRIT_TOOLTIP, critical, GetCombatRatingBonus(ratingIndex)), nil, nil, nil, nil, nil, nil, nil, true)
 
         GameTooltip:Show()
     end)

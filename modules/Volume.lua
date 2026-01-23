@@ -205,22 +205,22 @@ function mod.Create(slotFrame)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
 
-	    GameTooltip:AddLine(L["Active Output Audio Device"], 1, 1, 1)
-	    GameTooltip:AddLine(Sound_GameSystem_GetOutputDriverNameByIndex(GetCVar('Sound_OutputDriverIndex')))
-	    GameTooltip:AddLine(' ')
-	    GameTooltip:AddLine(L["Volume Streams"], 1, 1, 1)
+		SDT:AddTooltipHeader(GameTooltip, 14, L["Active Output Audio Device"], 1, 1, 1)
+		SDT:AddTooltipLine(GameTooltip, 12, Sound_GameSystem_GetOutputDriverNameByIndex(GetCVar('Sound_OutputDriverIndex')), nil, 1, 0.82, 0)
+		SDT:AddTooltipLine(GameTooltip, 12, " ")
+		SDT:AddTooltipLine(GameTooltip, 14, L["Volume Streams"], nil, 1, 1, 1)
 
 	    for _, Stream in ipairs(AudioStreams) do
-		    GameTooltip:AddDoubleLine(Stream.Name, GetStreamString(Stream, true))
+			SDT:AddTooltipLine(GameTooltip, 12, Stream.Name, GetStreamString(Stream, true), 1, 0.82, 0)
 	    end
 
-	    GameTooltip:AddLine(' ')
+		SDT:AddTooltipLine(GameTooltip, 12, " ")
 
-	    GameTooltip:AddLine("|cFFffffff" .. L["Left Click: Select Volume Stream"] .. "|r")
-	    GameTooltip:AddLine("|cFFffffff" .. L["Middle Click: Toggle Mute Master Stream"] .. "|r")
-	    GameTooltip:AddLine("|cFFffffff" .. L["Shift + Middle Click: Toggle Volume Stream"] .. "|r")
-	    GameTooltip:AddLine("|cFFffffff" .. L["Shift + Left Click: Open System Audio Panel"] .. "|r")
-	    GameTooltip:AddLine("|cFFffffff" .. L["Shift + Right Click: Select Output Audio Device"] .. "|r")
+		SDT:AddTooltipLine(GameTooltip, 12, "|cFFffffff" .. L["Left Click: Select Volume Stream"] .. "|r")
+		SDT:AddTooltipLine(GameTooltip, 12, "|cFFffffff" .. L["Middle Click: Toggle Mute Master Stream"] .. "|r")
+		SDT:AddTooltipLine(GameTooltip, 12, "|cFFffffff" .. L["Shift + Middle Click: Toggle Volume Stream"] .. "|r")
+		SDT:AddTooltipLine(GameTooltip, 12, "|cFFffffff" .. L["Shift + Left Click: Open System Audio Panel"] .. "|r")
+		SDT:AddTooltipLine(GameTooltip, 12, "|cFFffffff" .. L["Shift + Right Click: Select Output Audio Device"] .. "|r")
 
 	    GameTooltip:Show()
     end)

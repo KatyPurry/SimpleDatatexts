@@ -96,13 +96,15 @@ local function ShowTooltip(self)
     ------------------------------------------------
     -- HEADER: CURRENCIES
     ------------------------------------------------
-    tooltip:AddLine(L["CURRENCIES"])
-    tooltip:AddLine(" ")
+    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+        SDT:AddTooltipHeader(tooltip, 14, L["CURRENCIES"])
+        SDT:AddTooltipLine(tooltip, 12, " ")
+    end
 
     for i = 1, 3 do
         local info = C_CurrencyInfo_GetBackpackCurrencyInfo(i)
         if info and info.quantity and info.iconFileID then
-            tooltip:AddDoubleLine(
+            SDT:AddTooltipLine(tooltip, 12, 
                 format("%s %s", format(ICON_FMT, info.iconFileID), info.name or "?"),
                 BreakUpLargeNumbers(info.quantity),
                 1,1,1, 1,1,1
@@ -113,9 +115,11 @@ local function ShowTooltip(self)
     ------------------------------------------------
     -- HEADER: GOLD
     ------------------------------------------------
-    tooltip:AddLine(" ")
-    tooltip:AddLine(L["GOLD"])
-    tooltip:AddDoubleLine(UnitName("player"), FormatMoney(GetMoney()), 1,1,1, 1,1,1)
+    SDT:AddTooltipLine(tooltip, 12, " ")
+    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+        SDT:AddTooltipHeader(tooltip, 14, L["GOLD"])
+    end
+    SDT:AddTooltipLine(tooltip, 12, UnitName("player"), FormatMoney(GetMoney()), 1,1,1, 1,1,1)
 
     tooltip:Show()
 end

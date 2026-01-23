@@ -67,15 +67,17 @@ function mod.OnEnter(self)
     local anchor = SDT:FindBestAnchorPoint(self)
     GameTooltip:SetOwner(self, anchor)
     GameTooltip:ClearLines()
+    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+        SDT:AddTooltipHeader(GameTooltip, 14, L["SYSTEM"])
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+    end
 
     local fps = floor(GetFramerate())
     local _, _, homePing, worldPing = GetNetStats()
 
-    GameTooltip:AddLine(L["SYSTEM"])
-    GameTooltip:AddLine(" ")
-    GameTooltip:AddDoubleLine(L["FPS:"], fps, .69, .31, .31, .84, .75, .65)
-    GameTooltip:AddDoubleLine(L["Home Latency:"], homePing .. " ms", .69, .31, .31, .84, .75, .65)
-    GameTooltip:AddDoubleLine(L["World Latency:"], worldPing .. " ms", .69, .31, .31, .84, .75, .65)
+    SDT:AddTooltipLine(GameTooltip, 12, L["FPS:"], fps, .69, .31, .31, .84, .75, .65)
+    SDT:AddTooltipLine(GameTooltip, 12, L["Home Latency:"], homePing .. " ms", .69, .31, .31, .84, .75, .65)
+    SDT:AddTooltipLine(GameTooltip, 12, L["World Latency:"], worldPing .. " ms", .69, .31, .31, .84, .75, .65)
 
     -- Update memory & CPU usage
     UpdateAddOnMemoryUsage()
@@ -108,22 +110,22 @@ function mod.OnEnter(self)
     tsort(infoDisplay, function(a,b) return a.sort > b.sort end)
 
     -- Display addons
-    GameTooltip:AddDoubleLine(L["Total Memory:"], FormatMem(totalMEM), .69, .31, .31, .84, .75, .65)
-    GameTooltip:AddLine(" ")
+    SDT:AddTooltipLine(GameTooltip, 12, L["Total Memory:"], FormatMem(totalMEM), .69, .31, .31, .84, .75, .65)
+    SDT:AddTooltipLine(GameTooltip, 12, " ")
     for _, data in ipairs(infoDisplay) do
         local memStr = FormatMem(data.mem or 0)
         if cpuProfiling then
             local cpuStr = data.cpu and format("%d ms", floor(data.cpu)) or "0 ms"
-            GameTooltip:AddDoubleLine(data.title, memStr.." / "..cpuStr)
+            SDT:AddTooltipLine(GameTooltip, 12, data.title, memStr.." / "..cpuStr)
         else
             local red = totalMEM > 0 and data.mem / totalMEM or 0
 		    local green = (1 - red) + .5
-            GameTooltip:AddDoubleLine(data.title, memStr, 1, 1, 1, red or 1, green or 1, 0)
+            SDT:AddTooltipLine(GameTooltip, 12, data.title, memStr, 1, 1, 1, red or 1, green or 1, 0)
         end
     end
 
-    GameTooltip:AddLine(" ")
-    GameTooltip:AddLine(L["(Shift Click) Collect Garbage"])
+    SDT:AddTooltipLine(GameTooltip, 12, " ")
+    SDT:AddTooltipLine(GameTooltip, 12, L["(Shift Click) Collect Garbage"])
     GameTooltip:Show()
 end
 

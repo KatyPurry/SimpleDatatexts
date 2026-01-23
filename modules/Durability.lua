@@ -191,8 +191,10 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        GameTooltip:AddLine(DURABILITY or "Durability")
-        GameTooltip:AddLine(" ")
+        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+            SDT:AddTooltipHeader(GameTooltip, 14, DURABILITY or "Durability")
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
+        end
 
         for slotIndex, perc in pairs(invDurability) do
             local texture = GetInventoryItemTexture("player", slotIndex)
@@ -200,12 +202,12 @@ function mod.Create(slotFrame)
             local colorR, colorG, colorB = ColorGradient((perc or 0) / 100)
             local left = format("|T%s:14:14:0:0:64:64:4:60:4:60|t %s", texture or "", link)
             local right = SDT:FormatPercent(perc or 0)
-            GameTooltip:AddDoubleLine(left, right, 1, 1, 1, colorR, colorG, colorB)
+            SDT:AddTooltipLine(GameTooltip, 12, left, right, 1, 1, 1, colorR, colorG, colorB)
         end
 
         if totalRepairCost and totalRepairCost > 0 then
-            GameTooltip:AddLine(" ")
-            GameTooltip:AddDoubleLine(REPAIR_COST or "Repair Cost", GetCoinTextureString(totalRepairCost) or tostring(totalRepairCost), 0.6, 0.8, 1, 1, 1, 1)
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
+            SDT:AddTooltipLine(GameTooltip, 12, REPAIR_COST or "Repair Cost", GetCoinTextureString(totalRepairCost) or tostring(totalRepairCost), 0.6, 0.8, 1, 1, 1, 1)
         end
 
         GameTooltip:Show()

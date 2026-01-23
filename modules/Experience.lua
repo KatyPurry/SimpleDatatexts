@@ -289,30 +289,32 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
+        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+            SDT:AddTooltipHeader(GameTooltip, 14, L["Experience"])
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
+        end
 
         local level = UnitLevel("player")
-        GameTooltip:AddLine(L["Experience"], 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(format(L["Level %d"], SDTC.playerLevel), 1, 1, 1)
-        GameTooltip:AddDoubleLine(
+        SDT:AddTooltipLine(GameTooltip, 12, format(L["Level %d"], SDTC.playerLevel), 1, 1, 1)
+        SDT:AddTooltipLine(GameTooltip, 12,
             "Progress:",
             format("%s / %s", 
                 FormatValue(currentXP), 
                 FormatValue(maxXP)),
             1, 0.82, 0, 1, 1, 1
         )
-        GameTooltip:AddDoubleLine(
+        SDT:AddTooltipLine(GameTooltip, 12,
             "Remaining:",
             FormatValue(maxXP - currentXP),
             1, 0.82, 0, 1, 1, 1
         )
-        GameTooltip:AddDoubleLine(
+        SDT:AddTooltipLine(GameTooltip, 12,
             "Percentage:",
             format("%.2f%%", xpPercent),
             1, 0.82, 0, 1, 1, 1
         )
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(L["Configure in settings"], 0.7, 0.7, 0.7)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, L["Configure in settings"], 0.7, 0.7, 0.7)
 
         GameTooltip:Show()
     end)

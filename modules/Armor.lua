@@ -86,23 +86,23 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        GameTooltip:AddLine(L["Mitigation By Level:"])
-        GameTooltip:AddLine(' ')
+        SDT:AddTooltipHeader(GameTooltip, 14, L["Mitigation By Level:"])
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
 
         -- Armor
         local _, currentArmor = UnitArmor("player")
         local upperLevel = UnitLevel("player") + 3
         for _ = 1, 4 do
             local armorReduction = C_PDI_GetArmorEffectiveness(currentArmor, upperLevel) * 100
-            GameTooltip:AddDoubleLine(format(L["Level %d"], upperLevel), format("%.2f%%", armorReduction), 1, 1, 1)
+            SDT:AddTooltipLine(GameTooltip, 12, format(L["Level %d"], upperLevel), format("%.2f%%", armorReduction), 1, 1, 1, 0.1, 1, 0.1)
             upperLevel = upperLevel - 1
         end
         
         local targetLevel = UnitLevel("target")
 	    if targetLevel and targetLevel > 0 and (targetLevel > upperLevel + 3 or targetLevel < upperLevel) then
 		    local armorReduction = C_PDI_GetArmorEffectiveness(currentArmor, targetLevel) * 100
-		    GameTooltip:AddLine(' ')
-		    GameTooltip:AddDoubleLine(L["Target Mitigation"], format("%.2f%%", armorReduction), 1, 1, 1)
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
+		    SDT:AddTooltipLine(GameTooltip, 12, L["Target Mitigation"], format("%.2f%%", armorReduction), 1, 1, 1)
 	    end
 
         GameTooltip:Show()

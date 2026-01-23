@@ -96,21 +96,21 @@ function mod.Create(slotFrame)
 
         -- Haste
         local haste = GetHaste()
-        GameTooltip:AddLine(format('%s: %s%.2f%%|r', STAT_HASTE, '|cffFFFFFF', haste), 1, 1, 1)
+        SDT:AddTooltipHeader(GameTooltip, 14, format('%s: %s%.2f%%|r', STAT_HASTE, '|cffFFFFFF', haste))
         local hasteStat = SDTC.playerClass == "HUNTER" and CR_HASTE_RANGED or CR_HASTE_MELEE
-        GameTooltip:AddLine(format('%s'..STAT_HASTE_BASE_TOOLTIP, _G['STAT_HASTE_'..SDTC.playerClass..'_TOOLTIP'] or STAT_HASTE_TOOLTIP, GetCombatRating(hasteStat), GetCombatRatingBonus(hasteStat)), nil, nil, nil, true)
+        SDT:AddTooltipLine(GameTooltip, 12, format('%s'..STAT_HASTE_BASE_TOOLTIP, _G['STAT_HASTE_'..SDTC.playerClass..'_TOOLTIP'] or STAT_HASTE_TOOLTIP, GetCombatRating(hasteStat), GetCombatRatingBonus(hasteStat)), nil, nil, nil, nil, nil, nil, true)
 
         -- Attack speed
         local mh, oh = UnitAttackSpeed("player")
         GameTooltip:AddLine(" ")
         if oh then
-            GameTooltip:AddDoubleLine(
+            SDT:AddTooltipLine(GameTooltip, 12,
                 ATTACK_SPEED,
                 string.format("%.2f / %.2f", mh, oh),
                 1, 0.82, 0, 1, 0.82, 0
             )
         else
-            GameTooltip:AddDoubleLine(
+            SDT:AddTooltipLine(GameTooltip, 12,
                 ATTACK_SPEED,
                 string.format("%.2f", mh),
                 1, 0.82, 0, 1, 0.82, 0

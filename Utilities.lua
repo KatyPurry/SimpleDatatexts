@@ -157,6 +157,58 @@ function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, 
 end
 
 -------------------------------------------------
+-- Utility: Module Tooltip Functions
+-------------------------------------------------
+function SDT:AddTooltipHeader(tooltip, fontSize, text, r, g, b, wrap)
+    tooltip = tooltip or GameTooltip
+    r = r or 1
+    g = g or 0.82
+    b = b or 0
+    
+    tooltip:AddLine(text, r, g, b, wrap or false)
+    
+    -- Force the header to use a specific font size
+    local textLeft = _G[tooltip:GetName() .. "TextLeft" .. tooltip:NumLines()]
+    if textLeft then
+        local font, _, flags = textLeft:GetFont()
+        textLeft:SetFont(font, fontSize or 14, flags)
+    end
+end
+
+function SDT:AddTooltipLine(tooltip, fontSize, textLeft, textRight, r1, g1, b1, r2, g2, b2, wrap)
+    tooltip = tooltip or GameTooltip
+
+    -- Handle single or double lines
+    if textRight then
+        r1 = r1 or 1
+        g1 = g1 or 1
+        b1 = b1 or 1
+        r2 = r2 or 0.5
+        g2 = g2 or 0.5
+        b2 = b2 or 0.5
+        tooltip:AddDoubleLine(textLeft, textRight, r1, g1, b1, r2, g2, b2, wrap or false)
+    else
+        r1 = r1 or 1
+        g1 = g1 or 1
+        b1 = b1 or 1
+        tooltip:AddLine(textLeft, r1, g1, b1, wrap or false)
+    end
+
+    -- Normal lines get a 12pt font.
+    local lineNum = tooltip:NumLines()
+    local textLeftObj = _G[tooltip:GetName() .. "TextLeft" .. tooltip:NumLines()]
+    local textRightObj = _G[tooltip:GetName() .. "TextRight" .. tooltip:NumLines()]
+    if textLeftObj then
+        local font, _, flags = textLeftObj:GetFont()
+        textLeftObj:SetFont(font, fontSize or 12, flags)
+    end
+    if textRightObj then
+        local font, _, flags = textRightObj:GetFont()
+        textRightObj:SetFont(font, fontSize or 12, flags)
+    end
+end
+
+-------------------------------------------------
 -- Utility: Apply Chosen Font
 -------------------------------------------------
 function SDT:ApplyFont()

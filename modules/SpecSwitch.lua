@@ -293,18 +293,20 @@ function mod.Create(slotFrame)
     slotFrame:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, SDT:FindBestAnchorPoint(self))
         GameTooltip:ClearLines()
-        GameTooltip:AddLine(SDT:ColorText(SPECIALIZATION))
-        GameTooltip:AddLine(" ")
+        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+            SDT:AddTooltipHeader(GameTooltip, 14, SDT:ColorText(SPECIALIZATION))
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
+        end
 
         for i = 1, GetNumSpecializations() or 0 do
             local id, name, _, icon = GetSpecializationInfo(i)
             if id and name then
                 local activeMark = (i == activeSpecIndex) and activeString or inactiveString
-                GameTooltip:AddLine(strjoin(' ', SDT:ColorText(name), AddTexture(icon), (i == activeSpecIndex and activeString or inactiveString)), 1, 1, 1)
+                SDT:AddTooltipLine(GameTooltip, 12, strjoin(' ', SDT:ColorText(name), AddTexture(icon), (i == activeSpecIndex and activeString or inactiveString)), nil, 1, 1, 1)
             end
         end
 
-        GameTooltip:AddLine(' ')
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
 
         local specLoot = GetLootSpecialization()
         local sameSpec = (specLoot == 0) and GetSpecialization()
@@ -313,46 +315,46 @@ function mod.Create(slotFrame)
             local id, name, _, icon = GetSpecializationInfo((specIndex ~= 0 and specIndex) or GetSpecialization())
             if name then
                 if specLoot == 0 then
-                    GameTooltip:AddLine(format('|cffFFFFFF%s:|r %s', SELECT_LOOT_SPECIALIZATION, format(LOOT_SPECIALIZATION_DEFAULT, name)))
+                    SDT:AddTooltipLine(GameTooltip, 12, format('|cffFFFFFF%s:|r %s', SELECT_LOOT_SPECIALIZATION, format(LOOT_SPECIALIZATION_DEFAULT, name)))
                 else
-                    GameTooltip:AddLine(format('|cffFFFFFF%s:|r %s', SELECT_LOOT_SPECIALIZATION, name))
+                    SDT:AddTooltipLine(GameTooltip, 12, format('|cffFFFFFF%s:|r %s', SELECT_LOOT_SPECIALIZATION, name))
                 end
             end
         end
 
-        GameTooltip:AddLine(' ')
-        GameTooltip:AddLine(L["Loadouts"], 0.69, 0.31, 0.31)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, L["Loadouts"], nil, 0.69, 0.31, 0.31)
 
         BuildLoadoutList()
         for index, loadout in ipairs(loadoutList) do
             if index > 1 then
                 local textStr = (type(loadout.checked) == "function" and loadout.checked(loadout) and activeString) or inactiveString
-                GameTooltip:AddLine(strjoin(' - ', loadout.text, textStr), 1, 1, 1)
+                SDT:AddTooltipLine(GameTooltip, 12, strjoin(' - ', loadout.text, textStr), nil, 1, 1, 1)
             end
         end
 
         if C_SpecializationInfo_GetAllSelectedPvpTalentIDs then
             local pvpTalents = C_SpecializationInfo_GetAllSelectedPvpTalentIDs()
             if pvpTalents and next(pvpTalents) then
-                GameTooltip:AddLine(' ')
-                GameTooltip:AddLine(PVP_TALENTS, 0.69, 0.31, 0.31)
+                SDT:AddTooltipLine(GameTooltip, 12, " ")
+                SDT:AddTooltipLine(GameTooltip, 12, PVP_TALENTS, nil, 0.69, 0.31, 0.31)
                 local i = 0
                 for _, talentID in next, pvpTalents do
                     i = i + 1
                     if i > 4 then break end
                     local name, _, icon, _, _, _, unlocked = GetPvpTalentInfoByID and GetPvpTalentInfoByID(talentID) or nil
                     if name and unlocked then
-                        GameTooltip:AddLine(AddTexture(icon) .. ' ' .. name)
+                        SDT:AddTooltipLine(GameTooltip, 12, AddTexture(icon) .. ' ' .. name)
                     end
                 end
             end
         end
 
-        GameTooltip:AddLine(' ')
-        GameTooltip:AddLine("|cffFFFFFF" .. L["Left Click: Change Talent Specialization"] .. "|r")
-        GameTooltip:AddLine("|cffFFFFFF" .. L["Control + Left Click: Change Loadout"] .. "|r")
-        GameTooltip:AddLine("|cffFFFFFF" .. L["Shift + Left Click: Show Talent Specialization UI"] .. "|r")
-        GameTooltip:AddLine("|cffFFFFFF" .. L["Shift + Right Click: Change Loot Specialization"] .. "|r")
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, "|cffFFFFFF" .. L["Left Click: Change Talent Specialization"] .. "|r")
+        SDT:AddTooltipLine(GameTooltip, 12, "|cffFFFFFF" .. L["Control + Left Click: Change Loadout"] .. "|r")
+        SDT:AddTooltipLine(GameTooltip, 12, "|cffFFFFFF" .. L["Shift + Left Click: Show Talent Specialization UI"] .. "|r")
+        SDT:AddTooltipLine(GameTooltip, 12, "|cffFFFFFF" .. L["Shift + Right Click: Change Loot Specialization"] .. "|r")
         GameTooltip:Show()
     end)
 

@@ -58,11 +58,11 @@ function mod.Create(slotFrame)
         local senders = { GetLatestThreeSenders() }
         if next(senders) then
             local header = HasNewMail() and HAVE_MAIL_FROM or MAIL_LABEL
-            GameTooltip:AddLine(header, 1, 1, 1)
-            GameTooltip:AddLine(" ")
+            SDT:AddTooltipHeader(GameTooltip, 14, header)
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
 
             for _, sender in pairs(senders) do
-                GameTooltip:AddLine(sender)
+                SDT:AddTooltipLine(GameTooltip, 12, sender)
             end
 
             GameTooltip:Show()

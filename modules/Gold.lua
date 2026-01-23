@@ -199,22 +199,25 @@ local function ShowTooltip(self)
     local anchor = SDT:FindBestAnchorPoint(self)
     tooltip:SetOwner(self, anchor)
     tooltip:ClearLines()
-    tooltip:AddLine(L["GOLD"])
-    tooltip:AddLine(" ")
+    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+        SDT:AddTooltipHeader(tooltip, 14, L["GOLD"])
+        SDT:AddTooltipLine(tooltip, 12, " ")
+    end
 
     -- Session info
-    tooltip:AddLine(L["Session:"])
-    tooltip:AddDoubleLine(L["Earned:"], FormatMoney(Profit), 1,1,1,1,1,1)
-    tooltip:AddDoubleLine(L["Spent:"], FormatMoney(Spent), 1,1,1,1,1,1)
+    SDT:AddTooltipLine(tooltip, 12, L["Session:"])
+    SDT:AddTooltipLine(tooltip, 12, L["Earned:"], FormatMoney(Profit), 1,1,1,1,1,1)
+    SDT:AddTooltipLine(tooltip, 12, L["Spent:"], FormatMoney(Spent), 1,1,1,1,1,1)
     if Spent ~= 0 then
         local gained = Profit > Spent
-        tooltip:AddDoubleLine(gained and L["Profit:"] or L["Deficit:"],
+        SDT:AddTooltipLine(tooltip, 12, 
+            gained and L["Profit:"] or L["Deficit:"],
             FormatMoney(Profit-Spent),
             gained and 0 or 1, gained and 1 or 0, 0, 1,1,1)
     end
 
-    tooltip:AddLine(" ")
-    tooltip:AddLine(L["Character:"])
+    SDT:AddTooltipLine(tooltip, 12, " ")
+    SDT:AddTooltipLine(tooltip, 12, L["Character:"])
     sort(myGold, SortFunction)
     local total, limit = #myGold, nil
     local useLimit = limit and limit > 0
@@ -223,25 +226,29 @@ local function ShowTooltip(self)
         if g.faction and g.faction ~= 'Neutral' and g.faction ~= '' then
             toonName = format('|TInterface\\FriendsFrame\\PlusManz-%s:14|t ', g.faction) .. toonName
         end
-        tooltip:AddDoubleLine((g.name == _G.UnitName("player") and toonName..' |TInterface\\COMMON\\Indicator-Green:14|t' or toonName),
+        SDT:AddTooltipLine(tooltip, 12, (g.name == _G.UnitName("player") and toonName..' |TInterface\\COMMON\\Indicator-Green:14|t' or toonName),
             g.amountText, g.r, g.g, g.b, 1,1,1)
     end
 
-    tooltip:AddLine(" ")
-    tooltip:AddLine(L["Server:"])
-    if totalAlliance > 0 then tooltip:AddDoubleLine(L["Alliance:"], FormatMoney(totalAlliance), 0, .376,1,1,1,1) end
-    if totalHorde > 0 then tooltip:AddDoubleLine(L["Horde:"], FormatMoney(totalHorde), 1, .2, .2, 1,1,1) end
-    tooltip:AddLine(" ")
-    tooltip:AddDoubleLine(L["Total:"], FormatMoney(totalGold), 1,1,1,1,1,1)
-    tooltip:AddDoubleLine(L["Warband:"], FormatMoney(warbandGold), 1,1,1,1,1,1)
+    SDT:AddTooltipLine(tooltip, 12, " ")
+    SDT:AddTooltipLine(tooltip, 12, L["Server:"])
+    if totalAlliance > 0 then
+        SDT:AddTooltipLine(tooltip, 12, L["Alliance:"], FormatMoney(totalAlliance), 0, .376,1,1,1,1)
+    end
+    if totalHorde > 0 then
+        SDT:AddTooltipLine(tooltip, 12, L["Horde:"], FormatMoney(totalHorde), 1, .2, .2, 1,1,1)
+    end
+    SDT:AddTooltipLine(tooltip, 12, " ")
+    SDT:AddTooltipLine(tooltip, 12, L["Total:"], FormatMoney(totalGold), 1,1,1,1,1,1)
+    SDT:AddTooltipLine(tooltip, 12, L["Warband:"], FormatMoney(warbandGold), 1,1,1,1,1,1)
     if C_WowTokenPublic_GetCurrentMarketPrice then
-        tooltip:AddLine(" ")
-        tooltip:AddDoubleLine(L["WoW Token:"], FormatMoney(C_WowTokenPublic_GetCurrentMarketPrice() or 0), 0,.8,1,1,1,1)
+        SDT:AddTooltipLine(tooltip, 12, " ")
+        SDT:AddTooltipLine(tooltip, 12, L["WoW Token:"], FormatMoney(C_WowTokenPublic_GetCurrentMarketPrice() or 0), 0,.8,1,1,1,1)
     end
     DisplayCurrencyInfo()
 
-    tooltip:AddLine(" ")
-    tooltip:AddLine("|cffaaaaaa" .. L["Reset Session Data: Hold Ctrl + Right Click"] .. "|r")
+    SDT:AddTooltipLine(tooltip, 12, " ")
+    SDT:AddTooltipLine(tooltip, 12, "|cffaaaaaa" .. L["Reset Session Data: Hold Ctrl + Right Click"] .. "|r")
     tooltip:Show()
 end
 

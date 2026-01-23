@@ -73,12 +73,12 @@ function mod.Create(slotFrame)
         local masteryRating, bonusCoeff = GetMasteryEffect()
 	    local masteryBonus = (GetCombatRatingBonus(CR_MASTERY) or 0) * (bonusCoeff or 0)
 
-	    local title = format('|cffFFFFFF%s: %.2f%%|r', STAT_MASTERY, masteryRating)
+	    local title = format('%s: |cffFFFFFF%.2f%%|r', STAT_MASTERY, masteryRating)
 	    if masteryBonus > 0 then
 		    title = format('%s |cffFFFFFF(%.2f%%|r |cff33ff33+%.2f%%|r|cffFFFFFF)|r', title, masteryRating - masteryBonus, masteryBonus)
 	    end
-        GameTooltip:AddLine(title)
-        GameTooltip:AddLine(" ")
+        SDT:AddTooltipHeader(GameTooltip, 14, title)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
 
         local spec = GetSpecialization()
 	    if spec then
@@ -95,16 +95,16 @@ function mod.Create(slotFrame)
                 local spellName = spellObj:GetSpellName()
                 local spellDescription = spellObj:GetSpellDescription()
                 if spellName then
-                    GameTooltip:AddLine(spellName, 1, 1, 1)
+                    SDT:AddTooltipLine(GameTooltip, 12, spellName, nil, 1, 1, 1)
                     if spellDescription and spellDescription ~= "" then
-                        GameTooltip:AddLine(spellDescription)
+                        SDT:AddTooltipLine(GameTooltip, 12, spellDescription)
                     end
                 end
 		    end
 	    end
 
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(format("%s: %s [+%.2f%%]", STAT_MASTERY, GetCombatRating(CR_MASTERY), masteryBonus), 1, 0.82, 0)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, format("%s: %s [+%.2f%%]", STAT_MASTERY, GetCombatRating(CR_MASTERY), masteryBonus))
         GameTooltip:Show()
     end)
 

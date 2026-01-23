@@ -98,11 +98,11 @@ function mod.Create(slotFrame)
         GameTooltip:ClearLines()
 
         local versatility = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE)
-        local text = HIGHLIGHT_FONT_COLOR_CODE..format(VERSATILITY_TOOLTIP_FORMAT, STAT_VERSATILITY, currentVers, versReduction)..FONT_COLOR_CODE_CLOSE
+        local text = HIGHLIGHT_FONT_COLOR_CODE..format(VERSATILITY_TOOLTIP_FORMAT, '|cffFFD000'..STAT_VERSATILITY..'|r', currentVers, versReduction)..FONT_COLOR_CODE_CLOSE
         local tooltip = format(CR_VERSATILITY_TOOLTIP, currentVers, versReduction, BreakUpLargeNumbers(versatility), currentVers, versReduction)
         
-        GameTooltip:AddDoubleLine(text, nil, 1, 1, 1)
-	    GameTooltip:AddLine(tooltip, nil, nil, nil, true)
+        SDT:AddTooltipHeader(GameTooltip, 14, text)
+        SDT:AddTooltipLine(GameTooltip, 12, tooltip, nil, nil, nil, nil, nil, nil, nil, true)
 
         GameTooltip:Show()
     end)

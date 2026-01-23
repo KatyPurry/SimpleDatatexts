@@ -176,60 +176,63 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        GameTooltip:AddLine(L["TIME"])
-        GameTooltip:AddLine(" ")
+        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+            SDT:AddTooltipHeader(GameTooltip, 14, L["TIME"])
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
+        end
         enteredFrame = true
 
         -- Saved instances
         if next(lockedInstances.raids) then
-            GameTooltip:AddLine(L["Saved Raid(s)"])
+            SDT:AddTooltipLine(GameTooltip, 12, L["Saved Raid(s)"])
             tsort(lockedInstances.raids, function(a,b) return a[1]<b[1] end)
             for _, info in next, lockedInstances.raids do
                 local difficultyLetter, buttonImg = info[2], info[3]
                 local name, _, reset, _, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(info[4])
                 local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
                 if numEncounters and numEncounters > 0 and (encounterProgress and encounterProgress > 0) then
-                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                    SDT:AddTooltipLine(GameTooltip, 12, format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
                 else
-                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                    SDT:AddTooltipLine(GameTooltip, 12, format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
                 end
             end
-            GameTooltip:AddLine(" ")
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
         end
 
         -- Saved dungeons
         if next(lockedInstances.dungeons) then
-            GameTooltip:AddLine(L["Saved Dungeon(s)"])
+            SDT:AddTooltipLine(GameTooltip, 12, L["Saved Dungeon(s)"])
             tsort(lockedInstances.dungeons, function(a,b) return a[1]<b[1] end)
             for _, info in next, lockedInstances.dungeons do
                 local difficultyLetter, buttonImg = info[2], info[3]
                 local name, _, reset, _, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(info[4])
                 local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
                 if numEncounters and numEncounters > 0 and (encounterProgress and encounterProgress > 0) then
-                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                    SDT:AddTooltipLine(GameTooltip, 12, format('%s%s %s |cffaaaaaa(%s, %s/%s)', buttonImg, maxPlayers, difficultyLetter, name, encounterProgress, numEncounters), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
                 else
-                    GameTooltip:AddDoubleLine(format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
+                    SDT:AddTooltipLine(GameTooltip, 12, format('%s%s %s |cffaaaaaa(%s)', buttonImg, maxPlayers, difficultyLetter, name), ToTime(reset), 1,1,1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
                 end
             end
-            GameTooltip:AddLine(" ")
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
         end
 
         -- Daily/weekly reset
         local dailyReset = C_DateAndTime_GetSecondsUntilDailyReset()
         local weeklyReset = C_DateAndTime_GetSecondsUntilWeeklyReset()
         if dailyReset then
-            GameTooltip:AddDoubleLine(DAILY_RESET, ToTime(dailyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+            SDT:AddTooltipLine(GameTooltip, 12, DAILY_RESET, ToTime(dailyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
         end
         if weeklyReset then
-            GameTooltip:AddDoubleLine(WEEKLY_RESET, ToTime(weeklyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+            SDT:AddTooltipLine(GameTooltip, 12, WEEKLY_RESET, ToTime(weeklyReset), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
         end
-        GameTooltip:AddLine(" ")
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
 
         -- Local/realm time
         local Hr, Min, Sec, AmPm = GetTimeValues()
-        GameTooltip:AddDoubleLine(TIMEMANAGER_TOOLTIP_LOCALTIME, format('%02d:%02d:%02d', Hr, Min, Sec), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+        SDT:AddTooltipLine(GameTooltip, 12, TIMEMANAGER_TOOLTIP_LOCALTIME, format('%02d:%02d:%02d', Hr, Min, Sec), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
         GameTooltip:Show()
     end)
+    
     slotFrame:SetScript("OnLeave", function() enteredFrame = false; GameTooltip:Hide() end)
 
     ----------------------------------------------------

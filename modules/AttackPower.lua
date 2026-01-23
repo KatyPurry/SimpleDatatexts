@@ -104,21 +104,21 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        GameTooltip:AddDoubleLine(isHunter and RANGED_ATTACK_POWER or MELEE_ATTACK_POWER , totalAP, 1, 1, 1)
+        SDT:AddTooltipLine(GameTooltip, 14, isHunter and RANGED_ATTACK_POWER or MELEE_ATTACK_POWER, totalAP, 1, 0.82, 0, 1, 1, 1)
 
         local APBonus = format("%.2f", totalAP / ATTACK_POWER_MAGIC_NUMBER)
-        GameTooltip:AddLine(format(isHunter and RANGED_ATTACK_POWER_TOOLTIP or MELEE_ATTACK_POWER_TOOLTIP, APBonus), nil, nil, nil, true)
+        SDT:AddTooltipLine(GameTooltip, 12, format(isHunter and RANGED_ATTACK_POWER_TOOLTIP or MELEE_ATTACK_POWER_TOOLTIP, APBonus), nil, nil, nil, nil, nil, nil, true)
 
 	    if isHunter and ComputePetBonus then
 		    local petAPBonus = ComputePetBonus('PET_BONUS_RAP_TO_AP', totalAP)
 		    local petSpellDmgBonus = ComputePetBonus('PET_BONUS_RAP_TO_SPELLDMG', totalAP)
 
     		if petAPBonus > 0 then
-	    		GameTooltip:AddLine(format(PET_BONUS_TOOLTIP_RANGED_ATTACK_POWER, format("%.2f", petAPBonus)))
+                SDT:AddTooltipLine(GameTooltip, 12, format(PET_BONUS_TOOLTIP_RANGED_ATTACK_POWER, format("%.2f", petAPBonus)))
 		    end
 
     		if petSpellDmgBonus > 0 then
-	    		GameTooltip:AddLine(format(PET_BONUS_TOOLTIP_SPELLDAMAGE, format("%.2f", petSpellDmgBonus)))
+                SDT:AddTooltipLine(GameTooltip, 12, format(PET_BONUS_TOOLTIP_SPELLDAMAGE, format("%.2f", petSpellDmgBonus)))
 		    end
 	    end
 

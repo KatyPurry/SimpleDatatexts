@@ -76,6 +76,7 @@ local charDefaultsTable = {
         useClassColor = false,
         useCustomColor = false,
         customColorHex = "#ffffff",
+        hideModuleTitle = false,
         use24HourClock = false,
         showLoginMessage = true,
         expFormat = 1,
@@ -433,8 +434,18 @@ colorPickerButton:SetScript("OnClick", function()
     showColorPicker()
 end)
 
+local hideTitleCheckbox = CreateFrame("CheckButton", nil, globalSubPanel, "InterfaceOptionsCheckButtonTemplate")
+hideTitleCheckbox:SetPoint("TOPLEFT", customColorCheckbox, "BOTTOMLEFT", 0, -20)
+hideTitleCheckbox.Text:SetText(L["Hide Module Title in Tooltip"])
+hideTitleCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.hideModuleTitle)
+
+hideTitleCheckbox:SetScript("OnClick", function(self)
+    SDT.SDTDB_CharDB.settings.hideModuleTitle = self:GetChecked()
+    SDT:UpdateAllModules()
+end)
+
 local fontLabel = globalSubPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-fontLabel:SetPoint("TOPLEFT", customColorCheckbox, "BOTTOMLEFT", 0, -20)
+fontLabel:SetPoint("TOPLEFT", hideTitleCheckbox, "BOTTOMLEFT", 0, -20)
 fontLabel:SetText(L["Display Font:"])
 
 local fontDropdown = CreateSettingsDropdown(addonName .. "_FontDropdown", globalSubPanel)
@@ -1893,6 +1904,7 @@ loader:SetScript("OnEvent", function(self, event, arg)
         loginMessageCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.showLoginMessage)
         classColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.useClassColor)
         customColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.useCustomColor)
+        hideTitleCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.hideModuleTitle)
         colorPickerButton:SetText(SDT.SDTDB_CharDB.settings.customColorHex)
         fontSizeSlider:SetValue(SDT.SDTDB_CharDB.settings.fontSize)
         fontSizeBox:SetText(tostring(SDT.SDTDB_CharDB.settings.fontSize))

@@ -134,8 +134,10 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        GameTooltip:AddLine(L["Bags"])
-        GameTooltip:AddLine(" ")
+        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+            SDT:AddTooltipHeader(GameTooltip, 14, L["Bags"])
+            SDT:AddTooltipLine(GameTooltip, 12, " ")
+        end
 
         for i = 0, NUM_BAG_SLOTS do
             local bagName = GetBagName(i)
@@ -152,9 +154,9 @@ function mod.Create(slotFrame)
                     local icon = GetInventoryItemTexture('player', id)
                     local quality = GetInventoryItemQuality('player', id) or 1
                     r1, g1, b1 = GetItemQualityColor(quality)
-                    GameTooltip:AddDoubleLine(format(iconString, icon or "", bagName), format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
+                    SDT:AddTooltipLine(GameTooltip, 12, format(iconString, icon or "", bagName), format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
                 else
-                    GameTooltip:AddDoubleLine(bagName, format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
+                    SDT:AddTooltipLine(GameTooltip, 12, bagName, format('%d / %d', usedSlots, numSlots), r1, g1, b1, r2, g2, b2)
                 end
             end
         end
