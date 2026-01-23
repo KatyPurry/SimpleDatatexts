@@ -6,6 +6,8 @@
 local _, _, _, wowTOC = GetBuildInfo()
 local SDT = SimpleDatatexts
 
+local InCombatLockdown = InCombatLockdown
+
 local BUTTON_HEIGHT, ICON_SIZE, GAP, TEXT_OFFSET, INFO_HEIGHT, FONT_SIZE, MAX_ENTRIES = 15, 13, 10, 5, 25, 12
 
 local f = CreateFrame( "Frame", "AraBrokerGuildFriends", UIParent)
@@ -238,6 +240,7 @@ end
 
 local friendOnline, friendOffline = ERR_FRIEND_ONLINE_SS:gsub("|Hplayer:%%s|h%[%%s%]|h",""), ERR_FRIEND_OFFLINE_S:gsub("%%s","")
 function f:CHAT_MSG_SYSTEM( msg )
+	if InCombatLockdown() then return end
 	if msg:find(friendOnline) or msg:find(friendOffline) then ShowFriends() end
 end
 
