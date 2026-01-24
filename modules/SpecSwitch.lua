@@ -86,8 +86,8 @@ local loadoutList = { { text = L["Loadouts"], isTitle = true, notCheckable = tru
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Icon"], "showSpecIcon", true)
     SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Text"], "showSpecText", true)
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Spec Icon"], "showLootSpecIcon", true)
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Spec Text"], "showLootSpecText", true)
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Specialization Icon"], "showLootSpecIcon", true)
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Specialization Text"], "showLootSpecText", true)
     SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loadout"], "showLoadout", true)
 end
 
