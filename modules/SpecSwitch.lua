@@ -81,6 +81,19 @@ local specList = { { text = SPECIALIZATION, isTitle = true, notCheckable = true 
 local loadoutList = { { text = L["Loadouts"], isTitle = true, notCheckable = true } }
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Icon"], "showSpecIcon", true)
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Text"], "showSpecText", true)
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Spec Icon"], "showLootSpecIcon", true)
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Spec Text"], "showLootSpecText", true)
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loadout"], "showLoadout", true)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Helpers
 ----------------------------------------------------
 local function AddTexture(texture)
@@ -224,17 +237,23 @@ function mod.Create(slotFrame)
     local function UpdateDisplay()
         BuildSpecAndLootLists()
 
+        -- Get our module settings
+        local settings = {
+            showSpecIcon = SDT:GetModuleSetting("Talent/Loot Specialization", "showSpecIcon", true),
+            showSpecText = SDT:GetModuleSetting("Talent/Loot Specialization", "showSpecText", true),
+            showLootSpecIcon = SDT:GetModuleSetting("Talent/Loot Specialization", "showLootSpecIcon", true),
+            showLootSpecText = SDT:GetModuleSetting("Talent/Loot Specialization", "showLootSpecText", true),
+            showLoadout = SDT:GetModuleSetting("Talent/Loot Specialization", "showLoadout", true)
+        }
+
         local specLoot = GetLootSpecialization()
         local specIndex = GetSpecialization()
-        local infoName, infoIcon, infoID
-
-        if specIndex then
-            local id, name, _, icon = GetSpecializationInfo(specIndex)
-            infoName = name
-            infoIcon = icon
-            infoID = id
+        if not specIndex then
+            text:SetText("|cff9d9d9d?") -- can't determine spec yet
+            return
         end
 
+        local infoID, infoName, _, infoIcon = GetSpecializationInfo(specIndex)
         if not infoID then
             text:SetText("|cff9d9d9d?") -- can't determine spec yet
             return
@@ -242,46 +261,68 @@ function mod.Create(slotFrame)
 
         activeSpecIndex = specIndex
 
-        -- Build activeLoadoutText (if class talents supported)
-        local activeLoadout = ""
+        -- Build activeLoadoutText
+        local activeLoadoutText = ""
         if CanUseClassTalents and CanUseClassTalents() and GetLastSelectedSavedConfigID then
             local classTalentID = GetLastSelectedSavedConfigID(infoID)
             if classTalentID == STARTER_ID then
-                activeLoadout = "|cff00aaffStarter|r"
+                activeLoadoutText = "|cff00aaffStarter|r"
             elseif classTalentID then
                 local cfg = C_Traits_GetConfigInfo and C_Traits_GetConfigInfo(classTalentID)
-                activeLoadout = cfg and cfg.name or ""
+                activeLoadoutText = cfg and cfg.name or ""
             end
         end
 
-        activeLoadoutText = activeLoadout or ""
+        -- Helper function to format spec display
+        local function formatSpecDisplay(icon, name, showIcon, showText, tag)
+            if not (showIcon or showText) then return "" end
 
-        -- Compose main display: icon + spec name (and optionally loadout)
-        local mainIconSize = 16
-        local specIcon = infoIcon and format('|T%s:%d:%d:0:0:64:64:4:60:4:60|t', infoIcon, mainIconSize, mainIconSize) or ""
-        local display = specIcon .. " " .. (infoName or UNKNOWN)
+            local parts = {}
+            if tag then parts[#parts + 1] = tag end
+            if showIcon and icon then
+                parts[#parts + 1] = format('|T%s:16:16:0:0:64:64:4:60:4:60|t', icon)
+            end
+            if showText then
+                parts[#parts + 1] = name or UNKNOWN
+            end
 
-        -- If loot spec differs or has special case, show both icons (mimic ElvUI logic)
+            return table.concat(parts, showIcon and showText and " " or "")
+        end
+
+        -- Start to build our display
+        local displayParts = {}
+
+        -- Main spec display
+        local specDisplay = formatSpecDisplay(infoIcon, infoName, settings.showSpecIcon, settings.showSpecText, 
+            (settings.showSpecIcon or settings.showSpecText) and L["Spec"]..": " or nil)
+        if specDisplay ~= "" then
+            displayParts[#displayParts + 1] = specDisplay
+        end
+
+        -- Loot spec (if different)
+        local specLoot = GetLootSpecialization()
         if specLoot and specLoot ~= 0 and specLoot ~= infoID then
-            local lootIcon
-            -- get icon for loot spec if possible (need to map loot spec id to index)
             for idx = 1, GetNumSpecializations() or 0 do
-                local id2, name2, _, icon2 = GetSpecializationInfo(idx)
-                if id2 == specLoot then
-                    lootIcon = icon2
+                local lootID, lootName, _, lootIcon = GetSpecializationInfo(idx)
+                if lootID == specLoot then
+                    local lootDisplay = formatSpecDisplay(lootIcon, lootName, settings.showLootSpecIcon, 
+                        settings.showLootSpecText, (settings.showLootSpecIcon or settings.showLootSpecText) and LOOT..": " or nil)
+                    if lootDisplay ~= "" then
+                        displayParts[#displayParts + 1] = lootDisplay
+                    end
                     break
                 end
             end
-            if lootIcon then
-                display = format('%s: %s %s: %s', L["Spec"], specIcon .. " " .. infoName or UNKNOWN, LOOT, format('|T%s:%d:%d:0:0:64:64:4:60:4:60|t', lootIcon, mainIconSize, mainIconSize))
-            end
         end
 
-        if activeLoadoutText and activeLoadoutText ~= "" then
-            display = SDT:ColorText(strjoin('', display, ' / ', activeLoadoutText))
+        -- Loadout
+        if settings.showLoadout and activeLoadoutText ~= "" then
+            displayParts[#displayParts + 1] = activeLoadoutText
         end
 
-        text:SetText(display)
+        local display = table.concat(displayParts, " / ")
+
+        text:SetText(SDT:ColorText(display))
     end
 
     f.Update = UpdateDisplay

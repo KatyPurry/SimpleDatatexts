@@ -75,7 +75,6 @@ SDT.excludedModules = {
     ["HidingBar1"] = true,
     ["Mail"] = true,
     ["System"] = true,
-    ["Talent/Loot Specialization"] = true,
     ["Time"] = true,
     -- Some LDB modules aren't getting tagged with "LDB:". Needs investigated.
     ["Core Loot Manager"] = true,
