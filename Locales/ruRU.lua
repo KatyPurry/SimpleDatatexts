@@ -53,6 +53,7 @@ L["Show login message"] = "Показывать сообщение при вхо
 L["Use Class Color"] = "Использовать цвет класса"
 L["Use 24Hr Clock"] = "Использовать 24-часовой формат"
 L["Use Custom Color"] = "Использовать пользовательский цвет"
+L["Hide Module Title in Tooltip"] = "Скрыть название модуля в подсказке"
 L["Display Font:"] = "Шрифт:"
 L["Font Size"] = "Размер шрифта"
 L["Create New Panel"] = "Создать новую панель"
@@ -220,6 +221,11 @@ L["Left Click: Change Talent Specialization"] = "Левый клик: измен
 L["Control + Left Click: Change Loadout"] = "Ctrl + левый клик: изменить сборку"
 L["Shift + Left Click: Show Talent Specialization UI"] = "Shift + левый клик: открыть интерфейс специализации"
 L["Shift + Right Click: Change Loot Specialization"] = "Shift + правый клик: изменить специализацию добычи"
+L["Show Specialization Icon"] = "Показать значок специализации"
+L["Show Specialization Text"] = "Показать текст специализации"
+L["Show Loot Specialization Icon"] = "Показать значок специализации добычи"
+L["Show Loot Specialization Text"] = "Показать текст специализации добычи"
+L["Show Loadout"] = "Показать набор"
 
 -- ----------------------------
 -- modules/Speed.lua

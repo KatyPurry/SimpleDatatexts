@@ -148,7 +148,7 @@ local function MenuFunc(_, arg1) SetLootSpecialization(arg1) end
 local function SpecChecked(data) return data and data.arg1 == GetSpecialization() end
 local function SpecFunc(_, arg1) SetSpecialization(arg1) end
 
-local function WrapMenuFunc(func, closeMenu)
+local function WrapMenuFunc(func)
     return function(self, arg1)
         --print("Wrapped menu func called", tostring(func))
         if func then
@@ -175,6 +175,9 @@ function mod.Create(slotFrame)
         slotFrame.text = text
     end
 
+    -- Create the menu frame for this module
+    local menuFrame = CreateFrame("Frame", "SDT_SpecMenuFrame", UIParent, "UIDropDownMenuTemplate")
+
     local activeSpecIndex = nil
     local activeLoadoutText = ""
 
@@ -187,8 +190,8 @@ function mod.Create(slotFrame)
             for index = 1, n do
                 local id, name, _, icon = GetSpecializationInfo(index)
                 if id then
-                    tinsert(menuList, { arg1 = id, text = name, checked = MenuChecked, func = WrapMenuFunc(MenuFunc, menuFrame) })
-                    tinsert(specList, { arg1 = index, text = format('|T%s:16:16:0:0|t  %s', icon or "", name), checked = SpecChecked, func = WrapMenuFunc(SpecFunc, menuFrame) })
+                    tinsert(menuList, { arg1 = id, text = name, checked = MenuChecked, func = WrapMenuFunc(MenuFunc) })
+                    tinsert(specList, { arg1 = index, text = format('|T%s:16:16:0:0|t  %s', icon or "", name), checked = SpecChecked, func = WrapMenuFunc(SpecFunc) })
                 end
             end
         end
@@ -213,7 +216,7 @@ function mod.Create(slotFrame)
                     tinsert(loadoutList, {
                         text = format('|cff%02x%02x%02x%s|r', BLUE_FONT_COLOR.r*255, BLUE_FONT_COLOR.g*255, BLUE_FONT_COLOR.b*255, L["Starter Build"]),
                         checked = StarterChecked,
-                        func = WrapMenuFunc(LoadoutFunc, menuFrame),
+                        func = WrapMenuFunc(LoadoutFunc),
                         arg1 = STARTER_ID
                     })
                 else
@@ -224,7 +227,7 @@ function mod.Create(slotFrame)
                             local active = GetLastSelectedSavedConfigID and GetLastSelectedSavedConfigID(info.id) or nil
                             return active and data.arg1 == active
                         end,
-                        func = WrapMenuFunc(LoadoutFunc, menuFrame),
+                        func = WrapMenuFunc(LoadoutFunc),
                         arg1 = configID })
                 end
             end
@@ -246,7 +249,6 @@ function mod.Create(slotFrame)
             showLoadout = SDT:GetModuleSetting("Talent/Loot Specialization", "showLoadout", true)
         }
 
-        local specLoot = GetLootSpecialization()
         local specIndex = GetSpecialization()
         if not specIndex then
             text:SetText("|cff9d9d9d?") -- can't determine spec yet
@@ -293,8 +295,8 @@ function mod.Create(slotFrame)
         local displayParts = {}
 
         -- Main spec display
-        local specDisplay = formatSpecDisplay(infoIcon, infoName, settings.showSpecIcon, settings.showSpecText, 
-            (settings.showSpecIcon or settings.showSpecText) and L["Spec"]..": " or nil)
+        local specTag = (settings.showSpecIcon or settings.showSpecText) and (L["Spec"]..": ") or ""
+        local specDisplay = formatSpecDisplay(infoIcon, infoName, settings.showSpecIcon, settings.showSpecText, specTag)
         if specDisplay ~= "" then
             displayParts[#displayParts + 1] = specDisplay
         end
@@ -302,15 +304,12 @@ function mod.Create(slotFrame)
         -- Loot spec (if different)
         local specLoot = GetLootSpecialization()
         if specLoot and specLoot ~= 0 and specLoot ~= infoID then
-            for idx = 1, GetNumSpecializations() or 0 do
-                local lootID, lootName, _, lootIcon = GetSpecializationInfo(idx)
-                if lootID == specLoot then
-                    local lootDisplay = formatSpecDisplay(lootIcon, lootName, settings.showLootSpecIcon, 
-                        settings.showLootSpecText, (settings.showLootSpecIcon or settings.showLootSpecText) and LOOT..": " or nil)
-                    if lootDisplay ~= "" then
-                        displayParts[#displayParts + 1] = lootDisplay
-                    end
-                    break
+            local lootID, lootName, _, lootIcon = GetSpecializationInfoByID(specLoot)
+            if lootID then
+                local lootTag = (settings.showLootSpecIcon or settings.showLootSpecText) and (LOOT..": ") or ""
+                local lootDisplay = formatSpecDisplay(lootIcon, lootName, settings.showLootSpecIcon, settings.showLootSpecText, lootTag)
+                if lootDisplay ~= "" then
+                    displayParts[#displayParts + 1] = lootDisplay
                 end
             end
         end
@@ -321,7 +320,6 @@ function mod.Create(slotFrame)
         end
 
         local display = table.concat(displayParts, " / ")
-
         text:SetText(SDT:ColorText(display))
     end
 
@@ -342,7 +340,6 @@ function mod.Create(slotFrame)
         for i = 1, GetNumSpecializations() or 0 do
             local id, name, _, icon = GetSpecializationInfo(i)
             if id and name then
-                local activeMark = (i == activeSpecIndex) and activeString or inactiveString
                 SDT:AddTooltipLine(GameTooltip, 12, strjoin(' ', SDT:ColorText(name), AddTexture(icon), (i == activeSpecIndex and activeString or inactiveString)), nil, 1, 1, 1)
             end
         end
@@ -407,7 +404,6 @@ function mod.Create(slotFrame)
     -- Click Handler
     ----------------------------------------------------
     slotFrame:SetScript("OnClick", function (self, button)
-        local menuFrame = CreateFrame("Frame", "SDT_SpecMenuFrame", UIParent, "UIDropDownMenuTemplate")
         local specIndex = GetSpecialization()
         if not specIndex then return end
 

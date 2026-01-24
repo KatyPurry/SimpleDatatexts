@@ -49,6 +49,7 @@ L["Show login message"] = "Show login message"
 L["Use Class Color"] = "Use Class Color"
 L["Use 24Hr Clock"] = "Use 24Hr Clock"
 L["Use Custom Color"] = "Use Custom Color"
+L["Hide Module Title in Tooltip"] = "Hide Module Title in Tooltip"
 L["Display Font:"] = "Display Font:"
 L["Font Size"] = "Font Size"
 L["Create New Panel"] = "Create New Panel"
@@ -216,6 +217,11 @@ L["Left Click: Change Talent Specialization"] = "Left Click: Change Talent Speci
 L["Control + Left Click: Change Loadout"] = "Control + Left Click: Change Loadout"
 L["Shift + Left Click: Show Talent Specialization UI"] = "Shift + Left Click: Show Talent Specialization UI"
 L["Shift + Right Click: Change Loot Specialization"] = "Shift + Right Click: Change Loot Specialization"
+L["Show Specialization Icon"] = "Show Specialization Icon"
+L["Show Specialization Text"] = "Show Specialization Text"
+L["Show Loot Specialization Icon"] = "Show Loot Specialization Icon"
+L["Show Loot Specialization Text"] = "Show Loot Specialization Text"
+L["Show Loadout"] = "Show Loadout"
 
 -- ----------------------------
 -- modules/Speed.lua
