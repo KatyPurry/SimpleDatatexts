@@ -29,24 +29,20 @@ local wipe             = table.wipe
 ----------------------------------------------------
 -- WoW API Locals
 ----------------------------------------------------
-local CreateFrame               = CreateFrame
-local Delay                     = C_Timer.After
-local GetAddOnInfo              = C_AddOns.GetAddOnInfo
-local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
-local GetClassColor             = C_ClassColor.GetClassColor
-local GetNumAddOns              = C_AddOns.GetNumAddOns
-local GetRealmName              = GetRealmName
-local GetScreenWidth            = GetScreenWidth
-local IsControlKeyDown          = IsControlKeyDown
-local IsShiftKeyDown            = IsShiftKeyDown
-local ToggleDropDownMenu        = ToggleDropDownMenu
-local UIDropDownMenu_AddButton  = UIDropDownMenu_AddButton
-local UIDropDownMenu_CreateInfo = UIDropDownMenu_CreateInfo
-local UIDropDownMenu_Initialize = UIDropDownMenu_Initialize
-local UIDropDownMenu_SetText    = UIDropDownMenu_SetText
-local UIParent                  = UIParent
-local UnitClass                 = UnitClass
-local UnitName                  = UnitName
+local CreateFrame                = CreateFrame
+local Delay                      = C_Timer.After
+local GetAddOnInfo               = C_AddOns.GetAddOnInfo
+local GetAddOnMetadata           = C_AddOns.GetAddOnMetadata
+local GetClassColor              = C_ClassColor.GetClassColor
+local GetNumAddOns               = C_AddOns.GetNumAddOns
+local GetRealmName               = GetRealmName
+local GetScreenWidth             = GetScreenWidth
+local IsControlKeyDown           = IsControlKeyDown
+local IsShiftKeyDown             = IsShiftKeyDown
+local MenuUtil_CreateContextMenu = MenuUtil.CreateContextMenu
+local UIParent                   = UIParent
+local UnitClass                  = UnitClass
+local UnitName                   = UnitName
 
 -------------------------------------------------
 -- Bar Position Helper
@@ -251,47 +247,37 @@ end
 -------------------------------------------------
 -- Slot Selection Dropdown
 -------------------------------------------------
-local dropdownFrame = CreateFrame("Frame", addonName .. "_SlotDropdown", UIParent, "UIDropDownMenuTemplate")
-local function InitializeSlotDropdown(slot, bar)
-    local barName = bar:GetName()
-    local info = UIDropDownMenu_CreateInfo()
-    info.notCheckable = true
-
-    info.text = L["(empty)"]
-    info.func = function()
-        if SDT.profileBars[barName] then
-            SDT.profileBars[barName].slots[slot.index] = nil
-            SDT:RebuildSlots(bar)
-        end
-    end
-    UIDropDownMenu_AddButton(info)
-
-    info.text = "(spacer)"
-    info.func = function()
-        if SDT.profileBars[barName] then
-            SDT.profileBars[barName].slots[slot.index] = "(spacer)"
-            SDT:RebuildSlots(bar)
-        end
-    end
-    UIDropDownMenu_AddButton(info)
-
-    for _, moduleName in ipairs(SDT.cache.moduleNames) do
-        info.text = moduleName
-        info.func = function()
-            if SDT.profileBars[barName] then
-                SDT.profileBars[barName].slots[slot.index] = moduleName
-                SDT:RebuildSlots(bar)
-            end
-        end
-        UIDropDownMenu_AddButton(info)
-    end
-end
-
 function SDT:ShowSlotDropdown(slot, bar)
-    UIDropDownMenu_Initialize(dropdownFrame, function()
-        InitializeSlotDropdown(slot, bar)
+    -- Create the context menu at the cursor
+    local menu = MenuUtil_CreateContextMenu(slot, function(owner, root)
+        -- Empty option
+        root:CreateButton(L["(empty)"], function()
+            SDT.profileBars[bar:GetName()].slots[slot.index] = nil
+            SDT:RebuildSlots(bar)
+        end)
+
+        -- Spacer option
+        root:CreateButton(L["(spacer)"], function()
+            SDT.profileBars[bar:GetName()].slots[slot.index] = "(spacer)"
+            SDT:RebuildSlots(bar)
+        end)
+
+        -- Module options
+        for _, moduleName in ipairs(SDT.cache.moduleNames) do
+            root:CreateButton(moduleName, function()
+                SDT.profileBars[bar:GetName()].slots[slot.index] = moduleName
+                SDT:RebuildSlots(bar)
+            end)
+        end
     end)
-    ToggleDropDownMenu(1, nil, dropdownFrame, "cursor", 0, 0)
+
+    -- Scale the menu
+    if menu then
+        local UIScale = UIParent:GetEffectiveScale()
+        menu:SetScale(0.8 * UIScale)
+        menu:ClearAllPoints()
+        menu:SetPoint("TOPLEFT", slot, "BOTTOMLEFT", 0, 0)
+    end
 end
 
 -------------------------------------------------
