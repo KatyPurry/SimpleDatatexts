@@ -10,6 +10,7 @@ end
 -- ----------------------------
 -- Used in: Settings.lua, SimpleDatatexts.lua
 L["(empty)"] = "(vazio)"
+L["(spacer)"] = "(espaçador)"
 L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts carregado. Módulos totais:"
 L["Options"] = "Opções"
 L["Lock/Unlock"] = "Bloquear/Desbloquear"

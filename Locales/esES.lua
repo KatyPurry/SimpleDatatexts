@@ -9,6 +9,7 @@ end
 -- SimpleDatatexts.lua
 -- ----------------------------
 L["(empty)"] = "(vacío)"
+L["(spacer)"] = "(separador)"
 L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts cargado. Total de módulos:"
 L["Options"] = "Opciones"
 L["Lock/Unlock"] = "Bloquear/Desbloquear"
