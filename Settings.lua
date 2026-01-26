@@ -79,15 +79,6 @@ local charDefaultsTable = {
         hideModuleTitle = false,
         use24HourClock = false,
         showLoginMessage = true,
-        expFormat = 1,
-        expShowBar = true,
-        expHideBlizzardBar = false,
-        expBarHeightPercent = 100,
-        expBarUseClassColor = true,
-        expTextUseClassColor = true,
-        expBarColor = "#4080FF",
-        expTextColor = "#FFFFFF",
-        expTextFontSize = 12,
         font = "Friz Quadrata TT",
         fontSize = 12,
         fontOutline = "NONE",
@@ -158,19 +149,74 @@ local function checkDefaultDB()
                         height = 22,
                         name = "SDT_Bar1",
                     }
+                },
+                moduleSettings = {
+                    ["Experience"] = {
+                        expFormat = 1,
+                        expHideModuleTitle = false,
+                        expShowGraphicalBar = true,
+                        expHideBlizzardBar = false,
+                        expBarHeightPercent = 100,
+                        expBarUseClassColor = true,
+                        expTextUseClassColor = true,
+                        expBarColor = "#4080FF",
+                        expTextColor = "#FFFFFF",
+                        expTextFontSize = 12
+                    }
                 }
             }
         end
     end
 
-    local profileName
+    -- Determine the active profile
+    local activeProfileName
     if charDB.useSpecProfiles then
         local _, currentSpec = GetSpecializationInfo(GetSpecialization())
-        profileName = charDB.chosenProfile[currentSpec]
+        activeProfileName = charDB.chosenProfile[currentSpec]
     else
-        profileName = charDB.chosenProfile.generic
+        activeProfileName = charDB.chosenProfile.generic
     end
-    SDT.profileBars = SDTDB.profiles[profileName].bars
+    local activeProfile = SDTDB.profiles[activeProfileName]
+
+    -- Migrate module settings from character DB to ACTIVE PROFILE ONLY (one-time migration)
+    if charDB.moduleSettings and next(charDB.moduleSettings) then
+        if activeProfile then
+            if not activeProfile.moduleSettings then
+                activeProfile.moduleSettings = {}
+            end
+
+            -- Migrate all module settings from character DB to active profile
+            for moduleName, moduleData in pairs(charDB.moduleSettings) do
+                if not activeProfile.moduleSettings[moduleName] then
+                    -- Copy the entire module settings for this module
+                    activeProfile.moduleSettings[moduleName] = CopyTable(moduleData)
+                else
+                    -- Merge missing settings
+                    for key, value in pairs(moduleData) do
+                        if activeProfile.moduleSettings[moduleName][key] == nil then
+                            activeProfile.moduleSettings[moduleName][key] = value
+                        end
+                    end
+                end
+            end
+        end
+
+        -- After migrating to active profile, remove the old character-level settings
+        charDB.moduleSettings = nil
+    end
+
+    -- Migrate Experience module settings
+    local expModuleSettings = { "expFormat", "expShowGraphicalBar", "expHideBlizzardBar", "expBarHeightPercent", "expBarUseClassColor", "expTextUseClassColor", "expBarColor", "expTextColor", "expTextFontSize" }
+    if not activeProfile.moduleSettings["Experience"] then
+        activeProfile.moduleSettings["Experience"] = {}
+    end
+    for _, expSetting in ipairs(expModuleSettings) do
+        if charDB.settings[expSetting] ~= nil and activeProfile.moduleSettings["Experience"][expSetting] == nil then
+            activeProfile.moduleSettings["Experience"][expSetting] = charDB.settings[expSetting]
+        end
+    end
+
+    SDT.profileBars = SDTDB.profiles[activeProfileName].bars
 end
 
 _G.SDTDB = _G.SDTDB or {}
@@ -1123,14 +1169,14 @@ expFormatDropdown:SetPoint("TOPLEFT", expFormatLabel, "BOTTOMLEFT", -20, -6)
 local expShowBarCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expShowBarCheckbox:SetPoint("LEFT", expFormatDropdown, "RIGHT", 0, 0)
 expShowBarCheckbox.Text:SetText(L["Show Bar"])
-expShowBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expShowGraphicalBar)
+expShowBarCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expShowGraphicalBar", true))
 
 local expHideBlizzardBarCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expHideBlizzardBarCheckbox:SetPoint("LEFT", expShowBarCheckbox, "RIGHT", 40, 0)
 expHideBlizzardBarCheckbox.Text:SetText(L["Hide Blizzard XP Bar"])
-expHideBlizzardBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expHideBlizzardBar)
+expHideBlizzardBarCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expHideBlizzardBar", false))
 expHideBlizzardBarCheckbox:SetScript("OnClick", function(self)
-    SDT.SDTDB_CharDB.settings.expHideBlizzardBar = self:GetChecked()
+    SDT:SetModuleConfigValue("Experience", "expHideBlizzardBar", self:GetChecked())
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
     end
@@ -1157,14 +1203,14 @@ expBarHeightBox:SetJustifyH("CENTER")
 expBarHeightBox:SetJustifyV("MIDDLE")
 expBarHeightBox:Hide()
 expBarHeightBox:SetScript("OnShow", function(self)
-    self:SetText(tostring(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100))
+    self:SetText(tostring(SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)))
 end)
 
 -- Sync slider -> editbox
 expBarHeightSlider:SetScript("OnValueChanged", function(self, value)
     local val = math.floor(value + 0.5)
     expBarHeightBox:SetText(val)
-    SDT.SDTDB_CharDB.settings.expBarHeightPercent = val
+    SDT:SetModuleConfigValue("Experience", "expBarHeightPercent", val)
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
     end
@@ -1177,7 +1223,7 @@ expBarHeightBox:SetScript("OnEnterPressed", function(self)
         val = math.max(10, math.min(100, val))
         expBarHeightSlider:SetValue(val)
         self:SetText(val)
-        SDT.SDTDB_CharDB.settings.expBarHeightPercent = val
+        SDT:SetModuleConfigValue("Experience", "expBarHeightPercent", val)
     else
         self:SetText(tostring(math.floor(expBarHeightSlider:GetValue() + 0.5)))
     end
@@ -1208,14 +1254,14 @@ expTextFontSizeBox:SetJustifyH("CENTER")
 expTextFontSizeBox:SetJustifyV("MIDDLE")
 expTextFontSizeBox:Hide()
 expTextFontSizeBox:SetScript("OnShow", function(self)
-    self:SetText(tostring(SDT.SDTDB_CharDB.settings.expTextFontSize or 12))
+    self:SetText(tostring(SDT:GetModuleSetting("Experience", "expTextFontSize", 12)))
 end)
 
 -- Sync slider -> editbox
 expTextFontSizeSlider:SetScript("OnValueChanged", function(self, value)
     local val = math.floor(value + 0.5)
     expTextFontSizeBox:SetText(val)
-    SDT.SDTDB_CharDB.settings.expTextFontSize = val
+    SDT:SetModuleConfigValue("Experience", "expTextFontSize", val)
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
     end
@@ -1228,7 +1274,7 @@ expTextFontSizeBox:SetScript("OnEnterPressed", function(self)
         val = math.max(8, math.min(24, val))
         expTextFontSizeSlider:SetValue(val)
         self:SetText(val)
-        SDT.SDTDB_CharDB.settings.expTextFontSize = val
+        SDT:SetModuleConfigValue("Experience", "expTextFontSize", val)
     else
         self:SetText(tostring(math.floor(expTextFontSizeSlider:GetValue() + 0.5)))
     end
@@ -1249,18 +1295,18 @@ expBarColorLabel:Hide()
 local expBarClassColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expBarClassColorCheckbox:SetPoint("TOPLEFT", expBarColorLabel, "BOTTOMLEFT", 0, -16)
 expBarClassColorCheckbox.Text:SetText(L["Use Class Color"])
-expBarClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+expBarClassColorCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expBarUseClassColor", true))
 expBarClassColorCheckbox:Hide()
 
 local expBarCustomColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expBarCustomColorCheckbox:SetPoint("TOPLEFT", expBarClassColorCheckbox, "BOTTOMLEFT", 0, -16)
 expBarCustomColorCheckbox.Text:SetText(L["Use Custom Color"])
-expBarCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expBarUseClassColor)
+expBarCustomColorCheckbox:SetChecked(not SDT:GetModuleSetting("Experience", "expBarUseClassColor", true))
 expBarCustomColorCheckbox:Hide()
 
 expBarClassColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
-    SDT.SDTDB_CharDB.settings.expBarUseClassColor = checked
+    SDT:SetModuleConfigValue("Experience", "expBarUseClassColor", checked)
     expBarCustomColorCheckbox:SetChecked(not checked)
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
@@ -1269,7 +1315,7 @@ end)
 
 expBarCustomColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
-    SDT.SDTDB_CharDB.settings.expBarUseClassColor = not checked
+    SDT:SetModuleConfigValue("Experience", "expBarUseClassColor", not checked)
     expBarClassColorCheckbox:SetChecked(not checked)
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
@@ -1279,32 +1325,33 @@ end)
 local expBarColorPickerButton = CreateFrame("Button", nil, experienceSubPanel, "UIPanelButtonTemplate")
 expBarColorPickerButton:SetPoint("LEFT", expBarCustomColorCheckbox, "RIGHT", 120, 0)
 expBarColorPickerButton:SetSize(80, 24)
-expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
+expBarColorPickerButton:SetText(SDT:GetModuleSetting("Experience", "expBarColor", "#4080FF"))
 expBarColorPickerButton:Hide()
 
 local function showExpBarColorPicker()
     ColorPickerFrame:Hide()
     
-    local initColor = SDT.SDTDB_CharDB.settings.expBarColor:gsub("#", "")
+    local settingColor = SDT:GetModuleSetting("Experience", "expBarColor", "#4080FF")
+    local initColor = settingColor:gsub("#", "")
     local initR = tonumber(initColor:sub(1, 2), 16) / 255
     local initG = tonumber(initColor:sub(3, 4), 16) / 255
     local initB = tonumber(initColor:sub(5, 6), 16) / 255
 
     local function onColorPicked()
         local r, g, b = ColorPickerFrame:GetColorRGB()
-        SDT.SDTDB_CharDB.settings.expBarColor = format("#%02X%02X%02X", r*255, g*255, b*255)
+        SDT:SetModuleConfigValue("Experience", "expBarColor", format("#%02X%02X%02X", r*255, g*255, b*255))
         if SDT.ExperienceModuleUpdate then
             SDT.ExperienceModuleUpdate()
         end
-        expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
+        expBarColorPickerButton:SetText(SDT:GetModuleSetting("Experience", "expBarColor", "#4080FF"))
     end
 
     local function onCancel()
-        SDT.SDTDB_CharDB.settings.expBarColor = format("#%02X%02X%02X", initR*255, initG*255, initB*255)
+        SDT:SetModuleConfigValue("Experience", "expBarColor", format("#%02X%02X%02X", initR*255, initG*255, initB*255))
         if SDT.ExperienceModuleUpdate then
             SDT.ExperienceModuleUpdate()
         end
-        expBarColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expBarColor)
+        expBarColorPickerButton:SetText(SDT:GetModuleSetting("Experience", "expBarColor", "#4080FF"))
     end
 
     local options = {
@@ -1335,18 +1382,18 @@ expTextColorLabel:Hide()
 local expTextClassColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expTextClassColorCheckbox:SetPoint("TOPLEFT", expTextColorLabel, "BOTTOMLEFT", 0, -16)
 expTextClassColorCheckbox.Text:SetText(L["Use Class Color"])
-expTextClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+expTextClassColorCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expTextUseClassColor", true))
 expTextClassColorCheckbox:Hide()
 
 local expTextCustomColorCheckbox = CreateFrame("CheckButton", nil, experienceSubPanel, "InterfaceOptionsCheckButtonTemplate")
 expTextCustomColorCheckbox:SetPoint("TOPLEFT", expTextClassColorCheckbox, "BOTTOMLEFT", 0, -16)
 expTextCustomColorCheckbox.Text:SetText(L["Use Custom Color"])
-expTextCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+expTextCustomColorCheckbox:SetChecked(not SDT:GetModuleSetting("Experience", "expTextUseClassColor", true))
 expTextCustomColorCheckbox:Hide()
 
 expTextClassColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
-    SDT.SDTDB_CharDB.settings.expTextUseClassColor = checked
+    SDT:SetModuleConfigValue("Experience", "expTextUseClassColor", checked)
     expTextCustomColorCheckbox:SetChecked(not checked)
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
@@ -1355,7 +1402,7 @@ end)
 
 expTextCustomColorCheckbox:SetScript("OnClick", function(self)
     local checked = self:GetChecked()
-    SDT.SDTDB_CharDB.settings.expTextUseClassColor = not checked
+    SDT:SetModuleConfigValue("Experience", "expTextUseClassColor", not checked)
     expTextClassColorCheckbox:SetChecked(not checked)
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
@@ -1365,32 +1412,33 @@ end)
 local expTextColorPickerButton = CreateFrame("Button", nil, experienceSubPanel, "UIPanelButtonTemplate")
 expTextColorPickerButton:SetPoint("LEFT", expTextCustomColorCheckbox, "RIGHT", 120, 0)
 expTextColorPickerButton:SetSize(80, 24)
-expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
+expTextColorPickerButton:SetText(SDT:GetModuleSetting("Experience", "expTextColor", "#FFFFFF"))
 expTextColorPickerButton:Hide()
 
 local function showExpTextColorPicker()
     ColorPickerFrame:Hide()
     
-    local initColor = SDT.SDTDB_CharDB.settings.expTextColor:gsub("#", "")
+    local settingColor = SDT:GetModuleSetting("Experience", "expTextColor", "#FFFFFF")
+    local initColor = settingColor:gsub("#", "")
     local initR = tonumber(initColor:sub(1, 2), 16) / 255
     local initG = tonumber(initColor:sub(3, 4), 16) / 255
     local initB = tonumber(initColor:sub(5, 6), 16) / 255
 
     local function onColorPicked()
         local r, g, b = ColorPickerFrame:GetColorRGB()
-        SDT.SDTDB_CharDB.settings.expTextColor = format("#%02X%02X%02X", r*255, g*255, b*255)
+        SDT:SetModuleConfigValue("Experience", "expTextColor", format("#%02X%02X%02X", r*255, g*255, b*255))
         if SDT.ExperienceModuleUpdate then
             SDT.ExperienceModuleUpdate()
         end
-        expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
+        expTextColorPickerButton:SetText(SDT:GetModuleSetting("Experience", "expTextColor", "#FFFFFF"))
     end
 
     local function onCancel()
-        SDT.SDTDB_CharDB.settings.expTextColor = format("#%02X%02X%02X", initR*255, initG*255, initB*255)
+        SDT:SetModuleConfigValue("Experience", "expTextColor", format("#%02X%02X%02X", initR*255, initG*255, initB*255))
         if SDT.ExperienceModuleUpdate then
             SDT.ExperienceModuleUpdate()
         end
-        expTextColorPickerButton:SetText(SDT.SDTDB_CharDB.settings.expTextColor)
+        expTextColorPickerButton:SetText(SDT:GetModuleSetting("Experience", "expTextColor", "#FFFFFF"))
     end
 
     local options = {
@@ -1411,7 +1459,7 @@ expTextColorPickerButton:SetScript("OnClick", function()
 end)
 
 local function UpdateBarOptionsVisibility()
-    local isGraphicalBar = SDT.SDTDB_CharDB.settings.expShowGraphicalBar
+    local isGraphicalBar = SDT:GetModuleSetting("Experience", "expShowGraphicalBar", true)
     
     if isGraphicalBar then
         -- Bar color section
@@ -1429,12 +1477,12 @@ local function UpdateBarOptionsVisibility()
         -- Text font size section
         expTextFontSizeSlider:Show()
         expTextFontSizeBox:Show()
-        expTextFontSizeBox:SetText(SDT.SDTDB_CharDB.settings.expTextFontSize or 12)
+        expTextFontSizeBox:SetText(SDT:GetModuleSetting("Experience", "expTextFontSize", 12))
     
         -- Bar height section
         expBarHeightSlider:Show()
         expBarHeightBox:Show()
-        expBarHeightBox:SetText(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100)
+        expBarHeightBox:SetText(SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100))
     else
         -- Bar color section
         expBarColorLabel:Hide()
@@ -1468,9 +1516,9 @@ local function expFormatDropdown_Initialize(self, level)
     for i = 1, 3 do
         info = UIDropDownMenu_CreateInfo()
         info.text = formatNames[i]
-        info.checked = SDT.SDTDB_CharDB.settings.expFormat == i
+        info.checked = SDT:GetModuleSetting("Experience", "expFormat", 1) == i
         info.func = function()
-            SDT.SDTDB_CharDB.settings.expFormat = i
+            SDT:SetModuleConfigValue("Experience", "expFormat", i)
             UIDropDownMenu_SetSelectedValue(expFormatDropdown, i)
             UIDropDownMenu_SetText(expFormatDropdown, formatNames[i])
             if SDT.ExperienceModuleUpdate then
@@ -1482,7 +1530,7 @@ local function expFormatDropdown_Initialize(self, level)
 end
 
 expShowBarCheckbox:SetScript("OnClick", function(self)
-    SDT.SDTDB_CharDB.settings.expShowGraphicalBar = self:GetChecked()
+    SDT:SetModuleConfigValue("Experience", "expShowGraphicalBar", self:GetChecked())
     UpdateBarOptionsVisibility()
     if SDT.ExperienceModuleUpdate then
         SDT.ExperienceModuleUpdate()
@@ -1868,8 +1916,8 @@ loader:SetScript("OnEvent", function(self, event, arg)
             "XP / Max (Percent)",
             "XP / Max (Percent) (Remaining)"
         }
-        UIDropDownMenu_SetSelectedValue(expFormatDropdown, SDT.SDTDB_CharDB.settings.expFormat)
-        UIDropDownMenu_SetText(expFormatDropdown, expFormatNames[SDT.SDTDB_CharDB.settings.expFormat])
+        UIDropDownMenu_SetSelectedValue(expFormatDropdown, SDT:GetModuleSetting("Experience", "expFormat", 1))
+        UIDropDownMenu_SetText(expFormatDropdown, expFormatNames[SDT:GetModuleSetting("Experience", "expFormat", 1)])
         UIDropDownMenu_Initialize(profileSelectDropdown, ProfileSelectDropdown_Init)
         local activeProfile
         if SDT.SDTDB_CharDB.useSpecProfiles then
@@ -1910,16 +1958,16 @@ loader:SetScript("OnEvent", function(self, event, arg)
         fontSizeBox:SetText(tostring(SDT.SDTDB_CharDB.settings.fontSize))
         fontSizeBox:SetCursorPosition(0)
         perSpecCheck:SetChecked(SDT.SDTDB_CharDB.useSpecProfiles)
-        expShowBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expShowGraphicalBar)
-        expHideBlizzardBarCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expHideBlizzardBar)
-        expBarHeightSlider:SetValue(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100)
-        expBarHeightBox:SetText(tostring(SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100))
-        expBarClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expBarUseClassColor)
-        expBarCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expBarUseClassColor)
-        expTextFontSizeSlider:SetValue(SDT.SDTDB_CharDB.settings.expTextFontSize or 12)
-        expTextFontSizeBox:SetText(tostring(SDT.SDTDB_CharDB.settings.expTextFontSize or 12))
-        expTextClassColorCheckbox:SetChecked(SDT.SDTDB_CharDB.settings.expTextUseClassColor)
-        expTextCustomColorCheckbox:SetChecked(not SDT.SDTDB_CharDB.settings.expTextUseClassColor)
+        expShowBarCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expShowGraphicalBar", true))
+        expHideBlizzardBarCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expHideBlizzardBar", false))
+        expBarHeightSlider:SetValue(SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100))
+        expBarHeightBox:SetText(tostring(SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)))
+        expBarClassColorCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expBarUseClassColor", true))
+        expBarCustomColorCheckbox:SetChecked(not SDT:GetModuleSetting("Experience", "expBarUseClassColor", true))
+        expTextFontSizeSlider:SetValue(SDT:GetModuleSetting("Experience", "expTextFontSize", 12))
+        expTextFontSizeBox:SetText(tostring(SDT:GetModuleSetting("Experience", "expTextFontSize", 12)))
+        expTextClassColorCheckbox:SetChecked(SDT:GetModuleSetting("Experience", "expTextUseClassColor", true))
+        expTextCustomColorCheckbox:SetChecked(not SDT:GetModuleSetting("Experience", "expTextUseClassColor", true))
         UpdateBarOptionsVisibility()
 
         -- Initialize module config panels

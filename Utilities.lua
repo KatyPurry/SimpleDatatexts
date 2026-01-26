@@ -98,6 +98,55 @@ function SDT:ExcludedModule(moduleName)
     return false
 end
 
+----------------------------------------------------
+-- Utility: Get Module Setting
+----------------------------------------------------
+function SDT:GetModuleSetting(moduleName, settingsKey, default)
+    local profileName = self.activeProfile
+    
+    -- Try to get from active profile first
+    if profileName and SDTDB.profiles[profileName] and SDTDB.profiles[profileName].moduleSettings then
+        if SDTDB.profiles[profileName].moduleSettings[moduleName] then
+            local value = SDTDB.profiles[profileName].moduleSettings[moduleName][settingsKey]
+            if value ~= nil then
+                return value
+            end
+        end
+    end
+    
+    -- Fallback to character settings for backward compatibility
+    if SDT.SDTDB_CharDB.moduleSettings and SDT.SDTDB_CharDB.moduleSettings[moduleName] then
+        return SDT.SDTDB_CharDB.moduleSettings[moduleName][settingsKey]
+    end
+    
+    return default
+end
+
+-------------------------------------------------
+-- Utility: Set Module Config Value
+-------------------------------------------------
+function SDT:SetModuleConfigValue(moduleName, settingKey, value)
+    local profileName = self.activeProfile
+    
+    if profileName and SDTDB.profiles[profileName] then
+        -- Initialize if needed
+        if not SDTDB.profiles[profileName].moduleSettings then
+            SDTDB.profiles[profileName].moduleSettings = {}
+        end
+        if not SDTDB.profiles[profileName].moduleSettings[moduleName] then
+            SDTDB.profiles[profileName].moduleSettings[moduleName] = {}
+        end
+        
+        -- Set the value in the profile
+        SDTDB.profiles[profileName].moduleSettings[moduleName][settingKey] = value
+    else
+        -- Fallback to character settings
+        SDT.SDTDB_CharDB.moduleSettings = SDT.SDTDB_CharDB.moduleSettings or {}
+        SDT.SDTDB_CharDB.moduleSettings[moduleName] = SDT.SDTDB_CharDB.moduleSettings[moduleName] or {}
+        SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = value
+    end
+end
+
 -------------------------------------------------
 -- Utility: Add Module Config
 -------------------------------------------------
@@ -120,10 +169,21 @@ function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, 
     end
     
     -- Initialize module settings in saved variables
-    SDT.SDTDB_CharDB.moduleSettings = SDT.SDTDB_CharDB.moduleSettings or {}
-    SDT.SDTDB_CharDB.moduleSettings[moduleName] = SDT.SDTDB_CharDB.moduleSettings[moduleName] or {}
-    if SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] == nil then
-        SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = defaultValue
+    local profileName = SDT.activeProfile
+    if not profileName or not SDTDB.profiles[profileName] then
+        -- Fallback to character settings if no profile is active yet
+        SDT.SDTDB_CharDB.moduleSettings = SDT.SDTDB_CharDB.moduleSettings or {}
+        SDT.SDTDB_CharDB.moduleSettings[moduleName] = SDT.SDTDB_CharDB.moduleSettings[moduleName] or {}
+        if SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] == nil then
+            SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = defaultValue
+        end
+    else
+        -- Use profile-based settings
+        SDTDB.profiles[profileName].moduleSettings = SDTDB.profiles[profileName].moduleSettings or {}
+        SDTDB.profiles[profileName].moduleSettings[moduleName] = SDTDB.profiles[profileName].moduleSettings[moduleName] or {}
+        if SDTDB.profiles[profileName].moduleSettings[moduleName][settingKey] == nil then
+            SDTDB.profiles[profileName].moduleSettings[moduleName][settingKey] = defaultValue
+        end
     end
     
     -- Track last anchor point
@@ -133,7 +193,21 @@ function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, 
         local checkbox = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
         checkbox:SetPoint("TOPLEFT", panel.lastAnchor, "BOTTOMLEFT", 0, -20)
         checkbox.Text:SetText(label)
-        checkbox:SetChecked(SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey])
+
+        -- Get initial value from profile
+        local currentValue = SDT:GetModuleSetting(moduleName, settingKey, true)
+        if currentValue == nil then
+            currentValue = defaultValue
+        end
+        checkbox:SetChecked(currentValue)
+
+        checkbox:SetScript("OnClick", function(self)
+            SDT:SetModuleConfigValue(moduleName, settingKey, self:GetChecked())
+            SDT:UpdateAllModules()
+        end)
+        panel.lastAnchor = checkbox
+
+        --[[checkbox:SetChecked(SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey])
         checkbox:SetScript("OnClick", function(self)
             SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = self:GetChecked()
             -- Trigger module update if it has an Update function
@@ -143,7 +217,7 @@ function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, 
             end
             SDT:UpdateAllModules()
         end)
-        panel.lastAnchor = checkbox
+        panel.lastAnchor = checkbox]]
         
     elseif settingType == "slider" then
         -- Add slider implementation here if needed
@@ -269,20 +343,6 @@ end
 -------------------------------------------------
 function SDT:GetCharKey()
     return SDT.cache.charKey
-end
-
-----------------------------------------------------
--- Utility: Get Module Setting
-----------------------------------------------------
-function SDT:GetModuleSetting(moduleName, key, default)
-    if not SDT.SDTDB_CharDB or not SDT.SDTDB_CharDB.moduleSettings then
-        return default
-    end
-    local settings = SDT.SDTDB_CharDB.moduleSettings[moduleName]
-    if not settings then return default end
-    local value = settings[key]
-    if value == nil then return default end
-    return value
 end
 
 -------------------------------------------------
@@ -448,7 +508,10 @@ StaticPopupDialogs["SDT_CONFIRM_COPY_PROFILE"] = {
 -- Utility: Profile Create
 -------------------------------------------------
 function SDT:ProfileCreate(profileName)
-    SDTDB.profiles[profileName] = { bars = {} }
+    SDTDB.profiles[profileName] = {
+        bars = {},
+        moduleSettings = {}
+    }
     SDT.profileBars = SDTDB.profiles[profileName].bars
     SDT:CreateDataBar(1, 3)
     SDT:ProfileActivate(profileName, "generic")
