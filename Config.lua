@@ -132,7 +132,7 @@ function SDT:GetGeneralOptions()
             },
             locked = {
                 type = "toggle",
-                name = L["Lock Panels (disable movement)"],
+                name = L["Lock Panels"],
                 desc = L["Prevent panels from being moved"],
                 get = function() return self.db.profile.locked end,
                 set = function(_, val)
@@ -142,10 +142,25 @@ function SDT:GetGeneralOptions()
             },
             showLoginMessage = {
                 type = "toggle",
-                name = L["Show login message"],
+                name = L["Show Login Message"],
                 get = function() return self.db.profile.showLoginMessage end,
                 set = function(_, val) self.db.profile.showLoginMessage = val end,
                 order = 3,
+            },
+            minimapIcon = {
+                type = "toggle",
+                name = L["Show Minimap Icon"],
+                desc = L["Toggle the minimap button on or off"],
+                get = function() return not self.db.profile.minimap.hide end,
+                set = function(_, val)
+                    self.db.profile.minimap.hide = not val
+                    if val then
+                        SDT.Icon:Show("SimpleDatatexts")
+                    else
+                        SDT.Icon:Hide("SimpleDatatexts")
+                    end
+                end,
+                order = 4,
             },
             hideModuleTitle = {
                 type = "toggle",
@@ -155,7 +170,7 @@ function SDT:GetGeneralOptions()
                     self.db.profile.hideModuleTitle = val
                     self:UpdateAllModules()
                 end,
-                order = 4,
+                order = 5,
             },
             use24HourClock = {
                 type = "toggle",
@@ -165,7 +180,7 @@ function SDT:GetGeneralOptions()
                     self.db.profile.use24HourClock = val
                     self:UpdateAllModules()
                 end,
-                order = 5,
+                order = 6,
             },
             spacer1 = {
                 type = "header",

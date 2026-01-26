@@ -35,7 +35,7 @@ L["No import string provided"] = "No import string provided"
 L["Profile imported successfully!"] = "Profile imported successfully!"
 
 -- ----------------------------
--- Config.lua - General
+-- Config.lua - Global
 -- ----------------------------
 L["Colors"] = "Colors"
 L["Custom Color"] = "Custom Color"
@@ -46,9 +46,11 @@ L["Font Outline"] = "Font Outline"
 L["Global"] = "Global"
 L["Global Settings"] = "Global Settings"
 L["Hide Module Title in Tooltip"] = "Hide Module Title in Tooltip"
-L["Lock Panels (disable movement)"] = "Lock Panels (disable movement)"
+L["Lock Panels"] = "Lock Panels"
 L["Prevent panels from being moved"] = "Prevent panels from being moved"
-L["Show login message"] = "Show login message"
+L["Show Login Message"] = "Show Login Message"
+L["Show Minimap Icon"] = "Show Minimap Icon"
+L["Toggle the minimap button on or off"] = "Toggle the minimap button on or off"
 L["Use 24Hr Clock"] = "Use 24Hr Clock"
 L["Use Class Color"] = "Use Class Color"
 L["Use Custom Color"] = "Use Custom Color"
@@ -74,17 +76,13 @@ L["Select Border:"] = "Select Border:"
 L["Select Panel:"] = "Select Panel:"
 L["Size & Scale"] = "Size & Scale"
 L["Slot Assignments"] = "Slot Assignments"
+L["Slot %d:"] = "Slot %d:"
 L["Slots"] = "Slots"
 L["Update slot assignment dropdowns after changing number of slots"] = "Update slot assignment dropdowns after changing number of slots"
 L["Width"] = "Width"
 
 -- ----------------------------
--- Config.lua - Slots
--- ----------------------------
-L["Slot %d:"] = "Slot %d:"
-
--- ----------------------------
--- Config.lua - Modules
+-- Config.lua - Module Settings
 -- ----------------------------
 L["Module Settings"] = "Module Settings"
 
