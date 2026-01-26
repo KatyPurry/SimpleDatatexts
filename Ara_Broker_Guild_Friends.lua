@@ -1504,17 +1504,17 @@ end
 function f:ADDON_LOADED( addon )
 	if addon ~= addonName then return end
 
-	SDTDB = SDTDB or {}
-	SDTDB.AraBroker = SDTDB.AraBroker or {}
+	local db = SDT.db.global.AraBroker
 
 	-- Migrate old settings if they exist
-	if AraBrokerGuildFriendsDB and not SDTDB.AraBroker.migrated then
-		SDTDB.AraBroker = AraBrokerGuildFriendsDB
-		SDTDB.AraBroker.migrated = true
+	if AraBrokerGuildFriendsDB and not db.migrated then
+		for k, v in pairs(AraBrokerGuildFriendsDB) do
+        	db[k] = CopyTable(v)
+    	end
+		db.migrated = true
 	end
 
-	SDTDB.AraBroker = SDTDB.AraBroker or defaultConfig
-	config = SDTDB.AraBroker
+	config = db
 	UpdateConfig( defaultConfig, config )
 
 	colors = config.colors
