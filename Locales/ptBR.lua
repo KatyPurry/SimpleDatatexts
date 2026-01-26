@@ -1,4 +1,4 @@
-local _, SDT = ...
+local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
 if GetLocale() ~= "ptBR" then

@@ -137,30 +137,20 @@ function SDT:MigrateOldData()
     
     local charKey = self.cache.charKey
     local oldDB = _G.SDTDB
-    
+
+    -- Skip if already migrated
+    if oldDB._migrated then
+        return
+    end
+
     self:Print("Migrating old settings to new profile system...")
     
-    -- Migrate character settings
-    if oldDB[charKey] and oldDB[charKey].settings then
-        local oldSettings = oldDB[charKey].settings
-        
-        self.db.profile.locked = oldSettings.locked or false
-        self.db.profile.useClassColor = oldSettings.useClassColor or false
-        self.db.profile.useCustomColor = oldSettings.useCustomColor or false
-        self.db.profile.customColorHex = oldSettings.customColorHex or "#ffffff"
-        self.db.profile.hideModuleTitle = oldSettings.hideModuleTitle or false
-        self.db.profile.use24HourClock = oldSettings.use24HourClock or false
-        self.db.profile.showLoginMessage = oldSettings.showLoginMessage ~= false
-        self.db.profile.font = oldSettings.font or "Friz Quadrata TT"
-        self.db.profile.fontSize = oldSettings.fontSize or 12
-        self.db.profile.fontOutline = oldSettings.fontOutline or "NONE"
-    end
-    
-    -- Migrate profile data
+    -- Migrate ALL old profiles to AceDB profiles
     if oldDB.profiles then
-        local activeProfileName = oldDB[charKey] and oldDB[charKey].chosenProfile and oldDB[charKey].chosenProfile.generic
-        if activeProfileName and oldDB.profiles[activeProfileName] then
-            local oldProfile = oldDB.profiles[activeProfileName]
+        for profileName, oldProfile in pairs(oldDB.profiles) do
+            -- Create this profile in AceDB if it doesn't exist
+            local tempProfile = profileName
+            self.db:SetProfile(tempProfile)
             
             -- Migrate bars
             if oldProfile.bars then
@@ -176,6 +166,30 @@ function SDT:MigrateOldData()
                 end
             end
         end
+    end
+    
+    -- Switch back to this character's profile
+    local activeProfileName = oldDB[charKey] and oldDB[charKey].chosenProfile and oldDB[charKey].chosenProfile.generic
+    if activeProfileName then
+        self.db:SetProfile(activeProfileName)
+    else
+        self.db:SetProfile(charKey)
+    end
+    
+    -- Migrate character settings to current profile
+    if oldDB[charKey] and oldDB[charKey].settings then
+        local oldSettings = oldDB[charKey].settings
+        
+        self.db.profile.locked = oldSettings.locked or false
+        self.db.profile.useClassColor = oldSettings.useClassColor or false
+        self.db.profile.useCustomColor = oldSettings.useCustomColor or false
+        self.db.profile.customColorHex = oldSettings.customColorHex or "#ffffff"
+        self.db.profile.hideModuleTitle = oldSettings.hideModuleTitle or false
+        self.db.profile.use24HourClock = oldSettings.use24HourClock or false
+        self.db.profile.showLoginMessage = oldSettings.showLoginMessage ~= false
+        self.db.profile.font = oldSettings.font or "Friz Quadrata TT"
+        self.db.profile.fontSize = oldSettings.fontSize or 12
+        self.db.profile.fontOutline = oldSettings.fontOutline or "NONE"
     end
     
     -- Migrate character profile choices
@@ -201,10 +215,9 @@ function SDT:MigrateOldData()
         self.db.global.AraBroker = CopyTable(oldDB.AraBroker)
     end
     
-    self:Print("Migration complete!")
+    self:Print("Migration complete! All profiles have been migrated.")
     
-    -- Don't delete old data, let user do it manually if they want
-    -- We'll just mark it as migrated
+    -- Mark as migrated
     oldDB._migrated = true
 end
 

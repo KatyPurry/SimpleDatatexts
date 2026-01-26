@@ -3,7 +3,7 @@
 ## Notes: Lightweight datatext framework.
 ## Author: Cilraaz
 ## Version: 12.0.0.41
-## SavedVariables: SDTDB
+## SavedVariables: SDTDB, SimpleDatatextsDB
 
 # Libs
 libs/LibStub.lua
