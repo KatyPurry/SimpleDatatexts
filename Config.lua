@@ -80,8 +80,40 @@ function SDT:RegisterConfig()
     AceConfigDialog:SetDefaultSize("SimpleDatatexts", 850, 650)
 end
 
+----------------------------------------------------
+-- Rebuild Config (for dynamic updates)
+----------------------------------------------------
+function SDT:RebuildConfig()
+    local AceConfig = LibStub("AceConfig-3.0")
+    local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
+    
+    -- Re-register the options table to rebuild it
+    local options = {
+        type = "group",
+        name = "Simple DataTexts",
+        childGroups = "tab",
+        args = {
+            general = self:GetGeneralOptions(),
+            panels = self:GetPanelOptions(),
+            modules = self:GetModuleOptions(),
+            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db),
+            importexport = self:GetImportExportOptions(),
+        }
+    }
+    
+    AceConfig:RegisterOptionsTable("SimpleDatatexts", options)
+    AceConfigRegistry:NotifyChange("SimpleDatatexts")
+end
+
 function SDT:OpenConfig()
-    LibStub("AceConfigDialog-3.0"):Open("SimpleDatatexts")
+    local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+    AceConfigDialog:Open("SimpleDatatexts")
+
+    -- Clamp the config window to the screen
+    local frame = AceConfigDialog.OpenFrames["SimpleDatatexts"]
+    if frame and frame.frame then
+        frame.frame:SetClampedToScreen(true)
+    end
 end
 
 ----------------------------------------------------
@@ -238,7 +270,7 @@ end
 -- Panel Options
 ----------------------------------------------------
 function SDT:GetPanelOptions()
-    return {
+    local options = {
         type = "group",
         name = L["Panels"],
         order = 2,
@@ -263,6 +295,7 @@ function SDT:GetPanelOptions()
                 get = function() return self.selectedBar end,
                 set = function(_, val)
                     self.selectedBar = val
+                    self:RebuildConfig()
                     LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
                 end,
                 order = 2,
@@ -475,11 +508,27 @@ function SDT:GetPanelOptions()
                         end,
                         set = function(_, val)
                             if self.selectedBar then
+                                local oldValue = self.db.profile.bars[self.selectedBar].numSlots
                                 self.db.profile.bars[self.selectedBar].numSlots = val
                                 self:RebuildSlots(self.bars[self.selectedBar])
+
+                                if oldValue ~= val then
+                                    self.needsSlotRebuild = true
+                                end
                             end
                         end,
                         order = 31,
+                    },
+                    applySlots = {
+                        type = "execute",
+                        name = "Apply Slot Changes",
+                        desc = "Update slot assignment dropdowns after changing number of slots",
+                        disabled = function() return not self.needsSlotRebuild end,
+                        func = function()
+                            self.needsSlotRebuild = false
+                            self:RebuildConfig()
+                        end,
+                        order = 32,
                     },
                 },
             },
@@ -489,10 +538,20 @@ function SDT:GetPanelOptions()
                 inline = true,
                 disabled = function() return not self.selectedBar end,
                 order = 4,
-                args = self:GetSlotArgs(),
+                args = {},
             },
         }
     }
+
+    -- Populate slot dropdowns dynamically based on current selection
+    if self.selectedBar then
+        local slotArgs = self:GetSlotArgs()
+        for k, v in pairs(slotArgs) do
+            options.args.slots.args[k] = v
+        end
+    end
+
+    return options
 end
 
 ----------------------------------------------------
@@ -608,62 +667,75 @@ function SDT:GetImportExportOptions()
             },
             description = {
                 type = "description",
-                name = "Export your current profile to share with others, or import a profile string.",
+                name = "Export your current profile to share with others, or import a profile string.\n",
                 order = 2,
+            },
+            -- EXPORT SECTION
+            exportHeader = {
+                type = "header",
+                name = "Export",
+                order = 10,
             },
             exportButton = {
                 type = "execute",
-                name = "Export Profile",
-                desc = "Generate an export string for your current profile",
+                name = "Generate Export String",
+                desc = "Create an export string for your current profile",
                 func = function()
                     local exportString = self:ExportProfile()
                     if exportString then
                         self.exportString = exportString
                         LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
-                        self:Print("Profile exported! Copy the string below.")
+                        self:Print("Export string generated! Copy it from the box below.")
                     end
                 end,
-                order = 3,
+                order = 11,
             },
             exportString = {
                 type = "input",
                 name = "Export String",
-                desc = "Copy this string to share your profile",
+                desc = "1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy",
                 multiline = 8,
                 width = "full",
                 get = function() return self.exportString or "" end,
-                set = function() end, -- Read-only
-                order = 4,
+                set = function(_, val) self.exportString = val end,
+                order = 12,
             },
-            spacer = {
+            -- IMPORT SECTION
+            importHeader = {
                 type = "header",
-                name = "",
-                order = 5,
+                name = "Import",
+                order = 20,
             },
             importString = {
                 type = "input",
                 name = "Import String",
-                desc = "Paste a profile export string here",
+                desc = "1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'",
                 multiline = 8,
                 width = "full",
-                get = function() return "" end,
-                set = function(_, val) self.importString = val end,
-                order = 6,
+                get = function() return self.importString or "" end,
+                set = function(_, val) 
+                    self.importString = val
+                end,
+                order = 21,
             },
             importButton = {
                 type = "execute",
                 name = "Import Profile",
-                desc = "Import the profile string above",
+                desc = "Import the profile string from above (after clicking Accept)",
                 confirm = function() return "This will overwrite your current profile. Are you sure?" end,
                 func = function()
-                    if self.importString and self.importString ~= "" then
-                        self:ImportProfile(self.importString)
-                        self.importString = nil
-                    else
-                        self:Print("Please paste an import string first")
+                    if not self.importString or self.importString == "" then
+                        self:Print("Please paste an import string and click Accept first")
+                        return
+                    end
+                    
+                    local success = self:ImportProfile(self.importString)
+                    if success then
+                        self.importString = "" -- Clear after successful import
+                        LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
                     end
                 end,
-                order = 7,
+                order = 22,
             },
         }
     }

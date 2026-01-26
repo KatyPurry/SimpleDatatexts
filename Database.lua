@@ -271,6 +271,17 @@ function SDT:SetModuleSetting(moduleName, settingKey, value)
 end
 
 ----------------------------------------------------
+-- Helper: Count Table Keys
+----------------------------------------------------
+function SDT:CountTableKeys(tbl)
+    local count = 0
+    for _ in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
+
+----------------------------------------------------
 -- Export Profile
 ----------------------------------------------------
 function SDT:ExportProfile()
@@ -292,7 +303,7 @@ function SDT:ExportProfile()
     end
     
     local encoded = self.LibDeflate:EncodeForPrint(compressed)
-    return encoded
+    return "SDT1:" .. encoded
 end
 
 ----------------------------------------------------
@@ -303,8 +314,17 @@ function SDT:ImportProfile(importString)
         self:Print("No import string provided")
         return false
     end
+
+    -- Strip whitespace and newlines
+    importString = importString:gsub("%s", "")
+
+    if importString:sub(1, 4) ~= "SDT1" then
+        self:Print("Invalid import string: Incorrect version")
+        return false
+    end
     
-    local decoded = self.LibDeflate:DecodeForPrint(importString)
+    local rawString = importString:sub(6)
+    local decoded = self.LibDeflate:DecodeForPrint(rawString)
     if not decoded then
         self:Print("Error decoding import string")
         return false
@@ -329,16 +349,38 @@ function SDT:ImportProfile(importString)
     
     -- Import the profile
     if profileData.profile then
+        self:Print("DEBUG: Starting profile import...")
         -- Clear current profile
         wipe(self.db.profile)
+
+        self:Print(format("DEBUG: Importing %d settings...", self:CountTableKeys(profileData.profile)))
         
         -- Copy imported data
         for k, v in pairs(profileData.profile) do
-            self.db.profile[k] = CopyTable(v)
+            if type(v) == "table" then
+                self.db.profile[k] = CopyTable(v)
+            else
+                self.db.profile[k] = v
+            end
+            self:Print(format("DEBUG: Imported setting: %s", tostring(k)))
         end
         
         self:Print("Profile imported successfully!")
+
+        -- Refresh config
+        self:Print("DEBUG: Calling RefreshConfig...")
         self:RefreshConfig()
+
+        -- Rebuild our config
+        if self.configDialog and self.configDialog:IsShown() then
+            self:Print("DEBUG: Rebuilding config UI...")
+            self:RebuildConfig()
+        end
+
+        -- Apply the font settings
+        self:Print("DEBUG: Applying fonts...")
+        self:ApplyFont()
+
         return true
     else
         self:Print("Invalid profile data")

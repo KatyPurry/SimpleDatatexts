@@ -71,13 +71,10 @@ end
 function SDT:OnInitialize()
     -- Build cache first
     self:BuildCache()
-    
+
     -- Initialize database (handled in Database.lua)
     self:InitializeDatabase()
-    
-    -- Register config (handled in Config.lua)
-    self:RegisterConfig()
-    
+
     -- Register slash commands
     self:RegisterSlashCommands()
 end
@@ -85,12 +82,23 @@ end
 function SDT:OnEnable()
     -- Register fonts
     self:RegisterFonts()
-    
+
     -- Create module list
     self:CreateModuleList()
-    
+
     -- Create addon list
     self:CreateAddonList()
+
+    -- Register config (handled in Config.lua)
+    self:RegisterConfig()
+
+    -- Create bars from current profile
+    for barName, barData in pairs(self.db.profile.bars) do
+        local id = tonumber(barName:match("SDT_Bar(%d+)"))
+        if id and id > 0 then
+            self:CreateDataBar(id, barData.numSlots)
+        end
+    end
 end
 
 ----------------------------------------------------
