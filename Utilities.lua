@@ -1,71 +1,33 @@
--- Utility Functions
-
-----------------------------------------------------
--- Addon Locals
-----------------------------------------------------
+-- Utilities.lua - Helper functions and utilities for SimpleDatatexts
 local addonName, SDT = ...
 local L = SDT.L
 
 ----------------------------------------------------
--- Library Instances
+-- Library Instances (already set in Core.lua)
 ----------------------------------------------------
-local LSM = LibStub("LibSharedMedia-3.0")
+-- SDT.LSM, SDT.LDB, etc. are initialized in Core.lua
 
 ----------------------------------------------------
 -- Lua Locals
 ----------------------------------------------------
-local format           = string.format
-local ipairs           = ipairs
-local pairs            = pairs
-local print            = print
-local tonumber         = tonumber
-local tostring         = tostring
-local wipe             = table.wipe
+local format = string.format
+local ipairs = ipairs
+local pairs = pairs
+local tonumber = tonumber
+local tostring = tostring
+local wipe = table.wipe
 
 ----------------------------------------------------
 -- WoW API Locals
 ----------------------------------------------------
-local CopyTable                 = CopyTable
-local GetAddOnMetadata          = C_AddOns.GetAddOnMetadata
-local GetClassColor             = C_ClassColor.GetClassColor
-local GetRealmName              = GetRealmName
-local UIParent                  = UIParent
-local UnitClass                 = UnitClass
-local UnitName                  = UnitName
+local GetCVar = GetCVar
+local SetCVar = SetCVar
+local UIParent = UIParent
 
--------------------------------------------------
--- Build Our Addon Table and Cache
--------------------------------------------------
-SDT.modules = SDT.modules or {}
-SDT.bars = SDT.bars or {}
-SimpleDatatexts = SDT
-
-SDT.cache = {}
-SDT.cache.playerName = UnitName("player")
-SDT.cache.playerNameLower = SDT.cache.playerName:lower()
-SDT.cache.playerClass = select(2, UnitClass("player"))
-SDT.cache.playerRealmProper = GetRealmName()
-SDT.cache.playerRealm = SDT.cache.playerRealmProper:gsub("[^%w]", ""):lower()
-SDT.cache.playerFaction = UnitFactionGroup("player")
-SDT.cache.playerLevel = UnitLevel("player")
-SDT.cache.charKey = SDT.cache.playerNameLower.."-"..SDT.cache.playerRealm
-local colors = { GetClassColor(SDT.cache.playerClass):GetRGB() }
-SDT.cache.colorR = colors[1]
-SDT.cache.colorG = colors[2]
-SDT.cache.colorB = colors[3]
-SDT.cache.colorHex = GetClassColor(SDT.cache.playerClass):GenerateHexColor()
-SDT.cache.version = GetAddOnMetadata(addonName, "Version") or "not defined"
-SDT.cache.moduleNames = {}
-
--------------------------------------------------
--- Utility: No Operation Function
--------------------------------------------------
-local noop = function() end
-
--------------------------------------------------
--- Utility: Module Settings Exclusions
--------------------------------------------------
--- Create a table of modules to exclude (aka modules that have no settings)
+----------------------------------------------------
+-- Module Settings Exclusions
+----------------------------------------------------
+-- Modules that have no settings panels
 SDT.excludedModules = {
     ["Coordinates"] = true,
     ["Currency"] = true,
@@ -76,140 +38,43 @@ SDT.excludedModules = {
     ["Mail"] = true,
     ["System"] = true,
     ["Time"] = true,
-    -- Some LDB modules aren't getting tagged with "LDB:". Needs investigated.
-    ["Core Loot Manager"] = true,
-    ["QuaziiUI"] = true,
-}
-
-SDT.allowedLDBModules = {
-    ["LDB: BugSack"] = true,
-    ["LDB: WIM"] = true,
 }
 
 function SDT:ExcludedModule(moduleName)
-    if SDT.excludedModules[moduleName] then
-        return true
-    end
-
-    if moduleName:sub(1, 3) == "LDB" and not SDT.allowedLDBModules[moduleName] then
-        return true
-    end
-
-    return false
+    return self.excludedModules[moduleName] == true
 end
 
 ----------------------------------------------------
--- Utility: Get Module Setting
+-- CVar Management
 ----------------------------------------------------
-function SDT:GetModuleSetting(moduleName, settingsKey, default)
-    local profileName = self.activeProfile
-    
-    -- Try to get from active profile first
-    if profileName and SDTDB.profiles[profileName] and SDTDB.profiles[profileName].moduleSettings then
-        if SDTDB.profiles[profileName].moduleSettings[moduleName] then
-            local value = SDTDB.profiles[profileName].moduleSettings[moduleName][settingsKey]
-            if value ~= nil then
-                return value
-            end
-        end
-    end
-    
-    -- Fallback to character settings for backward compatibility
-    if SDT.SDTDB_CharDB.moduleSettings and SDT.SDTDB_CharDB.moduleSettings[moduleName] then
-        return SDT.SDTDB_CharDB.moduleSettings[moduleName][settingsKey]
-    end
-    
-    return default
-end
-
--------------------------------------------------
--- Utility: Set Module Config Value
--------------------------------------------------
-function SDT:SetModuleConfigValue(moduleName, settingKey, value)
-    local profileName = self.activeProfile
-    
-    if profileName and SDTDB.profiles[profileName] then
-        -- Initialize if needed
-        if not SDTDB.profiles[profileName].moduleSettings then
-            SDTDB.profiles[profileName].moduleSettings = {}
-        end
-        if not SDTDB.profiles[profileName].moduleSettings[moduleName] then
-            SDTDB.profiles[profileName].moduleSettings[moduleName] = {}
-        end
-        
-        -- Set the value in the profile
-        SDTDB.profiles[profileName].moduleSettings[moduleName][settingKey] = value
+function SDT:SetCVar(cvar, value)
+    local valStr = ((type(value) == "boolean") and (value and '1' or '0')) or tostring(value)
+    if GetCVar(cvar) ~= valStr then
+        SetCVar(cvar, valStr)
     end
 end
 
--------------------------------------------------
--- Utility: Add Module Config
--------------------------------------------------
--- Modules can call this function to add settings to their config panel
--- Example usage in a module:
--- SDT:AddModuleConfigSetting("Agility", "checkbox", "Show Icon", "showIcon", true)
-function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, defaultValue)
-    local panel = SDT.ModuleConfigPanels[moduleName]
-    if not panel then
-        -- Panel doesn't exist yet, queue it
-        SDT.queuedModuleSettings = SDT.queuedModuleSettings or {}
-        SDT.queuedModuleSettings[moduleName] = SDT.queuedModuleSettings[moduleName] or {}
-        table.insert(SDT.queuedModuleSettings[moduleName], {
-            settingType = settingType,
-            label = label,
-            settingKey = settingKey,
-            defaultValue = defaultValue
-        })
-        return
+----------------------------------------------------
+-- Color Management
+----------------------------------------------------
+function SDT:GetTagColor()
+    if self.db.profile.useCustomColor then
+        local color = self.db.profile.customColorHex:gsub("#", "")
+        return "ff"..color
+    elseif self.db.profile.useClassColor then
+        return self.cache.colorHex
     end
-    
-    -- Initialize module settings in saved variables
-    local profileName = SDT.activeProfile
-    if not profileName or not SDTDB.profiles[profileName] then
-        SDT.Print("ERROR: Profile not found. This should never happen.")
-    else
-        -- Use profile-based settings
-        SDTDB.profiles[profileName].moduleSettings = SDTDB.profiles[profileName].moduleSettings or {}
-        SDTDB.profiles[profileName].moduleSettings[moduleName] = SDTDB.profiles[profileName].moduleSettings[moduleName] or {}
-        if SDTDB.profiles[profileName].moduleSettings[moduleName][settingKey] == nil then
-            SDTDB.profiles[profileName].moduleSettings[moduleName][settingKey] = defaultValue
-        end
-    end
-    
-    -- Track last anchor point
-    panel.lastAnchor = panel.lastAnchor or panel.contentAnchor
-    
-    if settingType == "checkbox" then
-        local checkbox = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
-        checkbox:SetPoint("TOPLEFT", panel.lastAnchor, "BOTTOMLEFT", 0, -20)
-        checkbox.Text:SetText(label)
-
-        -- Get initial value from profile
-        local currentValue = SDT:GetModuleSetting(moduleName, settingKey, true)
-        if currentValue == nil then
-            currentValue = defaultValue
-        end
-        checkbox:SetChecked(currentValue)
-
-        checkbox:SetScript("OnClick", function(self)
-            SDT:SetModuleConfigValue(moduleName, settingKey, self:GetChecked())
-            SDT:UpdateAllModules()
-        end)
-        panel.lastAnchor = checkbox
-        
-    elseif settingType == "slider" then
-        -- Add slider implementation here if needed
-        -- This is a placeholder for future expansion
-        
-    elseif settingType == "dropdown" then
-        -- Add dropdown implementation here if needed
-        -- This is a placeholder for future expansion
-    end
+    return "ffffffff"
 end
 
--------------------------------------------------
--- Utility: Module Tooltip Functions
--------------------------------------------------
+function SDT:ColorText(text)
+    local color = self:GetTagColor()
+    return "|c"..color..text.."|r"
+end
+
+----------------------------------------------------
+-- Tooltip Helpers
+----------------------------------------------------
 function SDT:AddTooltipHeader(tooltip, fontSize, text, r, g, b, wrap)
     tooltip = tooltip or GameTooltip
     r = r or 1
@@ -245,10 +110,11 @@ function SDT:AddTooltipLine(tooltip, fontSize, textLeft, textRight, r1, g1, b1, 
         tooltip:AddLine(textLeft, r1, g1, b1, wrap or false)
     end
 
-    -- Normal lines get a 12pt font.
+    -- Apply font size to the line
     local lineNum = tooltip:NumLines()
-    local textLeftObj = _G[tooltip:GetName() .. "TextLeft" .. tooltip:NumLines()]
-    local textRightObj = _G[tooltip:GetName() .. "TextRight" .. tooltip:NumLines()]
+    local textLeftObj = _G[tooltip:GetName() .. "TextLeft" .. lineNum]
+    local textRightObj = _G[tooltip:GetName() .. "TextRight" .. lineNum]
+    
     if textLeftObj then
         local font, _, flags = textLeftObj:GetFont()
         textLeftObj:SetFont(font, fontSize or 12, flags)
@@ -259,18 +125,18 @@ function SDT:AddTooltipLine(tooltip, fontSize, textLeft, textRight, r1, g1, b1, 
     end
 end
 
--------------------------------------------------
--- Utility: Apply Chosen Font
--------------------------------------------------
+----------------------------------------------------
+-- Font Application
+----------------------------------------------------
 function SDT:ApplyFont()
-    local fontPath = LSM:Fetch("font", SDT.SDTDB_CharDB.settings.font) or STANDARD_TEXT_FONT
-    local fontSize = SDT.SDTDB_CharDB.settings.fontSize or 12
-    local fontOutline = SDT.SDTDB_CharDB.settings.fontOutline or "NONE"
+    local fontPath = self.LSM:Fetch("font", self.db.profile.font) or STANDARD_TEXT_FONT
+    local fontSize = self.db.profile.fontSize or 12
+    local fontOutline = self.db.profile.fontOutline or "NONE"
 
     -- Convert "NONE" to empty string for SetFont
     local outline = (fontOutline == "NONE") and "" or fontOutline
 
-    for _, bar in pairs(SDT.bars) do
+    for _, bar in pairs(self.bars) do
         for _, slot in ipairs(bar.slots) do
             if slot.text then
                 slot.text:SetFont(fontPath, fontSize, outline)
@@ -282,17 +148,9 @@ function SDT:ApplyFont()
     end
 end
 
--------------------------------------------------
--- Utility: Color Text
--------------------------------------------------
-function SDT:ColorText(text)
-    local color = SDT:GetTagColor()
-    return "|c"..color..text.."|r"
-end
-
--------------------------------------------------
--- Utility: Find Best Anchor Point
--------------------------------------------------
+----------------------------------------------------
+-- Anchor Point Helper
+----------------------------------------------------
 function SDT:FindBestAnchorPoint(frame)
     local x, y = frame:GetCenter()
     local screenWidth = UIParent:GetRight()
@@ -309,48 +167,30 @@ function SDT:FindBestAnchorPoint(frame)
     end
 end
 
--------------------------------------------------
--- Utility: Format Percentage
--------------------------------------------------
+----------------------------------------------------
+-- Format Helpers
+----------------------------------------------------
 function SDT:FormatPercent(v)
-    return string.format("%.2f%%", v)
+    return format("%.2f%%", v)
 end
 
--------------------------------------------------
--- Utility: Get Character Key
--------------------------------------------------
-function SDT:GetCharKey()
-    return SDT.cache.charKey
-end
-
--------------------------------------------------
--- Utility: Get Tag Color
--------------------------------------------------
-function SDT:GetTagColor()
-    if SDT.SDTDB_CharDB.settings.useCustomColor then
-        local color = SDT.SDTDB_CharDB.settings.customColorHex:gsub("#", "")
-        return "ff"..color
-    elseif SDT.SDTDB_CharDB.settings.useClassColor then
-        return SDT.cache.colorHex
-    end
-    return "ffffffff"
-end
-
--------------------------------------------------
--- Utility: Handle Menu List
--------------------------------------------------
+----------------------------------------------------
+-- Menu List Handler (for right-click menus)
+----------------------------------------------------
 function SDT:HandleMenuList(root, menuList, submenu, depth)
     if submenu then root = submenu end
 
-    for _, list in next, menuList do
+    for _, list in pairs(menuList) do
         local previous
+        
         if list.isTitle then
             root:CreateTitle(list.text)
         elseif list.func or list.hasArrow then
             local name = list.text or ('test'..depth)
 
             local func = (list.arg1 or list.arg2) and (function() list.func(nil, list.arg1, list.arg2) end) or list.func
-            local checked = list.checked and (not list.notCheckable and function() return list.checked(list) end or noop)
+            local checked = list.checked and (not list.notCheckable and function() return list.checked(list) end or function() end)
+            
             if checked then
                 previous = root:CreateCheckbox(list.text or name, checked, func)
             else
@@ -358,191 +198,112 @@ function SDT:HandleMenuList(root, menuList, submenu, depth)
             end
         end
 
-        if list.menuList then -- loop it
-            HandleMenuList(root, list.menuList, list.hasArrow and previous, depth + 1)
+        if list.menuList then
+            self:HandleMenuList(root, list.menuList, list.hasArrow and previous, depth + 1)
         end
     end
 end
 
--------------------------------------------------
--- Utility: Initialize Module Config Panels
--------------------------------------------------
-function SDT:InitializeModuleConfigPanels()
-    -- Wait for modules to be registered
-    if not SDT.cache.moduleNames or #SDT.cache.moduleNames == 0 then
-        return
-    end
+----------------------------------------------------
+-- Module Settings (for modules that need config)
+----------------------------------------------------
+function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, defaultValue)
+    -- Queue settings to be added to the config system
+    self.queuedModuleSettings = self.queuedModuleSettings or {}
+    self.queuedModuleSettings[moduleName] = self.queuedModuleSettings[moduleName] or {}
     
-    -- Create a config panel for each module
-    for _, moduleName in ipairs(SDT.cache.moduleNames) do
-        if not SDT.ModuleConfigPanels[moduleName] then
-            CreateModuleConfigPanel(moduleName)
-        end
-    end
+    table.insert(self.queuedModuleSettings[moduleName], {
+        settingType = settingType,
+        label = label,
+        settingKey = settingKey,
+        defaultValue = defaultValue,
+    })
 end
 
--------------------------------------------------
--- Utility: Find next free bar ID
--------------------------------------------------
+----------------------------------------------------
+-- Bar ID Helper
+----------------------------------------------------
 function SDT:NextBarID()
     local n = 1
-    while SDT.profileBars["SDT_Bar" .. n] do
+    while self.db.profile.bars["SDT_Bar" .. n] do
         n = n + 1
     end
     return n
 end
 
--------------------------------------------------
--- Utility: Print Function
--------------------------------------------------
-function SDT.Print(...)
-    print("[|cFFFF6600SDT|r]", ...)
-end
-
--------------------------------------------------
--- Utility: Local Bar Creation Helper
--------------------------------------------------
-local function CreateBarsFromProfile()
-    for barName, barData in pairs(SDT.profileBars) do
-        local id = tonumber(barName:match("SDT_Bar(%d+)"))
-        local newBar = SDT:CreateDataBar(id, barData.numSlots)
-        SDT.bars[barName] = newBar
-        SDT.bars[barName]:Show()
+----------------------------------------------------
+-- Module List Creation
+----------------------------------------------------
+function SDT:CreateModuleList()
+    wipe(self.cache.moduleNames)
+    for name in pairs(self.modules) do
+        table.insert(self.cache.moduleNames, name)
     end
+    table.sort(self.cache.moduleNames)
 end
 
--------------------------------------------------
--- Utility: Profile Activate
--------------------------------------------------
-function SDT:ProfileActivate(profileName, spec)
-    SDT.SDTDB_CharDB.chosenProfile[spec] = profileName
-    SDT.activeProfile = profileName
-
-    for _, bar in pairs(SDT.bars) do
-        bar:Hide()
-    end
-    wipe(SDT.bars)
-
-    SDT.profileBars = SDTDB.profiles[profileName].bars
-    CreateBarsFromProfile()
-
-    SDT:RefreshProfileList()
-    SDT:UpdateActiveProfile(profileName, spec)
-
-    SDT:UpdateAllModules()
-end
-
--------------------------------------------------
--- Utility: Profile Copy
--------------------------------------------------
-function SDT:ProfileCopy(profileName)
-    if not profileName or profileName == "" then return end
-    if profileName == SDT.activeProfile then
-        StaticPopup_Show("SDT_CANT_COPY_ACTIVE_PROFILE")
-        return
-    end
-    local confirmString = format(L["Are you sure you want to overwrite your\n'%s' profile?\nThis action cannot be undone."], SDT.activeProfile)
-    StaticPopupDialogs.SDT_CONFIRM_COPY_PROFILE.text = confirmString
-    StaticPopup_Show("SDT_CONFIRM_COPY_PROFILE", nil, nil, profileName)
-end
-
-StaticPopupDialogs["SDT_CANT_COPY_ACTIVE_PROFILE"] = {
-    text = L["You cannot copy the active profile onto itself. Please change your active profile first."],
-    button1 = L["Ok"],
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3
-}
-StaticPopupDialogs["SDT_CONFIRM_COPY_PROFILE"] = {
-    text = L["Are you sure you want to overwrite your\n'%s' profile?\nThis action cannot be undone."],
-    button1 = L["Yes"],
-    button2 = L["No"],
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3,
-    OnAccept = function(self, profileName)
-        local src = SDTDB.profiles[profileName]
-        if not src then
-            SDT.Print(L["Invalid source profile specified."])
-            SDT:RefreshProfileList()
-            return
+----------------------------------------------------
+-- Addon List Creation
+----------------------------------------------------
+function SDT:CreateAddonList()
+    self.cache.addonList = self.cache.addonList or {}
+    wipe(self.cache.addonList)
+    
+    local GetAddOnInfo = C_AddOns.GetAddOnInfo
+    local GetNumAddOns = C_AddOns.GetNumAddOns
+    local addOnCount = GetNumAddOns()
+    local counter = 1
+    
+    for i = 1, addOnCount do
+        local name, title, _, loadable, reason = GetAddOnInfo(i)
+        if loadable or reason == "DEMAND_LOADED" then
+            self.cache.addonList[counter] = {
+                name = name,
+                title = title,
+                index = i
+            }
+            counter = counter + 1
         end
-        local newProfile = CopyTable(src)
-        for _, bar in pairs(SDT.bars) do
-            bar:Hide()
-        end
-        wipe(SDTDB.profiles[SDT.activeProfile])
-        SDTDB.profiles[SDT.activeProfile] = newProfile
-        SDT.profileBars = SDTDB.profiles[SDT.activeProfile].bars
-        CreateBarsFromProfile()
-        SDT:RefreshProfileList()
-        SDT:UpdateAllModules()
-    end,
-}
-
--------------------------------------------------
--- Utility: Profile Create
--------------------------------------------------
-function SDT:ProfileCreate(profileName)
-    SDTDB.profiles[profileName] = {
-        bars = {},
-        moduleSettings = {}
-    }
-    SDT.profileBars = SDTDB.profiles[profileName].bars
-    SDT:CreateDataBar(1, 3)
-    SDT:ProfileActivate(profileName, "generic")
+    end
 end
 
--------------------------------------------------
--- Utility: Profile Delete
--------------------------------------------------
-function SDT:ProfileDelete(profileName)
-    if profileName == "" then return end
-    if SDT.activeProfile == profileName then
-        StaticPopup_Show("SDT_CANT_DELETE_ACTIVE_PROFILE")
-        return
+----------------------------------------------------
+-- Lock/Unlock Panels
+----------------------------------------------------
+function SDT:ToggleLock()
+    self.db.profile.locked = not self.db.profile.locked
+    
+    if self.db.profile.locked then
+        self:Print(L["Panels locked"])
     else
-        StaticPopup_Show("SDT_CONFIRM_DELETE_PROFILE", nil, nil, profileName)
+        self:Print(L["Panels unlocked"])
+    end
+    
+    -- Update all bars to reflect the lock state
+    for _, bar in pairs(self.bars) do
+        if bar then
+            if self.db.profile.locked then
+                bar:EnableMouse(false)
+                bar:SetMovable(false)
+            else
+                bar:EnableMouse(true)
+                bar:SetMovable(true)
+            end
+        end
     end
 end
 
-StaticPopupDialogs["SDT_CANT_DELETE_ACTIVE_PROFILE"] = {
-    text = L["You cannot delete the active profile. Please change your active profile first."],
-    button1 = L["Ok"],
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3
-}
-StaticPopupDialogs["SDT_CONFIRM_DELETE_PROFILE"] = {
-    text = L["Are you sure you want to delete this profile?\nThis action cannot be undone."],
-    button1 = L["Yes"],
-    button2 = L["No"],
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3,
-    OnAccept = function(self, profileName)
-        SDTDB.profiles[profileName] = nil
-        SDT:RefreshProfileList()
-    end,
-}
-
--------------------------------------------------
--- Module Registration
--------------------------------------------------
-function SDT:RegisterDataText(name, module)
-    SDT.modules[name] = module
-end
-
--------------------------------------------------
--- Utility: SetCVar
--------------------------------------------------
-function SDT:SetCVar(cvar, value)
-    local valStr = ((type(value) == "boolean") and (value and '1' or '0')) or tostring(value)
-    if GetCVar(cvar) ~= valStr then
-        SetCVar(cvar, valStr)
+----------------------------------------------------
+-- Update All Modules
+----------------------------------------------------
+function SDT:UpdateAllModules()
+    for _, bar in pairs(self.bars) do
+        if bar and bar.slots then
+            for _, slot in ipairs(bar.slots) do
+                if slot.moduleFrame and slot.moduleFrame.Update then
+                    slot.moduleFrame:Update()
+                end
+            end
+        end
     end
 end
