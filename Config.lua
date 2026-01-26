@@ -1,0 +1,670 @@
+-- Config.lua - AceConfig GUI
+local addonName, SDT = ...
+local L = SDT.L
+
+----------------------------------------------------
+-- Helper Functions
+----------------------------------------------------
+local function GetBorderList()
+    local borderList = SDT.LSM:HashTable("border")
+    local sortedBorderNames = {}
+    
+    for name in pairs(borderList) do
+        if name ~= "None" then
+            sortedBorderNames[#sortedBorderNames+1] = name
+        end
+    end
+    table.sort(sortedBorderNames)
+    
+    local borders = { ["None"] = "None" }
+    for _, name in ipairs(sortedBorderNames) do
+        borders[name] = name
+    end
+    
+    return borders
+end
+
+local function GetFontList()
+    local fonts = {}
+    for _, fontName in ipairs(SDT.LSM:List("font")) do
+        fonts[fontName] = fontName
+    end
+    return fonts
+end
+
+local function GetBarList()
+    local bars = {}
+    for barName, barData in pairs(SDT.db.profile.bars) do
+        bars[barName] = barData.name or barName
+    end
+    return bars
+end
+
+local function GetModuleList()
+    local modules = { [""] = L["(empty)"], ["(spacer)"] = L["(spacer)"] }
+    for _, name in ipairs(SDT.cache.moduleNames) do
+        modules[name] = name
+    end
+    return modules
+end
+
+----------------------------------------------------
+-- Register Config
+----------------------------------------------------
+function SDT:RegisterConfig()
+    local AceConfig = LibStub("AceConfig-3.0")
+    local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+    local AceDBOptions = LibStub("AceDBOptions-3.0")
+    
+    -- Main options table
+    local options = {
+        type = "group",
+        name = "Simple DataTexts",
+        childGroups = "tab",
+        args = {
+            general = self:GetGeneralOptions(),
+            panels = self:GetPanelOptions(),
+            modules = self:GetModuleOptions(),
+            profiles = AceDBOptions:GetOptionsTable(self.db),
+            importexport = self:GetImportExportOptions(),
+        }
+    }
+    
+    -- Register options
+    AceConfig:RegisterOptionsTable("SimpleDatatexts", options)
+    
+    -- Create dialog
+    self.configDialog = AceConfigDialog:AddToBlizOptions("SimpleDatatexts", "Simple DataTexts")
+    
+    -- Register as standalone dialog too
+    AceConfigDialog:SetDefaultSize("SimpleDatatexts", 850, 650)
+end
+
+function SDT:OpenConfig()
+    LibStub("AceConfigDialog-3.0"):Open("SimpleDatatexts")
+end
+
+----------------------------------------------------
+-- General Options
+----------------------------------------------------
+function SDT:GetGeneralOptions()
+    return {
+        type = "group",
+        name = L["Global"],
+        order = 1,
+        args = {
+            header = {
+                type = "header",
+                name = L["Global Settings"],
+                order = 1,
+            },
+            locked = {
+                type = "toggle",
+                name = L["Lock Panels (disable movement)"],
+                desc = "Prevent panels from being moved",
+                get = function() return self.db.profile.locked end,
+                set = function(_, val)
+                    self.db.profile.locked = val
+                end,
+                order = 2,
+            },
+            showLoginMessage = {
+                type = "toggle",
+                name = L["Show login message"],
+                get = function() return self.db.profile.showLoginMessage end,
+                set = function(_, val) self.db.profile.showLoginMessage = val end,
+                order = 3,
+            },
+            hideModuleTitle = {
+                type = "toggle",
+                name = L["Hide Module Title in Tooltip"],
+                get = function() return self.db.profile.hideModuleTitle end,
+                set = function(_, val)
+                    self.db.profile.hideModuleTitle = val
+                    self:UpdateAllModules()
+                end,
+                order = 4,
+            },
+            use24HourClock = {
+                type = "toggle",
+                name = L["Use 24Hr Clock"],
+                get = function() return self.db.profile.use24HourClock end,
+                set = function(_, val)
+                    self.db.profile.use24HourClock = val
+                    self:UpdateAllModules()
+                end,
+                order = 5,
+            },
+            spacer1 = {
+                type = "header",
+                name = "Colors",
+                order = 10,
+            },
+            useClassColor = {
+                type = "toggle",
+                name = L["Use Class Color"],
+                get = function() return self.db.profile.useClassColor end,
+                set = function(_, val)
+                    self.db.profile.useClassColor = val
+                    if val then
+                        self.db.profile.useCustomColor = false
+                    end
+                    self:UpdateAllModules()
+                end,
+                order = 11,
+            },
+            useCustomColor = {
+                type = "toggle",
+                name = L["Use Custom Color"],
+                get = function() return self.db.profile.useCustomColor end,
+                set = function(_, val)
+                    self.db.profile.useCustomColor = val
+                    if val then
+                        self.db.profile.useClassColor = false
+                    end
+                    self:UpdateAllModules()
+                end,
+                order = 12,
+            },
+            customColorHex = {
+                type = "color",
+                name = "Custom Color",
+                disabled = function() return not self.db.profile.useCustomColor end,
+                get = function()
+                    local hex = self.db.profile.customColorHex:gsub("#", "")
+                    local r = tonumber(hex:sub(1, 2), 16) / 255
+                    local g = tonumber(hex:sub(3, 4), 16) / 255
+                    local b = tonumber(hex:sub(5, 6), 16) / 255
+                    return r, g, b
+                end,
+                set = function(_, r, g, b)
+                    self.db.profile.customColorHex = format("#%02X%02X%02X", r*255, g*255, b*255)
+                    self:UpdateAllModules()
+                end,
+                order = 13,
+            },
+            spacer2 = {
+                type = "header",
+                name = "Font Settings",
+                order = 20,
+            },
+            font = {
+                type = "select",
+                name = L["Display Font:"],
+                values = GetFontList,
+                get = function() return self.db.profile.font end,
+                set = function(_, val)
+                    self.db.profile.font = val
+                    self:ApplyFont()
+                end,
+                order = 21,
+            },
+            fontSize = {
+                type = "range",
+                name = L["Font Size"],
+                min = 4,
+                max = 40,
+                step = 1,
+                get = function() return self.db.profile.fontSize end,
+                set = function(_, val)
+                    self.db.profile.fontSize = val
+                    self:ApplyFont()
+                end,
+                order = 22,
+            },
+            fontOutline = {
+                type = "select",
+                name = "Font Outline",
+                values = {
+                    ["NONE"] = L["None"],
+                    ["OUTLINE"] = "Outline",
+                    ["THICKOUTLINE"] = "Thick Outline",
+                    ["MONOCHROME"] = "Monochrome",
+                    ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+                    ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+                },
+                get = function() return self.db.profile.fontOutline end,
+                set = function(_, val)
+                    self.db.profile.fontOutline = val
+                    self:ApplyFont()
+                end,
+                order = 23,
+            },
+        }
+    }
+end
+
+----------------------------------------------------
+-- Panel Options
+----------------------------------------------------
+function SDT:GetPanelOptions()
+    return {
+        type = "group",
+        name = L["Panels"],
+        order = 2,
+        args = {
+            createBar = {
+                type = "execute",
+                name = L["Create New Panel"],
+                func = function()
+                    local id = self:NextBarID()
+                    local name = "SDT_Bar" .. id
+                    self.db.profile.bars[name] = CopyTable(self.db.profile.bars['*'])
+                    self.db.profile.bars[name].name = name
+                    self:CreateDataBar(id, 3)
+                    LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
+                end,
+                order = 1,
+            },
+            selectBar = {
+                type = "select",
+                name = L["Select Panel:"],
+                values = GetBarList,
+                get = function() return self.selectedBar end,
+                set = function(_, val)
+                    self.selectedBar = val
+                    LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
+                end,
+                order = 2,
+            },
+            barSettings = {
+                type = "group",
+                name = "Panel Settings",
+                inline = true,
+                disabled = function() return not self.selectedBar end,
+                order = 3,
+                args = {
+                    name = {
+                        type = "input",
+                        name = L["Rename Panel:"],
+                        get = function()
+                            if not self.selectedBar then return "" end
+                            return self.db.profile.bars[self.selectedBar].name or self.selectedBar
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].name = val
+                            end
+                        end,
+                        order = 1,
+                    },
+                    delete = {
+                        type = "execute",
+                        name = L["Remove Selected Panel"],
+                        confirm = function() return L["Are you sure you want to delete this bar?\nThis action cannot be undone."] end,
+                        func = function()
+                            if self.selectedBar and self.bars[self.selectedBar] then
+                                self.bars[self.selectedBar]:Hide()
+                                self.bars[self.selectedBar] = nil
+                            end
+                            self.db.profile.bars[self.selectedBar] = nil
+                            self.selectedBar = nil
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
+                        end,
+                        order = 2,
+                    },
+                    spacer1 = {
+                        type = "header",
+                        name = "Size & Scale",
+                        order = 10,
+                    },
+                    width = {
+                        type = "range",
+                        name = L["Width"],
+                        min = 100,
+                        max = 2000,
+                        step = 1,
+                        get = function()
+                            if not self.selectedBar then return 300 end
+                            return self.db.profile.bars[self.selectedBar].width
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].width = val
+                                self:RebuildSlots(self.bars[self.selectedBar])
+                            end
+                        end,
+                        order = 11,
+                    },
+                    height = {
+                        type = "range",
+                        name = L["Height"],
+                        min = 16,
+                        max = 128,
+                        step = 1,
+                        get = function()
+                            if not self.selectedBar then return 22 end
+                            return self.db.profile.bars[self.selectedBar].height
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].height = val
+                                self:RebuildSlots(self.bars[self.selectedBar])
+                            end
+                        end,
+                        order = 12,
+                    },
+                    scale = {
+                        type = "range",
+                        name = L["Scale"],
+                        min = 50,
+                        max = 500,
+                        step = 1,
+                        get = function()
+                            if not self.selectedBar then return 100 end
+                            return self.db.profile.bars[self.selectedBar].scale
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].scale = val
+                                if self.bars[self.selectedBar] then
+                                    self.bars[self.selectedBar]:SetScale(val / 100)
+                                end
+                            end
+                        end,
+                        order = 13,
+                    },
+                    spacer2 = {
+                        type = "header",
+                        name = "Appearance",
+                        order = 20,
+                    },
+                    bgOpacity = {
+                        type = "range",
+                        name = L["Background Opacity"],
+                        min = 0,
+                        max = 100,
+                        step = 1,
+                        get = function()
+                            if not self.selectedBar then return 50 end
+                            return self.db.profile.bars[self.selectedBar].bgOpacity
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].bgOpacity = val
+                                if self.bars[self.selectedBar] then
+                                    self.bars[self.selectedBar]:ApplyBackground()
+                                end
+                            end
+                        end,
+                        order = 21,
+                    },
+                    border = {
+                        type = "select",
+                        name = L["Select Border:"],
+                        values = GetBorderList,
+                        get = function()
+                            if not self.selectedBar then return "None" end
+                            return self.db.profile.bars[self.selectedBar].borderName or "None"
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                local borderList = SDT.LSM:HashTable("border")
+                                self.db.profile.bars[self.selectedBar].borderName = val
+                                self.db.profile.bars[self.selectedBar].border = borderList[val]
+                                if self.bars[self.selectedBar] then
+                                    self.bars[self.selectedBar]:ApplyBackground()
+                                end
+                            end
+                        end,
+                        order = 22,
+                    },
+                    borderSize = {
+                        type = "range",
+                        name = L["Border Size"],
+                        min = 1,
+                        max = 40,
+                        step = 1,
+                        disabled = function()
+                            if not self.selectedBar then return true end
+                            return self.db.profile.bars[self.selectedBar].borderName == "None"
+                        end,
+                        get = function()
+                            if not self.selectedBar then return 8 end
+                            return self.db.profile.bars[self.selectedBar].borderSize
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].borderSize = val
+                                if self.bars[self.selectedBar] then
+                                    self.bars[self.selectedBar]:ApplyBackground()
+                                end
+                            end
+                        end,
+                        order = 23,
+                    },
+                    borderColor = {
+                        type = "color",
+                        name = "Border Color",
+                        disabled = function()
+                            if not self.selectedBar then return true end
+                            return self.db.profile.bars[self.selectedBar].borderName == "None"
+                        end,
+                        get = function()
+                            if not self.selectedBar then return 0, 0, 0 end
+                            local color = self.db.profile.bars[self.selectedBar].borderColor:gsub("#", "")
+                            local r = tonumber(color:sub(1, 2), 16) / 255
+                            local g = tonumber(color:sub(3, 4), 16) / 255
+                            local b = tonumber(color:sub(5, 6), 16) / 255
+                            return r, g, b
+                        end,
+                        set = function(_, r, g, b)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].borderColor = format("#%02X%02X%02X", r*255, g*255, b*255)
+                                if self.bars[self.selectedBar] then
+                                    self.bars[self.selectedBar]:ApplyBackground()
+                                end
+                            end
+                        end,
+                        order = 24,
+                    },
+                    spacer3 = {
+                        type = "header",
+                        name = L["Slots"],
+                        order = 30,
+                    },
+                    numSlots = {
+                        type = "range",
+                        name = "Number of Slots",
+                        min = 1,
+                        max = 12,
+                        step = 1,
+                        get = function()
+                            if not self.selectedBar then return 3 end
+                            return self.db.profile.bars[self.selectedBar].numSlots
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].numSlots = val
+                                self:RebuildSlots(self.bars[self.selectedBar])
+                            end
+                        end,
+                        order = 31,
+                    },
+                },
+            },
+            slots = {
+                type = "group",
+                name = "Slot Assignments",
+                inline = true,
+                disabled = function() return not self.selectedBar end,
+                order = 4,
+                args = self:GetSlotArgs(),
+            },
+        }
+    }
+end
+
+----------------------------------------------------
+-- Slot Args (Dynamic)
+----------------------------------------------------
+function SDT:GetSlotArgs()
+    local args = {}
+    
+    if not self.selectedBar then return args end
+    
+    local numSlots = self.db.profile.bars[self.selectedBar].numSlots or 3
+    
+    for i = 1, numSlots do
+        args["slot" .. i] = {
+            type = "select",
+            name = format(L["Slot %d:"], i),
+            values = GetModuleList,
+            get = function()
+                return self.db.profile.bars[self.selectedBar].slots[i] or ""
+            end,
+            set = function(_, val)
+                if val == "" then
+                    self.db.profile.bars[self.selectedBar].slots[i] = nil
+                else
+                    self.db.profile.bars[self.selectedBar].slots[i] = val
+                end
+                self:RebuildSlots(self.bars[self.selectedBar])
+            end,
+            order = i,
+        }
+    end
+    
+    return args
+end
+
+----------------------------------------------------
+-- Module Options (Dynamic)
+----------------------------------------------------
+function SDT:GetModuleOptions()
+    return {
+        type = "group",
+        name = L["Module Settings"],
+        order = 3,
+        childGroups = "select",
+        args = self:BuildModuleArgs(),
+    }
+end
+
+function SDT:BuildModuleArgs()
+    local args = {}
+    
+    for _, moduleName in ipairs(self.cache.moduleNames) do
+        if not self:ExcludedModule(moduleName) then
+            args[moduleName] = {
+                type = "group",
+                name = moduleName,
+                args = self:GetModuleSpecificArgs(moduleName),
+            }
+        end
+    end
+    
+    return args
+end
+
+function SDT:GetModuleSpecificArgs(moduleName)
+    -- This will be populated by modules using SDT:AddModuleConfigSetting
+    local args = {
+        header = {
+            type = "header",
+            name = moduleName .. " " .. L["Settings"],
+            order = 1,
+        }
+    }
+    
+    -- Add any queued settings
+    if self.queuedModuleSettings and self.queuedModuleSettings[moduleName] then
+        for idx, setting in ipairs(self.queuedModuleSettings[moduleName]) do
+            args["setting" .. idx] = self:ConvertSettingToArg(moduleName, setting)
+        end
+    end
+    
+    return args
+end
+
+function SDT:ConvertSettingToArg(moduleName, setting)
+    if setting.settingType == "checkbox" then
+        return {
+            type = "toggle",
+            name = setting.label,
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModules()
+            end,
+        }
+    end
+    -- Add other setting types as needed
+end
+
+----------------------------------------------------
+-- Import/Export Options
+----------------------------------------------------
+function SDT:GetImportExportOptions()
+    return {
+        type = "group",
+        name = "Import/Export",
+        order = 5,
+        args = {
+            header = {
+                type = "header",
+                name = "Profile Import/Export",
+                order = 1,
+            },
+            description = {
+                type = "description",
+                name = "Export your current profile to share with others, or import a profile string.",
+                order = 2,
+            },
+            exportButton = {
+                type = "execute",
+                name = "Export Profile",
+                desc = "Generate an export string for your current profile",
+                func = function()
+                    local exportString = self:ExportProfile()
+                    if exportString then
+                        self.exportString = exportString
+                        LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
+                        self:Print("Profile exported! Copy the string below.")
+                    end
+                end,
+                order = 3,
+            },
+            exportString = {
+                type = "input",
+                name = "Export String",
+                desc = "Copy this string to share your profile",
+                multiline = 8,
+                width = "full",
+                get = function() return self.exportString or "" end,
+                set = function() end, -- Read-only
+                order = 4,
+            },
+            spacer = {
+                type = "header",
+                name = "",
+                order = 5,
+            },
+            importString = {
+                type = "input",
+                name = "Import String",
+                desc = "Paste a profile export string here",
+                multiline = 8,
+                width = "full",
+                get = function() return "" end,
+                set = function(_, val) self.importString = val end,
+                order = 6,
+            },
+            importButton = {
+                type = "execute",
+                name = "Import Profile",
+                desc = "Import the profile string above",
+                confirm = function() return "This will overwrite your current profile. Are you sure?" end,
+                func = function()
+                    if self.importString and self.importString ~= "" then
+                        self:ImportProfile(self.importString)
+                        self.importString = nil
+                    else
+                        self:Print("Please paste an import string first")
+                    end
+                end,
+                order = 7,
+            },
+        }
+    }
+end

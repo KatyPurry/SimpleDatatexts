@@ -8,8 +8,17 @@
 # Libs
 libs/LibStub.lua
 libs/CallbackHandler-1.0.lua
-libs/LibDataBroker-1.1.lua
+libs/AceAddon-3.0/AceAddon-3.0.lua
+libs/AceDB-3.0/AceDB-3.0.lua
+libs/AceDBOptions-3.0/AceDBOptions-3.0.lua
+libs/AceConfig-3.0/AceConfig-3.0.lua
+libs/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
+libs/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
+libs/AceGUI-3.0/AceGUI-3.0.xml
+libs/LibDeflate/LibDeflate.lua
+libs/LibSerialize/LibSerialize.lua
 libs/LibSharedMedia-3.0.lua
+libs/LibDataBroker-1.1.lua
 
 # Locales
 Locales/Locale.lua
@@ -22,9 +31,10 @@ Locales/ptBR.lua
 Locales/ruRU.lua
 
 # Core
+Core.lua
+Database.lua
+Config.lua
 Utilities.lua
-Settings.lua
-SimpleDatatexts.lua
 
 # Ara
 Ara_Broker_Guild_Friends.lua
