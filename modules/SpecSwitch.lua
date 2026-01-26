@@ -84,6 +84,7 @@ local loadoutList = { { text = L["Loadouts"], isTitle = true, notCheckable = tru
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", "Show Label", "showLabel", true)
     SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Icon"], "showSpecIcon", true)
     SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Text"], "showSpecText", true)
     SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Specialization Icon"], "showLootSpecIcon", true)
@@ -242,6 +243,7 @@ function mod.Create(slotFrame)
 
         -- Get our module settings
         local settings = {
+            showLabel = SDT:GetModuleSetting("Talent/Loot Specialization", "showLabel", true),
             showSpecIcon = SDT:GetModuleSetting("Talent/Loot Specialization", "showSpecIcon", true),
             showSpecText = SDT:GetModuleSetting("Talent/Loot Specialization", "showSpecText", true),
             showLootSpecIcon = SDT:GetModuleSetting("Talent/Loot Specialization", "showLootSpecIcon", true),
@@ -295,7 +297,7 @@ function mod.Create(slotFrame)
         local displayParts = {}
 
         -- Main spec display
-        local specTag = (settings.showSpecIcon or settings.showSpecText) and (L["Spec"]..": ") or ""
+        local specTag = settings.showLabel and L["Spec"]..": " or ""
         local specDisplay = formatSpecDisplay(infoIcon, infoName, settings.showSpecIcon, settings.showSpecText, specTag)
         if specDisplay ~= "" then
             displayParts[#displayParts + 1] = specDisplay
@@ -306,7 +308,7 @@ function mod.Create(slotFrame)
         if specLoot and specLoot ~= 0 and specLoot ~= infoID then
             local lootID, lootName, _, lootIcon = GetSpecializationInfoByID(specLoot)
             if lootID then
-                local lootTag = (settings.showLootSpecIcon or settings.showLootSpecText) and (LOOT..": ") or ""
+                local lootTag = settings.showLabel and LOOT..": " or ""
                 local lootDisplay = formatSpecDisplay(lootIcon, lootName, settings.showLootSpecIcon, settings.showLootSpecText, lootTag)
                 if lootDisplay ~= "" then
                     displayParts[#displayParts + 1] = lootDisplay
