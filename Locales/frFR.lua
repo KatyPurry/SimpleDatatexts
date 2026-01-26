@@ -6,108 +6,118 @@ if GetLocale() ~= "frFR" then
 end
 
 -- ----------------------------
--- SimpleDatatexts.lua
+-- Global
 -- ----------------------------
--- Used in: Settings.lua, SimpleDatatexts.lua
+L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(vide)"
-L["(spacer)"] = "(séparateur)"
-L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts chargé. Modules au total :"
-L["Options"] = "Options"
-L["Lock/Unlock"] = "Verrouiller/Déverrouiller"
-L["Width"] = "Largeur"
-L["Height"] = "Hauteur"
-L["Scale"] = "Échelle"
+L["(spacer)"] = "(espace)"
 L["Settings"] = "Paramètres"
-L["Version"] = "Version"
-L["Usage"] = "Utilisation"
-L["barName"] = "Nom de la barre"
-L["value"] = "valeur"
-L["Invalid panel name supplied. Valid panel names are:"] = "Nom de panneau invalide. Les noms valides sont :"
-L["A valid numeric value for the adjustment must be specified."] = "Une valeur numérique valide doit être spécifiée pour l’ajustement."
-L["Invalid panel width specified."] = "Largeur de panneau invalide."
-L["Invalid panel height specified."] = "Hauteur de panneau invalide."
-L["Invalid panel scale specified."] = "Échelle de panneau invalide."
-L["Invalid adjustment type specified."] = "Type d'ajustement invalide."
-L["SDT panels are now"] = "Les panneaux SDT sont maintenant"
-L["LOCKED"] = "VERROUILLÉS"
-L["UNLOCKED"] = "DÉVERROUILLÉS"
-L["Simple Datatexts Version"] = "Version de Simple Datatexts"
 
 -- ----------------------------
--- Settings.lua
+-- Core.lua
 -- ----------------------------
-L["Simple DataTexts"] = "Simple DataTexts"
+L["Left Click to open settings"] = "Clic gauche pour ouvrir les paramètres"
+L["Lock/Unlock"] = "Verrouiller/Déverrouiller"
+L["Minimap Icon Disabled"] = "Icône de la mini-carte désactivée"
+L["Minimap Icon Enabled"] = "Icône de la mini-carte activée"
+L["Not Defined"] = "Non défini"
+L["Toggle Minimap Icon"] = "Basculer l'icône de la mini-carte"
+L["Usage"] = "Utilisation"
+L["Version"] = "Version"
+
+-- ----------------------------
+-- Database.lua
+-- ----------------------------
+L["Error compressing profile data"] = "Erreur lors de la compression des données du profil"
+L["Error decoding import string"] = "Erreur lors du décodage de la chaîne d'importation"
+L["Error decompressing data"] = "Erreur lors de la décompression des données"
+L["Error deserializing profile data"] = "Erreur lors de la désérialisation des données du profil"
+L["Error serializing profile data"] = "Erreur lors de la sérialisation des données du profil"
+L["Importing profile from version %s"] = "Importation du profil depuis la version %s"
+L["Invalid import string: Incorrect version"] = "Chaîne d'importation invalide : version incorrecte"
+L["Invalid profile data"] = "Données de profil invalides"
+L["Migrating old settings to new profile system..."] = "Migration des anciennes options vers le nouveau système de profils..."
+L["Migration complete! All profiles have been migrated."] = "Migration terminée ! Tous les profils ont été migrés."
+L["No import string provided"] = "Aucune chaîne d'importation fournie"
+L["Profile imported successfully!"] = "Profil importé avec succès !"
+
+-- ----------------------------
+-- Config.lua - Global
+-- ----------------------------
+L["Colors"] = "Couleurs"
+L["Custom Color"] = "Couleur Personnalisée"
+L["Display Font:"] = "Police :"
+L["Font Settings"] = "Paramètres de Police"
+L["Font Size"] = "Taille de Police"
+L["Font Outline"] = "Contour de Police"
 L["Global"] = "Global"
-L["Simple DataTexts - Global Settings"] = "Simple DataTexts - Paramètres globaux"
-L["Panels"] = "Panneaux"
-L["Simple DataTexts - Panel Settings"] = "Simple DataTexts - Paramètres des panneaux"
-L["Module Settings"] = "Paramètres du module"
-L["Configure settings for the "] = "Configurer les paramètres pour le "
-L["module."] = "module."
-L["Configuration"] = "Configuration"
-L["Experience Module"] = "Module d'Expérience"
-L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Paramètres d'Expérience"
-L["Profiles"] = "Profils"
-L["Simple DataTexts - Profile Settings"] = "Simple DataTexts - Paramètres des profils"
-L["Lock Panels (disable movement)"] = "Verrouiller les panneaux (désactiver le déplacement)"
-L["Show login message"] = "Afficher le message de connexion"
-L["Use Class Color"] = "Utiliser la couleur de classe"
+L["Global Settings"] = "Paramètres Globaux"
+L["Hide Module Title in Tooltip"] = "Masquer le titre du module dans l'infobulle"
+L["Lock Panels"] = "Verrouiller les panneaux"
+L["Prevent panels from being moved"] = "Empêcher le déplacement des panneaux"
+L["Show Login Message"] = "Afficher le message de connexion"
+L["Show Minimap Icon"] = "Afficher l'icône de la mini-carte"
+L["Toggle the minimap button on or off"] = "Activer/désactiver le bouton de la mini-carte"
 L["Use 24Hr Clock"] = "Utiliser l'horloge 24h"
+L["Use Class Color"] = "Utiliser la couleur de classe"
 L["Use Custom Color"] = "Utiliser une couleur personnalisée"
-L["Hide Module Title in Tooltip"] = "Masquer le titre du module dans l'info-bulle"
-L["Display Font:"] = "Police d’affichage :"
-L["Font Size"] = "Taille de la police"
-L["Create New Panel"] = "Créer un nouveau panneau"
-L["Select Panel:"] = "Sélectionner un panneau :"
-L["Rename Panel:"] = "Renommer le panneau :"
-L["Remove Selected Panel"] = "Supprimer le panneau sélectionné"
-L["Slot %d:"] = "Emplacement %d:"
-L["Scale"] = "Échelle"
-L["Background Opacity"] = "Opacité de l’arrière-plan"
-L["Slots"] = "Emplacements"
-L["Width"] = "Largeur"
-L["Height"] = "Hauteur"
-L["Select Border:"] = "Sélectionner une bordure :"
+
+-- ----------------------------
+-- Config.lua - Panels
+-- ----------------------------
+L["Appearance"] = "Apparence"
+L["Apply Slot Changes"] = "Appliquer les modifications de slot"
+L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Êtes-vous sûr de vouloir supprimer cette barre ?\nCette action est irréversible."
+L["Background Opacity"] = "Opacité de fond"
+L["Border Color"] = "Couleur de la bordure"
 L["Border Size"] = "Taille de la bordure"
-L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Voulez-vous vraiment supprimer cette barre ?\nCette action est irréversible."
-L["Yes"] = "Oui"
-L["No"] = "Non"
-L["(none)"] = "(aucun)"
-L["Display Format:"] = "Format d'Affichage :"
-L["Show Bar"] = "Afficher la Barre"
-L["Hide Blizzard XP Bar"] = "Masquer la barre d'XP de Blizzard"
-L["Bar Height (%)"] = "Hauteur de Barre (%)"
-L["Bar Font Size"] = "Taille de Police de Barre"
-L["Bar Color:"] = "Couleur de Barre :"
-L["Bar Text Color:"] = "Couleur de Texte de Barre :"
-L["Create New Profile:"] = "Créer un nouveau profil :"
-L["Current Profile:"] = "Profil actuel :"
-L["Enable Per-Spec Profiles"] = "Activer les profils par spécialisation"
-L["Copy Profile:"] = "Copier le profil :"
-L["Delete Profile:"] = "Supprimer le profil :"
-L["NYI:"] = "À venir :"
-L["The profile name you have entered already exists. Please enter a new name."] = "Le nom de profil que vous avez saisi existe déjà. Veuillez entrer un nouveau nom."
-L["Ok"] = "OK"
-L["Saved font not found. Resetting font to Friz Quadrata TT."] = "Police enregistrée introuvable. Réinitialisation sur Friz Quadrata TT."
+L["Create New Panel"] = "Créer un nouveau panneau"
+L["Height"] = "Hauteur"
+L["Number of Slots"] = "Nombre de slots"
+L["Panel Settings"] = "Paramètres du panneau"
+L["Panels"] = "Panneaux"
+L["Remove Selected Panel"] = "Supprimer le panneau sélectionné"
+L["Rename Panel:"] = "Renommer le panneau :"
+L["Scale"] = "Échelle"
+L["Select Border:"] = "Sélectionner la bordure :"
+L["Select Panel:"] = "Sélectionner le panneau :"
+L["Size & Scale"] = "Taille & Échelle"
+L["Slot Assignments"] = "Attributions des slots"
+L["Slot %d:"] = "Slot %d :"
+L["Slots"] = "Slots"
+L["Update slot assignment dropdowns after changing number of slots"] = "Mettre à jour les menus déroulants des slots après modification du nombre de slots"
+L["Width"] = "Largeur"
+
+-- ----------------------------
+-- Config.lua - Module Settings
+-- ----------------------------
+L["Module Settings"] = "Paramètres du Module"
+
+-- ----------------------------
+-- Config.lua - Import/Export
+-- ----------------------------
+L["1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy"] = "1. Cliquez sur 'Générer la chaîne d'export' ci-dessus\n2. Cliquez dans cette boîte\n3. Appuyez sur Ctrl+A pour tout sélectionner\n4. Appuyez sur Ctrl+C pour copier"
+L["1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'"] = "1. Collez une chaîne d'importation dans le champ ci-dessous\n2. Cliquez sur Accepter\n3. Cliquez sur 'Importer le profil'"
+L["Create an export string for your current profile"] = "Créer une chaîne d'export pour votre profil actuel"
+L["Export"] = "Exporter"
+L["Export String"] = "Chaîne d'export"
+L["Export string generated! Copy it from the box below."] = "Chaîne d'export générée ! Copiez-la depuis le champ ci-dessous."
+L["Export your current profile to share with others, or import a profile string.\n"] = "Exportez votre profil actuel pour le partager ou importez une chaîne de profil.\n"
+L["Generate Export String"] = "Générer la chaîne d'export"
+L["Import"] = "Importer"
+L["Import/Export"] = "Importer/Exporter"
+L["Import Profile"] = "Importer le profil"
+L["Import String"] = "Chaîne d'import"
+L["Import the profile string from above (after clicking Accept)"] = "Importez la chaîne de profil ci-dessus (après avoir cliqué sur Accepter)"
+L["Please paste an import string and click Accept first"] = "Veuillez d'abord coller une chaîne d'import et cliquer sur Accepter"
+L["Profile Import/Export"] = "Import/Export de profil"
+L["This will overwrite your current profile. Are you sure?"] = "Cela remplacera votre profil actuel. Êtes-vous sûr ?"
 
 -- ----------------------------
 -- Utilities.lua
 -- ----------------------------
-L["Are you sure you want to overwrite your\n'%s' profile?\nThis action cannot be undone."] = "Voulez-vous vraiment écraser votre profil\n'%s' ?\nCette action est irréversible."
-L["You cannot copy the active profile onto itself. Please change your active profile first."] = "Vous ne pouvez pas copier le profil actif sur lui-même. Veuillez d'abord changer votre profil actif."
-L["Invalid source profile specified."] = "Profil source invalide."
-L["You cannot delete the active profile. Please change your active profile first."] = "Vous ne pouvez pas supprimer le profil actif. Veuillez d'abord changer votre profil actif."
-L["Are you sure you want to delete this profile?\nThis action cannot be undone."] = "Voulez-vous vraiment supprimer ce profil ?\nCette action est irréversible."
-
--- ----------------------------
--- Module Settings
--- ----------------------------
-L["Show Label"] = "Afficher le libellé"
-L["Show Short Label"] = "Afficher le libellé court"
-L["Show Silver"] = "Afficher l'argent"
-L["Show Copper"] = "Afficher le cuivre"
-L["Use Coin Icons"] = "Utiliser les icônes de pièces"
-L["Show as Percentage"] = "Afficher en pourcentage"
+L["Panels locked"] = "Panneaux verrouillés"
+L["Panels unlocked"] = "Panneaux déverrouillés"
 
 -- ----------------------------
 -- modules/Agility.lua

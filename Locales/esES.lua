@@ -6,107 +6,118 @@ if GetLocale() ~= "esES" then
 end
 
 -- ----------------------------
--- SimpleDatatexts.lua
+-- Global
 -- ----------------------------
+L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(vacío)"
-L["(spacer)"] = "(separador)"
-L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts cargado. Total de módulos:"
-L["Options"] = "Opciones"
-L["Lock/Unlock"] = "Bloquear/Desbloquear"
-L["Width"] = "Ancho"
-L["Height"] = "Alto"
-L["Scale"] = "Escala"
-L["Settings"] = "Configuración"
-L["Version"] = "Versión"
-L["Usage"] = "Uso"
-L["barName"] = "nombreBarra"
-L["value"] = "valor"
-L["Invalid panel name supplied. Valid panel names are:"] = "Nombre de panel inválido. Los nombres válidos son:"
-L["A valid numeric value for the adjustment must be specified."] = "Debe especificarse un valor numérico válido."
-L["Invalid panel width specified."] = "Ancho de panel inválido."
-L["Invalid panel height specified."] = "Alto de panel inválido."
-L["Invalid panel scale specified."] = "Escala de panel inválida."
-L["Invalid adjustment type specified."] = "Tipo de ajuste inválido."
-L["SDT panels are now"] = "Los paneles SDT ahora están"
-L["LOCKED"] = "BLOQUEADO"
-L["UNLOCKED"] = "DESBLOQUEADO"
-L["Simple Datatexts Version"] = "Versión de Simple Datatexts"
+L["(spacer)"] = "(espaciador)"
+L["Settings"] = "Opciones"
 
 -- ----------------------------
--- Settings.lua
+-- Core.lua
 -- ----------------------------
-L["Simple DataTexts"] = "Simple Datatexts"
+L["Left Click to open settings"] = "Clic izquierdo para abrir opciones"
+L["Lock/Unlock"] = "Bloquear/Desbloquear"
+L["Minimap Icon Disabled"] = "Icono del minimapa desactivado"
+L["Minimap Icon Enabled"] = "Icono del minimapa activado"
+L["Not Defined"] = "No definido"
+L["Toggle Minimap Icon"] = "Alternar icono del minimapa"
+L["Usage"] = "Uso"
+L["Version"] = "Versión"
+
+-- ----------------------------
+-- Database.lua
+-- ----------------------------
+L["Error compressing profile data"] = "Error al comprimir los datos del perfil"
+L["Error decoding import string"] = "Error al decodificar la cadena de importación"
+L["Error decompressing data"] = "Error al descomprimir los datos"
+L["Error deserializing profile data"] = "Error al deserializar los datos del perfil"
+L["Error serializing profile data"] = "Error al serializar los datos del perfil"
+L["Importing profile from version %s"] = "Importando perfil de la versión %s"
+L["Invalid import string: Incorrect version"] = "Cadena de importación inválida: versión incorrecta"
+L["Invalid profile data"] = "Datos de perfil inválidos"
+L["Migrating old settings to new profile system..."] = "Migrando configuraciones antiguas al nuevo sistema de perfiles..."
+L["Migration complete! All profiles have been migrated."] = "¡Migración completa! Todos los perfiles han sido migrados."
+L["No import string provided"] = "No se proporcionó cadena de importación"
+L["Profile imported successfully!"] = "¡Perfil importado con éxito!"
+
+-- ----------------------------
+-- Config.lua - Global
+-- ----------------------------
+L["Colors"] = "Colores"
+L["Custom Color"] = "Color Personalizado"
+L["Display Font:"] = "Fuente:"
+L["Font Settings"] = "Configuración de Fuente"
+L["Font Size"] = "Tamaño de Fuente"
+L["Font Outline"] = "Contorno de Fuente"
 L["Global"] = "Global"
-L["Simple DataTexts - Global Settings"] = "Simple Datatexts - Configuración Global"
-L["Panels"] = "Paneles"
-L["Simple DataTexts - Panel Settings"] = "Simple Datatexts - Configuración de Panel"
-L["Module Settings"] = "Configuración del módulo"
-L["Configure settings for the "] = "Configurar ajustes para el "
-L["module."] = "módulo."
-L["Configuration"] = "Configuración"
-L["Experience Module"] = "Módulo de Experiencia"
-L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Configuración de Experiencia"
-L["Profiles"] = "Perfiles"
-L["Simple DataTexts - Profile Settings"] = "Simple Datatexts - Configuración de Perfil"
-L["Lock Panels (disable movement)"] = "Bloquear paneles (desactivar movimiento)"
-L["Show login message"] = "Mostrar mensaje de inicio de sesión"
+L["Global Settings"] = "Opciones Globales"
+L["Hide Module Title in Tooltip"] = "Ocultar título del módulo en tooltip"
+L["Lock Panels"] = "Bloquear Paneles"
+L["Prevent panels from being moved"] = "Evitar que los paneles se muevan"
+L["Show Login Message"] = "Mostrar mensaje de inicio"
+L["Show Minimap Icon"] = "Mostrar ícono del minimapa"
+L["Toggle the minimap button on or off"] = "Activar/desactivar el botón del minimapa"
+L["Use 24Hr Clock"] = "Usar reloj de 24 horas"
 L["Use Class Color"] = "Usar color de clase"
-L["Use 24Hr Clock"] = "Usar reloj 24h"
 L["Use Custom Color"] = "Usar color personalizado"
-L["Hide Module Title in Tooltip"] = "Ocultar título del módulo en la información"
-L["Display Font:"] = "Fuente mostrada:"
-L["Font Size"] = "Tamaño de fuente"
-L["Create New Panel"] = "Crear nuevo panel"
-L["Select Panel:"] = "Seleccionar panel:"
-L["Rename Panel:"] = "Renombrar panel:"
-L["Remove Selected Panel"] = "Eliminar panel seleccionado"
-L["Slot %d:"] = "Ranura %d:"
-L["Scale"] = "Escala"
-L["Background Opacity"] = "Opacidad del fondo"
-L["Slots"] = "Ranuras"
-L["Width"] = "Ancho"
-L["Height"] = "Alto"
-L["Select Border:"] = "Seleccionar borde:"
-L["Border Size"] = "Tamaño del borde"
+
+-- ----------------------------
+-- Config.lua - Panels
+-- ----------------------------
+L["Appearance"] = "Apariencia"
+L["Apply Slot Changes"] = "Aplicar cambios de ranura"
 L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "¿Estás seguro de que deseas eliminar esta barra?\nEsta acción no se puede deshacer."
-L["Yes"] = "Sí"
-L["No"] = "No"
-L["(none)"] = "(ninguno)"
-L["Display Format:"] = "Formato de Pantalla:"
-L["Show Bar"] = "Mostrar Barra"
-L["Hide Blizzard XP Bar"] = "Ocultar barra de XP de Blizzard"
-L["Bar Height (%)"] = "Altura de Barra (%)"
-L["Bar Font Size"] = "Tamaño de Fuente de Barra"
-L["Bar Color:"] = "Color de Barra:"
-L["Bar Text Color:"] = "Color de Texto de Barra:"
-L["Create New Profile:"] = "Crear nuevo perfil:"
-L["Current Profile:"] = "Perfil actual:"
-L["Enable Per-Spec Profiles"] = "Habilitar perfiles por especialización"
-L["Copy Profile:"] = "Copiar perfil:"
-L["Delete Profile:"] = "Eliminar perfil:"
-L["NYI:"] = "NYI:"
-L["The profile name you have entered already exists. Please enter a new name."] = "El nombre del perfil ya existe. Por favor, ingresa un nuevo nombre."
-L["Ok"] = "Ok"
-L["Saved font not found. Resetting font to Friz Quadrata TT."] = "Fuente guardada no encontrada. Restableciendo a Friz Quadrata TT."
+L["Background Opacity"] = "Opacidad de fondo"
+L["Border Color"] = "Color del borde"
+L["Border Size"] = "Tamaño del borde"
+L["Create New Panel"] = "Crear nuevo panel"
+L["Height"] = "Altura"
+L["Number of Slots"] = "Número de ranuras"
+L["Panel Settings"] = "Configuración del panel"
+L["Panels"] = "Paneles"
+L["Remove Selected Panel"] = "Eliminar panel seleccionado"
+L["Rename Panel:"] = "Renombrar panel:"
+L["Scale"] = "Escala"
+L["Select Border:"] = "Seleccionar borde:"
+L["Select Panel:"] = "Seleccionar panel:"
+L["Size & Scale"] = "Tamaño y escala"
+L["Slot Assignments"] = "Asignación de ranuras"
+L["Slot %d:"] = "Ranura %d:"
+L["Slots"] = "Ranuras"
+L["Update slot assignment dropdowns after changing number of slots"] = "Actualizar los menús desplegables de asignación de ranuras después de cambiar el número de ranuras"
+L["Width"] = "Ancho"
+
+-- ----------------------------
+-- Config.lua - Module Settings
+-- ----------------------------
+L["Module Settings"] = "Configuración de Módulo"
+
+-- ----------------------------
+-- Config.lua - Import/Export
+-- ----------------------------
+L["1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy"] = "1. Haz clic en 'Generar cadena de exportación' arriba\n2. Haz clic en este cuadro\n3. Presiona Ctrl+A para seleccionar todo\n4. Presiona Ctrl+C para copiar"
+L["1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'"] = "1. Pega una cadena de importación en el cuadro de abajo\n2. Haz clic en Aceptar\n3. Haz clic en 'Importar Perfil'"
+L["Create an export string for your current profile"] = "Crear una cadena de exportación para tu perfil actual"
+L["Export"] = "Exportar"
+L["Export String"] = "Cadena de exportación"
+L["Export string generated! Copy it from the box below."] = "Cadena de exportación generada! Cópiala del cuadro de abajo."
+L["Export your current profile to share with others, or import a profile string.\n"] = "Exporta tu perfil actual para compartirlo o importa una cadena de perfil.\n"
+L["Generate Export String"] = "Generar cadena de exportación"
+L["Import"] = "Importar"
+L["Import/Export"] = "Importar/Exportar"
+L["Import Profile"] = "Importar perfil"
+L["Import String"] = "Cadena de importación"
+L["Import the profile string from above (after clicking Accept)"] = "Importa la cadena de perfil de arriba (después de hacer clic en Aceptar)"
+L["Please paste an import string and click Accept first"] = "Por favor, pega primero una cadena de importación y haz clic en Aceptar"
+L["Profile Import/Export"] = "Importar/Exportar perfil"
+L["This will overwrite your current profile. Are you sure?"] = "Esto sobrescribirá tu perfil actual. ¿Estás seguro?"
 
 -- ----------------------------
 -- Utilities.lua
 -- ----------------------------
-L["Are you sure you want to overwrite your\n'%s' profile?\nThis action cannot be undone."] = "¿Estás seguro de que deseas sobrescribir tu perfil\n'%s'?\nEsta acción no se puede deshacer."
-L["You cannot copy the active profile onto itself. Please change your active profile first."] = "No se puede copiar el perfil activo sobre sí mismo. Cambia primero tu perfil activo."
-L["Invalid source profile specified."] = "Perfil fuente inválido."
-L["You cannot delete the active profile. Please change your active profile first."] = "No se puede eliminar el perfil activo. Cambia primero tu perfil activo."
-L["Are you sure you want to delete this profile?\nThis action cannot be undone."] = "¿Estás seguro de que deseas eliminar este perfil?\nEsta acción no se puede deshacer."
-
--- ----------------------------
--- Module Settings
--- ----------------------------
-L["Show Label"] = "Mostrar etiqueta"
-L["Show Short Label"] = "Mostrar etiqueta corta"
-L["Show Silver"] = "Mostrar plata"
-L["Show Copper"] = "Mostrar cobre"
-L["Use Coin Icons"] = "Usar iconos de monedas"
-L["Show as Percentage"] = "Mostrar como porcentaje"
+L["Panels locked"] = "Paneles bloqueados"
+L["Panels unlocked"] = "Paneles desbloqueados"
 
 -- ----------------------------
 -- modules/Agility.lua

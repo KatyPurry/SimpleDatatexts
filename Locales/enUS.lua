@@ -14,7 +14,10 @@ L["Settings"] = "Settings"
 -- ----------------------------
 L["Left Click to open settings"] = "Left Click to open settings"
 L["Lock/Unlock"] = "Lock/Unlock"
+L["Minimap Icon Disabled"] = "Minimap Icon Disabled"
+L["Minimap Icon Enabled"] = "Minimap Icon Enabled"
 L["Not Defined"] = "Not Defined"
+L["Toggle Minimap Icon"] = "Toggle Minimap Icon"
 L["Usage"] = "Usage"
 L["Version"] = "Version"
 

@@ -6,108 +6,118 @@ if GetLocale() ~= "ruRU" then
 end
 
 -- ----------------------------
--- SimpleDatatexts.lua
+-- Global
 -- ----------------------------
--- Used in: Settings.lua, SimpleDatatexts.lua
+L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(пусто)"
-L["(spacer)"] = "(разделитель)"
-L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts загружен. Всего модулей:"
-L["Options"] = "Настройки"
-L["Lock/Unlock"] = "Заблокировать/Разблокировать"
-L["Width"] = "Ширина"
-L["Height"] = "Высота"
-L["Scale"] = "Масштаб"
+L["(spacer)"] = "(пробел)"
 L["Settings"] = "Настройки"
-L["Version"] = "Версия"
-L["Usage"] = "Использование"
-L["barName"] = "Имя панели"
-L["value"] = "значение"
-L["Invalid panel name supplied. Valid panel names are:"] = "Указано недопустимое имя панели. Допустимые имена:"
-L["A valid numeric value for the adjustment must be specified."] = "Необходимо указать допустимое числовое значение для настройки."
-L["Invalid panel width specified."] = "Указана недопустимая ширина панели."
-L["Invalid panel height specified."] = "Указана недопустимая высота панели."
-L["Invalid panel scale specified."] = "Указан недопустимый масштаб панели."
-L["Invalid adjustment type specified."] = "Указан недопустимый тип настройки."
-L["SDT panels are now"] = "Панели SDT теперь"
-L["LOCKED"] = "ЗАБЛОКИРОВАНЫ"
-L["UNLOCKED"] = "РАЗБЛОКИРОВАНЫ"
-L["Simple Datatexts Version"] = "Версия Simple Datatexts"
 
 -- ----------------------------
--- Settings.lua
+-- Core.lua
 -- ----------------------------
-L["Simple DataTexts"] = "Simple DataTexts"
-L["Global"] = "Глобальные"
-L["Simple DataTexts - Global Settings"] = "Simple DataTexts - Глобальные настройки"
-L["Panels"] = "Панели"
-L["Simple DataTexts - Panel Settings"] = "Simple DataTexts - Настройки панелей"
-L["Module Settings"] = "Настройки модуля"
-L["Configure settings for the "] = "Настроить параметры для "
-L["module."] = "модуля."
-L["Configuration"] = "Настройка"
-L["Experience Module"] = "Модуль Опыта"
-L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Настройки Опыта"
-L["Profiles"] = "Профили"
-L["Simple DataTexts - Profile Settings"] = "Simple DataTexts - Настройки профилей"
-L["Lock Panels (disable movement)"] = "Блокировать панели (отключить перемещение)"
-L["Show login message"] = "Показывать сообщение при входе"
-L["Use Class Color"] = "Использовать цвет класса"
-L["Use 24Hr Clock"] = "Использовать 24-часовой формат"
-L["Use Custom Color"] = "Использовать пользовательский цвет"
-L["Hide Module Title in Tooltip"] = "Скрыть название модуля в подсказке"
+L["Left Click to open settings"] = "Левый клик для открытия настроек"
+L["Lock/Unlock"] = "Заблокировать/Разблокировать"
+L["Minimap Icon Disabled"] = "Иконка на миникарте отключена"
+L["Minimap Icon Enabled"] = "Иконка на миникарте включена"
+L["Not Defined"] = "Не определено"
+L["Toggle Minimap Icon"] = "Переключить иконку на миникарте"
+L["Usage"] = "Использование"
+L["Version"] = "Версия"
+
+-- ----------------------------
+-- Database.lua
+-- ----------------------------
+L["Error compressing profile data"] = "Ошибка сжатия данных профиля"
+L["Error decoding import string"] = "Ошибка декодирования строки импорта"
+L["Error decompressing data"] = "Ошибка распаковки данных"
+L["Error deserializing profile data"] = "Ошибка десериализации данных профиля"
+L["Error serializing profile data"] = "Ошибка сериализации данных профиля"
+L["Importing profile from version %s"] = "Импорт профиля из версии %s"
+L["Invalid import string: Incorrect version"] = "Недопустимая строка импорта: неправильная версия"
+L["Invalid profile data"] = "Недопустимые данные профиля"
+L["Migrating old settings to new profile system..."] = "Миграция старых настроек в новую систему профилей..."
+L["Migration complete! All profiles have been migrated."] = "Миграция завершена! Все профили были перенесены."
+L["No import string provided"] = "Строка импорта не предоставлена"
+L["Profile imported successfully!"] = "Профиль успешно импортирован!"
+
+-- ----------------------------
+-- Config.lua - Global
+-- ----------------------------
+L["Colors"] = "Цвета"
+L["Custom Color"] = "Пользовательский цвет"
 L["Display Font:"] = "Шрифт:"
+L["Font Settings"] = "Настройки шрифта"
 L["Font Size"] = "Размер шрифта"
-L["Create New Panel"] = "Создать новую панель"
-L["Select Panel:"] = "Выбрать панель:"
-L["Rename Panel:"] = "Переименовать панель:"
-L["Remove Selected Panel"] = "Удалить выбранную панель"
-L["Slot %d:"] = "Слот %d:"
-L["Scale"] = "Масштаб"
+L["Font Outline"] = "Контур шрифта"
+L["Global"] = "Глобально"
+L["Global Settings"] = "Глобальные настройки"
+L["Hide Module Title in Tooltip"] = "Скрыть название модуля в подсказке"
+L["Lock Panels"] = "Заблокировать панели"
+L["Prevent panels from being moved"] = "Запретить перемещение панелей"
+L["Show Login Message"] = "Показать сообщение при входе"
+L["Show Minimap Icon"] = "Показать значок на миникарте"
+L["Toggle the minimap button on or off"] = "Включить/выключить кнопку на миникарте"
+L["Use 24Hr Clock"] = "Использовать 24-часовой формат"
+L["Use Class Color"] = "Использовать цвет класса"
+L["Use Custom Color"] = "Использовать пользовательский цвет"
+
+-- ----------------------------
+-- Config.lua - Panels
+-- ----------------------------
+L["Appearance"] = "Внешний вид"
+L["Apply Slot Changes"] = "Применить изменения слотов"
+L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Вы уверены, что хотите удалить эту панель?\nЭту операцию нельзя отменить."
 L["Background Opacity"] = "Прозрачность фона"
-L["Slots"] = "Слоты"
-L["Width"] = "Ширина"
-L["Height"] = "Высота"
-L["Select Border:"] = "Выбрать рамку:"
+L["Border Color"] = "Цвет рамки"
 L["Border Size"] = "Размер рамки"
-L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Вы уверены, что хотите удалить эту панель?\nЭто действие нельзя отменить."
-L["Yes"] = "Да"
-L["No"] = "Нет"
-L["(none)"] = "(нет)"
-L["Display Format:"] = "Формат Отображения:"
-L["Show Bar"] = "Показать Полосу"
-L["Hide Blizzard XP Bar"] = "Скрыть полосу опыта Blizzard"
-L["Bar Height (%)"] = "Высота Полосы (%)"
-L["Bar Font Size"] = "Размер Шрифта Полосы"
-L["Bar Color:"] = "Цвет Полосы:"
-L["Bar Text Color:"] = "Цвет Текста Полосы:"
-L["Create New Profile:"] = "Создать новый профиль:"
-L["Current Profile:"] = "Текущий профиль:"
-L["Enable Per-Spec Profiles"] = "Включить профили по специализации"
-L["Copy Profile:"] = "Скопировать профиль:"
-L["Delete Profile:"] = "Удалить профиль:"
-L["NYI:"] = "Будет добавлено:"
-L["The profile name you have entered already exists. Please enter a new name."] = "Имя профиля уже существует. Введите новое имя."
-L["Ok"] = "OK"
-L["Saved font not found. Resetting font to Friz Quadrata TT."] = "Сохранённый шрифт не найден. Сброс на Friz Quadrata TT."
+L["Create New Panel"] = "Создать новую панель"
+L["Height"] = "Высота"
+L["Number of Slots"] = "Количество слотов"
+L["Panel Settings"] = "Настройки панели"
+L["Panels"] = "Панели"
+L["Remove Selected Panel"] = "Удалить выбранную панель"
+L["Rename Panel:"] = "Переименовать панель:"
+L["Scale"] = "Масштаб"
+L["Select Border:"] = "Выбрать рамку:"
+L["Select Panel:"] = "Выбрать панель:"
+L["Size & Scale"] = "Размер и масштаб"
+L["Slot Assignments"] = "Назначение слотов"
+L["Slot %d:"] = "Слот %d:"
+L["Slots"] = "Слоты"
+L["Update slot assignment dropdowns after changing number of slots"] = "Обновить выпадающие списки после изменения числа слотов"
+L["Width"] = "Ширина"
+
+-- ----------------------------
+-- Config.lua - Module Settings
+-- ----------------------------
+L["Module Settings"] = "Настройки модуля"
+
+-- ----------------------------
+-- Config.lua - Import/Export
+-- ----------------------------
+L["1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy"] = "1. Нажмите 'Сгенерировать строку экспорта' выше\n2. Кликните в это поле\n3. Нажмите Ctrl+A, чтобы выбрать всё\n4. Нажмите Ctrl+C, чтобы скопировать"
+L["1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'"] = "1. Вставьте строку импорта в поле ниже\n2. Нажмите Принять\n3. Нажмите 'Импортировать профиль'"
+L["Create an export string for your current profile"] = "Создать строку экспорта для вашего текущего профиля"
+L["Export"] = "Экспорт"
+L["Export String"] = "Строка экспорта"
+L["Export string generated! Copy it from the box below."] = "Строка экспорта создана! Скопируйте её из поля ниже."
+L["Export your current profile to share with others, or import a profile string.\n"] = "Экспортируйте текущий профиль для обмена или импортируйте строку профиля.\n"
+L["Generate Export String"] = "Сгенерировать строку экспорта"
+L["Import"] = "Импорт"
+L["Import/Export"] = "Импорт/Экспорт"
+L["Import Profile"] = "Импортировать профиль"
+L["Import String"] = "Строка импорта"
+L["Import the profile string from above (after clicking Accept)"] = "Импортируйте строку профиля сверху (после нажатия Принять)"
+L["Please paste an import string and click Accept first"] = "Пожалуйста, сначала вставьте строку импорта и нажмите Принять"
+L["Profile Import/Export"] = "Импорт/Экспорт профиля"
+L["This will overwrite your current profile. Are you sure?"] = "Это перезапишет ваш текущий профиль. Вы уверены?"
 
 -- ----------------------------
 -- Utilities.lua
 -- ----------------------------
-L["Are you sure you want to overwrite your\n'%s' profile?\nThis action cannot be undone."] = "Вы уверены, что хотите перезаписать профиль\n'%s'?\nЭто действие нельзя отменить."
-L["You cannot copy the active profile onto itself. Please change your active profile first."] = "Нельзя копировать активный профиль на самого себя. Сначала измените активный профиль."
-L["Invalid source profile specified."] = "Указан недопустимый исходный профиль."
-L["You cannot delete the active profile. Please change your active profile first."] = "Нельзя удалить активный профиль. Сначала измените активный профиль."
-L["Are you sure you want to delete this profile?\nThis action cannot be undone."] = "Вы уверены, что хотите удалить этот профиль?\nЭто действие нельзя отменить."
-
--- ----------------------------
--- Module Settings
--- ----------------------------
-L["Show Label"] = "Показать метку"
-L["Show Short Label"] = "Показать короткую метку"
-L["Show Silver"] = "Показать серебро"
-L["Show Copper"] = "Показать медь"
-L["Use Coin Icons"] = "Использовать значки монет"
-L["Show as Percentage"] = "Показать в процентах"
+L["Panels locked"] = "Панели заблокированы"
+L["Panels unlocked"] = "Панели разблокированы"
 
 -- ----------------------------
 -- modules/Agility.lua
