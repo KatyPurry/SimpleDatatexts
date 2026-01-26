@@ -59,7 +59,7 @@ function SDT:RegisterConfig()
     -- Main options table
     local options = {
         type = "group",
-        name = "Simple DataTexts",
+        name = format("%s - %s: |cff8888ff%s|r", L["Simple DataTexts"], L["Version"], SDT.cache.version),
         childGroups = "tab",
         args = {
             general = self:GetGeneralOptions(),
