@@ -41,6 +41,11 @@ local defaults = {
         moduleSettings = {
             ['*'] = {}
         },
+
+        -- Minimap button setting
+        minimap = {
+            hide = false,
+        }
     },
     
     -- Character-specific data

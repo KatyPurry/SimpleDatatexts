@@ -24,8 +24,25 @@ end
 ----------------------------------------------------
 SDT.LSM = LibStub("LibSharedMedia-3.0")
 SDT.LDB = LibStub("LibDataBroker-1.1")
+SDT.Icon = LibStub("LibDBIcon-1.0")
 SDT.LibDeflate = LibStub:GetLibrary("LibDeflate")
 SDT.AceSerializer = LibStub("AceSerializer-3.0")
+
+----------------------------------------------------
+-- Create LDB Object
+----------------------------------------------------
+local obj = SDT.LDB:NewDataObject("SimpleDatatexts", {
+    type = "data source",
+    text = "SimpleDatatexts",
+    icon = "Interface\\AddOns\\SimpleDatatexts\\textures\\SDT_Minimap_Icon",
+    OnClick = function(_, button)
+        if button == "LeftButton" then SDT:OpenConfig() end
+    end,
+    OnTooltipShow = function(tt)
+        tt:AddLine(L["Simple Datatexts"])
+        tt:AddLine(L["Left Click to open settings"], 1, 1, 1)
+    end,
+})
 
 ----------------------------------------------------
 -- Addon Tables
@@ -77,6 +94,9 @@ function SDT:OnInitialize()
 
     -- Register slash commands
     self:RegisterSlashCommands()
+
+    -- Create minimap button
+    SDT.Icon:Register("SimpleDatatexts", obj, self.db.profile.minimap)
 end
 
 function SDT:OnEnable()

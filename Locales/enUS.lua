@@ -12,6 +12,7 @@ L["Settings"] = "Settings"
 -- ----------------------------
 -- Core.lua
 -- ----------------------------
+L["Left Click to open settings"] = "Left Click to open settings"
 L["Lock/Unlock"] = "Lock/Unlock"
 L["Not Defined"] = "Not Defined"
 L["Usage"] = "Usage"
