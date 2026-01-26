@@ -40,6 +40,7 @@ local obj = SDT.LDB:NewDataObject("SimpleDatatexts", {
     end,
     OnTooltipShow = function(tt)
         tt:AddLine(L["Simple Datatexts"])
+        tt:AddLine(format("|cff8888ff%s: %s|r", L["Version"], SDT.cache.version), 1, 1, 1)
         tt:AddLine(L["Left Click to open settings"], 1, 1, 1)
     end,
 })
