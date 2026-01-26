@@ -82,7 +82,7 @@ function mod.Create(slotFrame)
         barText:SetShadowOffset(1, -1)
 
         -- Text font size
-        local fontSize = SDT.SDTDB_CharDB.settings.expTextFontSize or 12
+        local fontSize = SDT:GetModuleSetting("Experience", "expTextFontSize", 12)
         barText:SetFont(barText:GetFont(), fontSize, "OUTLINE")
 
         -- Dividers (every 10%)
@@ -101,7 +101,7 @@ function mod.Create(slotFrame)
     local function UpdateBarHeight()
         if not barFill then return end
     
-        local heightPercent = SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100
+        local heightPercent = SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)
         local slotHeight = slotFrame:GetHeight()
         local barHeight = (slotHeight * heightPercent) / 100
         local slotWidth = slotFrame:GetWidth()
@@ -120,7 +120,7 @@ function mod.Create(slotFrame)
     local function UpdateBarDividers()
         if not barDividers then return end
     
-        local heightPercent = SDT.SDTDB_CharDB.settings.expBarHeightPercent or 100
+        local heightPercent = SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)
         local slotHeight = slotFrame:GetHeight()
         local barHeight = (slotHeight * heightPercent) / 100
     
@@ -133,10 +133,11 @@ function mod.Create(slotFrame)
     end
 
     local function GetBarColor()
-        if SDT.SDTDB_CharDB.settings.expBarUseClassColor then
+        if SDT:GetModuleSetting("Experience", "expBarUseClassColor", true) then
             return SDTC.colorR, SDTC.colorG, SDTC.colorB, 1
         else
-            local color = SDT.SDTDB_CharDB.settings.expBarColor:gsub("#", "")
+            local colorSetting = SDT:GetModuleSetting("Experience", "expBarColor", "#4080FF")
+            local color = colorSetting:gsub("#", "")
             local r = tonumber(color:sub(1, 2), 16) / 255
             local g = tonumber(color:sub(3, 4), 16) / 255
             local b = tonumber(color:sub(5, 6), 16) / 255
@@ -145,10 +146,11 @@ function mod.Create(slotFrame)
     end
 
     local function GetColoredText(textString)
-        if SDT.SDTDB_CharDB.settings.expTextUseClassColor then
+        if SDT:GetModuleSetting("Experience", "expTextUseClassColor", true) then
             return SDT:ColorText(textString)
         else
-            return format("|cff%s%s|r", SDT.SDTDB_CharDB.settings.expTextColor:gsub("#", ""), textString)
+            local colorSetting = SDT:GetModuleSetting("Experience", "expTextColor", "#FFFFFF")
+            return format("|cff%s%s|r", colorSetting:gsub("#", ""), textString)
         end
     end
 
@@ -180,9 +182,9 @@ function mod.Create(slotFrame)
         local xpRemaining = maxXP - currentXP
 
         local textString = ""
-        local format_mode = SDT.SDTDB_CharDB.settings.expFormat or 1
+        local format_mode = SDT:GetModuleSetting("Experience", "expFormat", 1)
 
-        local showingBar = SDT.SDTDB_CharDB.settings.expShowGraphicalBar
+        local showingBar = SDT:GetModuleSetting("Experience", "expShowGraphicalBar", true)
 
         -- Format mode 1: XP / XPMax
         if format_mode == 1 then
@@ -230,7 +232,7 @@ function mod.Create(slotFrame)
             
             -- Update font size from settings
             local fontPath = LSM:Fetch("font", SDT.SDTDB_CharDB.settings.font) or STANDARD_TEXT_FONT
-            local fontSize = SDT.SDTDB_CharDB.settings.expTextFontSize or 12
+            local fontSize = SDT:GetModuleSetting("Experience", "expTextFontSize", 12)
             barText:SetFont(fontPath, fontSize, "")
         elseif barFrame then
             barFrame:Hide()
@@ -246,7 +248,7 @@ function mod.Create(slotFrame)
         end
 
         -- Hide Blizzard XP bar
-        if SDT.SDTDB_CharDB.settings.expHideBlizzardBar then
+        if SDT:GetModuleSetting("Experience", "expHideBlizzardBar", false) then
             StatusTrackingBarManager:UnregisterAllEvents()
 		    StatusTrackingBarManager:Hide()
             SDT.BlizzardXPBarHidden = true

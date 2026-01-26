@@ -213,7 +213,11 @@ local function checkDefaultDB()
     for _, expSetting in ipairs(expModuleSettings) do
         if charDB.settings[expSetting] ~= nil and activeProfile.moduleSettings["Experience"][expSetting] == nil then
             activeProfile.moduleSettings["Experience"][expSetting] = charDB.settings[expSetting]
+            charDB.settings[expSetting] = nil
         end
+    end
+    if charDB.settings["expShowBar"] ~= nil then
+        charDB.settings["expShowBar"] = nil
     end
 
     SDT.profileBars = SDTDB.profiles[activeProfileName].bars
