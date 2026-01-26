@@ -96,7 +96,7 @@ local function ShowTooltip(self)
     ------------------------------------------------
     -- HEADER: CURRENCIES
     ------------------------------------------------
-    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+    if not SDT.db.profile.hideModuleTitle then
         SDT:AddTooltipHeader(tooltip, 14, L["CURRENCIES"])
         SDT:AddTooltipLine(tooltip, 12, " ")
     end
@@ -116,7 +116,7 @@ local function ShowTooltip(self)
     -- HEADER: GOLD
     ------------------------------------------------
     SDT:AddTooltipLine(tooltip, 12, " ")
-    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+    if not SDT.db.profile.hideModuleTitle then
         SDT:AddTooltipHeader(tooltip, 14, L["GOLD"])
     end
     SDT:AddTooltipLine(tooltip, 12, UnitName("player"), FormatMoney(GetMoney()), 1,1,1, 1,1,1)

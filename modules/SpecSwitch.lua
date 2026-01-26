@@ -334,7 +334,7 @@ function mod.Create(slotFrame)
     slotFrame:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, SDT:FindBestAnchorPoint(self))
         GameTooltip:ClearLines()
-        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+        if not SDT.db.profile.hideModuleTitle then
             SDT:AddTooltipHeader(GameTooltip, 14, SDT:ColorText(SPECIALIZATION))
             SDT:AddTooltipLine(GameTooltip, 12, " ")
         end

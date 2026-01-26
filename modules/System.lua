@@ -67,7 +67,7 @@ function mod.OnEnter(self)
     local anchor = SDT:FindBestAnchorPoint(self)
     GameTooltip:SetOwner(self, anchor)
     GameTooltip:ClearLines()
-    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+    if not SDT.db.profile.hideModuleTitle then
         SDT:AddTooltipHeader(GameTooltip, 14, L["SYSTEM"])
         SDT:AddTooltipLine(GameTooltip, 12, " ")
     end

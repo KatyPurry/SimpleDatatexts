@@ -34,7 +34,6 @@ local WARBANDBANK_TYPE                       = (Enum.BankType and Enum.BankType.
 ----------------------------------------------------
 -- State
 ----------------------------------------------------
-SDTDB.gold = SDTDB.gold or {}
 local Profit, Spent = 0, 0
 local Ticker = nil
 local myGold = {}
@@ -132,7 +131,7 @@ end
 local function RebuildGoldCache()
     wipe(myGold)
     totalGold, totalHorde, totalAlliance = 0, 0, 0
-    for realm, chars in pairs(SDTDB.gold) do
+    for realm, chars in pairs(SDT.db.global.gold) do
         for name, charValues in pairs(chars) do
             tinsert(myGold, {
                 name = name,
@@ -156,13 +155,13 @@ local function UpdateGold(self)
     local playerName = SDT.cache.playerName
     local realmName = SDT.cache.playerRealmProper
     local faction = SDT.cache.playerFaction
-    SDTDB.gold[realmName] = SDTDB.gold[realmName] or {}
-    SDTDB.gold[realmName][playerName] = SDTDB.gold[realmName][playerName] or {}
-    SDTDB.gold[realmName][playerName].faction = faction
+    SDT.db.global.gold[realmName] = SDT.db.global.gold[realmName] or {}
+    SDT.db.global.gold[realmName][playerName] = SDT.db.global.gold[realmName][playerName] or {}
+    SDT.db.global.gold[realmName][playerName].faction = faction
 
-    local oldMoney = SDTDB.gold[realmName][playerName].amount
+    local oldMoney = SDT.db.global.gold[realmName][playerName].amount
     local newMoney = GetMoney()
-    SDTDB.gold[realmName][playerName].amount = newMoney
+    SDT.db.global.gold[realmName][playerName].amount = newMoney
 
     local change = (oldMoney and (newMoney - oldMoney)) or 0
     if change ~= 0 then
@@ -199,7 +198,7 @@ local function ShowTooltip(self)
     local anchor = SDT:FindBestAnchorPoint(self)
     tooltip:SetOwner(self, anchor)
     tooltip:ClearLines()
-    if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+    if not SDT.db.profile.hideModuleTitle then
         SDT:AddTooltipHeader(tooltip, 14, L["GOLD"])
         SDT:AddTooltipLine(tooltip, 12, " ")
     end

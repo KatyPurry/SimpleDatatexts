@@ -64,7 +64,7 @@ end
 
 local function ConvertTime(h, m, s)
     local charKey = SDT:GetCharKey()
-    if SDTDB[charKey].settings.use24HourClock then
+    if SDT.db.profile.use24HourClock then
         return h, m, s, -1
     elseif h >= 12 then
         if h > 12 then h = h - 12 end
@@ -176,7 +176,7 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+        if not SDT.db.profile.hideModuleTitle then
             SDT:AddTooltipHeader(GameTooltip, 14, L["TIME"])
             SDT:AddTooltipLine(GameTooltip, 12, " ")
         end

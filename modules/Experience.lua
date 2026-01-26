@@ -231,7 +231,7 @@ function mod.Create(slotFrame)
             barFill:SetColorTexture(r, g, b, 0.8)
             
             -- Update font size from settings
-            local fontPath = LSM:Fetch("font", SDT.SDTDB_CharDB.settings.font) or STANDARD_TEXT_FONT
+            local fontPath = LSM:Fetch("font", SDT.db.profile.font) or STANDARD_TEXT_FONT
             local fontSize = SDT:GetModuleSetting("Experience", "expTextFontSize", 12)
             barText:SetFont(fontPath, fontSize, "")
         elseif barFrame then
@@ -291,7 +291,7 @@ function mod.Create(slotFrame)
         local anchor = SDT:FindBestAnchorPoint(self)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
-        if not SDT.SDTDB_CharDB.settings.hideModuleTitle then
+        if not SDT.db.profile.hideModuleTitle then
             SDT:AddTooltipHeader(GameTooltip, 14, L["Experience"])
             SDT:AddTooltipLine(GameTooltip, 12, " ")
         end
