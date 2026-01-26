@@ -61,7 +61,7 @@ function SDT:BuildCache()
     self.cache.colorG = colors[2]
     self.cache.colorB = colors[3]
     self.cache.colorHex = GetClassColor(self.cache.playerClass):GenerateHexColor()
-    self.cache.version = GetAddOnMetadata(addonName, "Version") or "not defined"
+    self.cache.version = GetAddOnMetadata(addonName, "Version") or L["Not Defined"]
     self.cache.moduleNames = {}
 end
 
@@ -167,7 +167,7 @@ function SDT:HandleSlashCommand(msg)
     elseif command == "lock" then
         self:ToggleLock()
     elseif command == "version" then
-        self:Print(format("%s: |cff8888ff%s|r", self.L["Simple Datatexts Version"], self.cache.version))
+        self:Print(format("%s %s: |cff8888ff%s|r", self.L["Simple Datatexts"], self.L["Version"], self.cache.version))
     else
         self:Print(self.L["Usage"] .. ":")
         self:Print("/sdt config - " .. self.L["Settings"])
