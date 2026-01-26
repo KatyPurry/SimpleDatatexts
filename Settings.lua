@@ -83,8 +83,7 @@ local charDefaultsTable = {
         fontSize = 12,
         fontOutline = "NONE",
         debug = false,
-    },
-    moduleSettings = {}
+    }
 }
 
 local function checkDefaultDB()

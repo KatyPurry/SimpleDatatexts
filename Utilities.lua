@@ -139,11 +139,6 @@ function SDT:SetModuleConfigValue(moduleName, settingKey, value)
         
         -- Set the value in the profile
         SDTDB.profiles[profileName].moduleSettings[moduleName][settingKey] = value
-    else
-        -- Fallback to character settings
-        SDT.SDTDB_CharDB.moduleSettings = SDT.SDTDB_CharDB.moduleSettings or {}
-        SDT.SDTDB_CharDB.moduleSettings[moduleName] = SDT.SDTDB_CharDB.moduleSettings[moduleName] or {}
-        SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = value
     end
 end
 
@@ -171,12 +166,7 @@ function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, 
     -- Initialize module settings in saved variables
     local profileName = SDT.activeProfile
     if not profileName or not SDTDB.profiles[profileName] then
-        -- Fallback to character settings if no profile is active yet
-        SDT.SDTDB_CharDB.moduleSettings = SDT.SDTDB_CharDB.moduleSettings or {}
-        SDT.SDTDB_CharDB.moduleSettings[moduleName] = SDT.SDTDB_CharDB.moduleSettings[moduleName] or {}
-        if SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] == nil then
-            SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = defaultValue
-        end
+        SDT.Print("ERROR: Profile not found. This should never happen.")
     else
         -- Use profile-based settings
         SDTDB.profiles[profileName].moduleSettings = SDTDB.profiles[profileName].moduleSettings or {}
@@ -206,18 +196,6 @@ function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, 
             SDT:UpdateAllModules()
         end)
         panel.lastAnchor = checkbox
-
-        --[[checkbox:SetChecked(SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey])
-        checkbox:SetScript("OnClick", function(self)
-            SDT.SDTDB_CharDB.moduleSettings[moduleName][settingKey] = self:GetChecked()
-            -- Trigger module update if it has an Update function
-            local module = SDT.modules[moduleName]
-            if module and module.OnConfigChanged then
-                module.OnConfigChanged()
-            end
-            SDT:UpdateAllModules()
-        end)
-        panel.lastAnchor = checkbox]]
         
     elseif settingType == "slider" then
         -- Add slider implementation here if needed
