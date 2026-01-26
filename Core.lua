@@ -2,7 +2,9 @@
 local addonName, SDT = ...
 
 -- Create the addon object using Ace3
-SDT = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0")
+for k, v in pairs(LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0")) do
+    SDT[k] = v
+end
 _G.SimpleDatatexts = SDT
 
 ----------------------------------------------------
