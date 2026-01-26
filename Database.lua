@@ -143,7 +143,7 @@ function SDT:MigrateOldData()
         return
     end
 
-    self:Print("Migrating old settings to new profile system...")
+    self:Print(L["Migrating old settings to new profile system..."])
     
     -- Migrate ALL old profiles to AceDB profiles
     if oldDB.profiles then
@@ -215,7 +215,7 @@ function SDT:MigrateOldData()
         self.db.global.AraBroker = CopyTable(oldDB.AraBroker)
     end
     
-    self:Print("Migration complete! All profiles have been migrated.")
+    self:Print(L["Migration complete! All profiles have been migrated."])
     
     -- Mark as migrated
     oldDB._migrated = true
@@ -292,13 +292,13 @@ function SDT:ExportProfile()
     
     local serialized = self.AceSerializer:Serialize(profileData)
     if not serialized then
-        self:Print("Error serializing profile data")
+        self:Print(L["Error serializing profile data"])
         return nil
     end
     
     local compressed = self.LibDeflate:CompressDeflate(serialized)
     if not compressed then
-        self:Print("Error compressing profile data")
+        self:Print(L["Error compressing profile data"])
         return nil
     end
     
@@ -311,7 +311,7 @@ end
 ----------------------------------------------------
 function SDT:ImportProfile(importString)
     if not importString or importString == "" then
-        self:Print("No import string provided")
+        self:Print(L["No import string provided"])
         return false
     end
 
@@ -319,41 +319,38 @@ function SDT:ImportProfile(importString)
     importString = importString:gsub("%s", "")
 
     if importString:sub(1, 4) ~= "SDT1" then
-        self:Print("Invalid import string: Incorrect version")
+        self:Print(L["Invalid import string: Incorrect version"])
         return false
     end
     
     local rawString = importString:sub(6)
     local decoded = self.LibDeflate:DecodeForPrint(rawString)
     if not decoded then
-        self:Print("Error decoding import string")
+        self:Print(L["Error decoding import string"])
         return false
     end
     
     local decompressed = self.LibDeflate:DecompressDeflate(decoded)
     if not decompressed then
-        self:Print("Error decompressing data")
+        self:Print(L["Error decompressing data"])
         return false
     end
     
     local success, profileData = self.AceSerializer:Deserialize(decompressed)
     if not success or not profileData then
-        self:Print("Error deserializing profile data")
+        self:Print(L["Error deserializing profile data"])
         return false
     end
     
     -- Validate version (optional)
     if profileData.version then
-        self:Print(format("Importing profile from version %s", profileData.version))
+        self:Print(format(L["Importing profile from version %s"], profileData.version))
     end
     
     -- Import the profile
     if profileData.profile then
-        self:Print("DEBUG: Starting profile import...")
         -- Clear current profile
         wipe(self.db.profile)
-
-        self:Print(format("DEBUG: Importing %d settings...", self:CountTableKeys(profileData.profile)))
         
         -- Copy imported data
         for k, v in pairs(profileData.profile) do
@@ -362,28 +359,24 @@ function SDT:ImportProfile(importString)
             else
                 self.db.profile[k] = v
             end
-            self:Print(format("DEBUG: Imported setting: %s", tostring(k)))
         end
         
-        self:Print("Profile imported successfully!")
+        self:Print(L["Profile imported successfully!"])
 
         -- Refresh config
-        self:Print("DEBUG: Calling RefreshConfig...")
         self:RefreshConfig()
 
         -- Rebuild our config
         if self.configDialog and self.configDialog:IsShown() then
-            self:Print("DEBUG: Rebuilding config UI...")
             self:RebuildConfig()
         end
 
         -- Apply the font settings
-        self:Print("DEBUG: Applying fonts...")
         self:ApplyFont()
 
         return true
     else
-        self:Print("Invalid profile data")
+        self:Print(L["Invalid profile data"])
         return false
     end
 end

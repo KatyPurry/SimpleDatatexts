@@ -2,108 +2,116 @@ local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
 -- ----------------------------
--- SimpleDatatexts.lua
+-- Global
 -- ----------------------------
--- Used in: Settings.lua, SimpleDatatexts.lua
+L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(empty)"
 L["(spacer)"] = "(spacer)"
-L["Simple Datatexts loaded. Total modules:"] = "Simple Datatexts loaded. Total modules:"
-L["Options"] = "Options"
-L["Lock/Unlock"] = "Lock/Unlock"
-L["Width"] = "Width"
-L["Height"] = "Height"
-L["Scale"] = "Scale"
 L["Settings"] = "Settings"
-L["Version"] = "Version"
-L["Usage"] = "Usage"
-L["barName"] = "barName"
-L["value"] = "value"
-L["Invalid panel name supplied. Valid panel names are:"] = "Invalid panel name supplied. Valid panel names are:"
-L["A valid numeric value for the adjustment must be specified."] = "A valid numeric value for the adjustment must be specified."
-L["Invalid panel width specified."] = "Invalid panel width specified."
-L["Invalid panel height specified."] = "Invalid panel height specified."
-L["Invalid panel scale specified."] = "Invalid panel scale specified."
-L["Invalid adjustment type specified."] = "Invalid adjustment type specified."
-L["SDT panels are now"] = "SDT panels are now"
-L["LOCKED"] = "LOCKED"
-L["UNLOCKED"] = "UNLOCKED"
-L["Simple Datatexts Version"] = "Simple Datatexts Version"
 
 -- ----------------------------
--- Settings.lua
+-- Core.lua
 -- ----------------------------
-L["Simple DataTexts"] = "Simple DataTexts"
-L["Global"] = "Global"
-L["Simple DataTexts - Global Settings"] = "Simple DataTexts - Global Settings"
-L["Panels"] = "Panels"
-L["Simple DataTexts - Panel Settings"] = "Simple DataTexts - Panel Settings"
-L["Module Settings"] = "Module Settings"
-L["Configure settings for the "] = "Configure settings for the "
-L["module."] = "module."
-L["Configuration"] = "Configuration"
-L["Experience Module"] = "Experience Module"
-L["Simple DataTexts - Experience Settings"] = "Simple DataTexts - Experience Settings"
-L["Profiles"] = "Profiles"
-L["Simple DataTexts - Profile Settings"] = "Simple DataTexts - Profile Settings"
-L["Lock Panels (disable movement)"] = "Lock Panels (disable movement)"
-L["Show login message"] = "Show login message"
-L["Use Class Color"] = "Use Class Color"
-L["Use 24Hr Clock"] = "Use 24Hr Clock"
-L["Use Custom Color"] = "Use Custom Color"
-L["Hide Module Title in Tooltip"] = "Hide Module Title in Tooltip"
+L["Lock/Unlock"] = "Lock/Unlock"
+L["Not Defined"] = "Not Defined"
+L["Usage"] = "Usage"
+L["Version"] = "Version"
+
+-- ----------------------------
+-- Database.lua
+-- ----------------------------
+L["Error compressing profile data"] = "Error compressing profile data"
+L["Error decoding import string"] = "Error decoding import string"
+L["Error decompressing data"] = "Error decompressing data"
+L["Error deserializing profile data"] = "Error deserializing profile data"
+L["Error serializing profile data"] = "Error serializing profile data"
+L["Importing profile from version %s"] = "Importing profile from version %s"
+L["Invalid import string: Incorrect version"] = "Invalid import string: Incorrect version"
+L["Invalid profile data"] = "Invalid profile data"
+L["Migrating old settings to new profile system..."] = "Migrating old settings to new profile system..."
+L["Migration complete! All profiles have been migrated."] = "Migration complete! All profiles have been migrated."
+L["No import string provided"] = "No import string provided"
+L["Profile imported successfully!"] = "Profile imported successfully!"
+
+-- ----------------------------
+-- Config.lua - General
+-- ----------------------------
+L["Colors"] = "Colors"
+L["Custom Color"] = "Custom Color"
 L["Display Font:"] = "Display Font:"
+L["Font Settings"] = "Font Settings"
 L["Font Size"] = "Font Size"
-L["Create New Panel"] = "Create New Panel"
-L["Select Panel:"] = "Select Panel:"
-L["Rename Panel:"] = "Rename Panel:"
-L["Remove Selected Panel"] = "Remove Selected Panel"
-L["Slot %d:"] = "Slot %d:"
-L["Scale"] = "Scale"
-L["Background Opacity"] = "Background Opacity"
-L["Slots"] = "Slots"
-L["Width"] = "Width"
-L["Height"] = "Height"
-L["Select Border:"] = "Select Border:"
-L["Border Size"] = "Border Size"
+L["Font Outline"] = "Font Outline"
+L["Global"] = "Global"
+L["Global Settings"] = "Global Settings"
+L["Hide Module Title in Tooltip"] = "Hide Module Title in Tooltip"
+L["Lock Panels (disable movement)"] = "Lock Panels (disable movement)"
+L["Prevent panels from being moved"] = "Prevent panels from being moved"
+L["Show login message"] = "Show login message"
+L["Use 24Hr Clock"] = "Use 24Hr Clock"
+L["Use Class Color"] = "Use Class Color"
+L["Use Custom Color"] = "Use Custom Color"
+
+-- ----------------------------
+-- Config.lua - Panels
+-- ----------------------------
+L["Appearance"] = "Appearance"
+L["Apply Slot Changes"] = "Apply Slot Changes"
 L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Are you sure you want to delete this bar?\nThis action cannot be undone."
-L["Yes"] = "Yes"
-L["No"] = "No"
-L["(none)"] = "(none)"
-L["Display Format:"] = "Display Format:"
-L["Show Bar"] = "Show Bar"
-L["Hide Blizzard XP Bar"] = "Hide Blizzard XP Bar"
-L["Bar Height (%)"] = "Bar Height (%)"
-L["Bar Font Size"] = "Bar Font Size"
-L["Bar Color:"] = "Bar Color:"
-L["Bar Text Color:"] = "Bar Text Color:"
-L["Create New Profile:"] = "Create New Profile:"
-L["Current Profile:"] = "Current Profile:"
-L["Enable Per-Spec Profiles"] = "Enable Per-Spec Profiles"
-L["Copy Profile:"] = "Copy Profile:"
-L["Delete Profile:"] = "Delete Profile:"
-L["NYI:"] = "NYI:"
-L["The profile name you have entered already exists. Please enter a new name."] = "The profile name you have entered already exists. Please enter a new name."
-L["Ok"] = "Ok"
-L["Saved font not found. Resetting font to Friz Quadrata TT."] = "Saved font not found. Resetting font to Friz Quadrata TT."
+L["Background Opacity"] = "Background Opacity"
+L["Border Color"] = "Border Color"
+L["Border Size"] = "Border Size"
+L["Create New Panel"] = "Create New Panel"
+L["Height"] = "Height"
+L["Number of Slots"] = "Number of Slots"
+L["Panel Settings"] = "Panel Settings"
+L["Panels"] = "Panels"
+L["Remove Selected Panel"] = "Remove Selected Panel"
+L["Rename Panel:"] = "Rename Panel:"
+L["Scale"] = "Scale"
+L["Select Border:"] = "Select Border:"
+L["Select Panel:"] = "Select Panel:"
+L["Size & Scale"] = "Size & Scale"
+L["Slot Assignments"] = "Slot Assignments"
+L["Slots"] = "Slots"
+L["Update slot assignment dropdowns after changing number of slots"] = "Update slot assignment dropdowns after changing number of slots"
+L["Width"] = "Width"
+
+-- ----------------------------
+-- Config.lua - Slots
+-- ----------------------------
+L["Slot %d:"] = "Slot %d:"
+
+-- ----------------------------
+-- Config.lua - Modules
+-- ----------------------------
+L["Module Settings"] = "Module Settings"
+
+-- ----------------------------
+-- Config.lua - Import/Export
+-- ----------------------------
+L["1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy"] = "1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy"
+L["1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'"] = "1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'"
+L["Create an export string for your current profile"] = "Create an export string for your current profile"
+L["Export"] = "Export"
+L["Export String"] = "Export String"
+L["Export string generated! Copy it from the box below."] = "Export string generated! Copy it from the box below."
+L["Export your current profile to share with others, or import a profile string.\n"] = "Export your current profile to share with others, or import a profile string.\n"
+L["Generate Export String"] = "Generate Export String"
+L["Import"] = "Import"
+L["Import/Export"] = "Import/Export"
+L["Import Profile"] = "Import Profile"
+L["Import String"] = "Import String"
+L["Import the profile string from above (after clicking Accept)"] = "Import the profile string from above (after clicking Accept)"
+L["Please paste an import string and click Accept first"] = "Please paste an import string and click Accept first"
+L["Profile Import/Export"] = "Profile Import/Export"
+L["This will overwrite your current profile. Are you sure?"] = "This will overwrite your current profile. Are you sure?"
 
 -- ----------------------------
 -- Utilities.lua
 -- ----------------------------
-L["Are you sure you want to overwrite your\n'%s' profile?\nThis action cannot be undone."] = "Are you sure you want to overwrite your\n'%s' profile?\nThis action cannot be undone."
-L["You cannot copy the active profile onto itself. Please change your active profile first."] = "You cannot copy the active profile onto itself. Please change your active profile first."
-L["Invalid source profile specified."] = "Invalid source profile specified."
-L["You cannot delete the active profile. Please change your active profile first."] = "You cannot delete the active profile. Please change your active profile first."
-L["Are you sure you want to delete this profile?\nThis action cannot be undone."] = "Are you sure you want to delete this profile?\nThis action cannot be undone."
-
--- ----------------------------
--- Module Settings
--- ----------------------------
-L["Show Label"] = "Show Label"
-L["Show Short Label"] = "Show Short Label"
-L["Show Silver"] = "Show Silver"
-L["Show Copper"] = "Show Copper"
-L["Use Coin Icons"] = "Use Coin Icons"
-L["Show as Percentage"] = "Show as Percentage"
+L["Panels locked"] = "Panels locked"
+L["Panels unlocked"] = "Panels unlocked"
 
 -- ----------------------------
 -- modules/Agility.lua

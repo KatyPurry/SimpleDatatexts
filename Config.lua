@@ -133,7 +133,7 @@ function SDT:GetGeneralOptions()
             locked = {
                 type = "toggle",
                 name = L["Lock Panels (disable movement)"],
-                desc = "Prevent panels from being moved",
+                desc = L["Prevent panels from being moved"],
                 get = function() return self.db.profile.locked end,
                 set = function(_, val)
                     self.db.profile.locked = val
@@ -169,7 +169,7 @@ function SDT:GetGeneralOptions()
             },
             spacer1 = {
                 type = "header",
-                name = "Colors",
+                name = L["Colors"],
                 order = 10,
             },
             useClassColor = {
@@ -200,7 +200,7 @@ function SDT:GetGeneralOptions()
             },
             customColorHex = {
                 type = "color",
-                name = "Custom Color",
+                name = L["Custom Color"],
                 disabled = function() return not self.db.profile.useCustomColor end,
                 get = function()
                     local hex = self.db.profile.customColorHex:gsub("#", "")
@@ -217,7 +217,7 @@ function SDT:GetGeneralOptions()
             },
             spacer2 = {
                 type = "header",
-                name = "Font Settings",
+                name = L["Font Settings"],
                 order = 20,
             },
             font = {
@@ -246,7 +246,7 @@ function SDT:GetGeneralOptions()
             },
             fontOutline = {
                 type = "select",
-                name = "Font Outline",
+                name = L["Font Outline"],
                 values = {
                     ["NONE"] = L["None"],
                     ["OUTLINE"] = "Outline",
@@ -302,7 +302,7 @@ function SDT:GetPanelOptions()
             },
             barSettings = {
                 type = "group",
-                name = "Panel Settings",
+                name = L["Panel Settings"],
                 inline = true,
                 disabled = function() return not self.selectedBar end,
                 order = 3,
@@ -338,7 +338,7 @@ function SDT:GetPanelOptions()
                     },
                     spacer1 = {
                         type = "header",
-                        name = "Size & Scale",
+                        name = L["Size & Scale"],
                         order = 10,
                     },
                     width = {
@@ -399,7 +399,7 @@ function SDT:GetPanelOptions()
                     },
                     spacer2 = {
                         type = "header",
-                        name = "Appearance",
+                        name = L["Appearance"],
                         order = 20,
                     },
                     bgOpacity = {
@@ -468,7 +468,7 @@ function SDT:GetPanelOptions()
                     },
                     borderColor = {
                         type = "color",
-                        name = "Border Color",
+                        name = L["Border Color"],
                         disabled = function()
                             if not self.selectedBar then return true end
                             return self.db.profile.bars[self.selectedBar].borderName == "None"
@@ -498,7 +498,7 @@ function SDT:GetPanelOptions()
                     },
                     numSlots = {
                         type = "range",
-                        name = "Number of Slots",
+                        name = L["Number of Slots"],
                         min = 1,
                         max = 12,
                         step = 1,
@@ -521,8 +521,8 @@ function SDT:GetPanelOptions()
                     },
                     applySlots = {
                         type = "execute",
-                        name = "Apply Slot Changes",
-                        desc = "Update slot assignment dropdowns after changing number of slots",
+                        name = L["Apply Slot Changes"],
+                        desc = L["Update slot assignment dropdowns after changing number of slots"],
                         disabled = function() return not self.needsSlotRebuild end,
                         func = function()
                             self.needsSlotRebuild = false
@@ -534,7 +534,7 @@ function SDT:GetPanelOptions()
             },
             slots = {
                 type = "group",
-                name = "Slot Assignments",
+                name = L["Slot Assignments"],
                 inline = true,
                 disabled = function() return not self.selectedBar end,
                 order = 4,
@@ -657,43 +657,43 @@ end
 function SDT:GetImportExportOptions()
     return {
         type = "group",
-        name = "Import/Export",
+        name = L["Import/Export"],
         order = 5,
         args = {
             header = {
                 type = "header",
-                name = "Profile Import/Export",
+                name = L["Profile Import/Export"],
                 order = 1,
             },
             description = {
                 type = "description",
-                name = "Export your current profile to share with others, or import a profile string.\n",
+                name = L["Export your current profile to share with others, or import a profile string.\n"],
                 order = 2,
             },
             -- EXPORT SECTION
             exportHeader = {
                 type = "header",
-                name = "Export",
+                name = L["Export"],
                 order = 10,
             },
             exportButton = {
                 type = "execute",
-                name = "Generate Export String",
-                desc = "Create an export string for your current profile",
+                name = L["Generate Export String"],
+                desc = L["Create an export string for your current profile"],
                 func = function()
                     local exportString = self:ExportProfile()
                     if exportString then
                         self.exportString = exportString
                         LibStub("AceConfigRegistry-3.0"):NotifyChange("SimpleDatatexts")
-                        self:Print("Export string generated! Copy it from the box below.")
+                        self:Print(L["Export string generated! Copy it from the box below."])
                     end
                 end,
                 order = 11,
             },
             exportString = {
                 type = "input",
-                name = "Export String",
-                desc = "1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy",
+                name = L["Export String"],
+                desc = L["1. Click 'Generate Export String' above\n2. Click in this box\n3. Press Ctrl+A to select all\n4. Press Ctrl+C to copy"],
                 multiline = 8,
                 width = "full",
                 get = function() return self.exportString or "" end,
@@ -703,13 +703,13 @@ function SDT:GetImportExportOptions()
             -- IMPORT SECTION
             importHeader = {
                 type = "header",
-                name = "Import",
+                name = L["Import"],
                 order = 20,
             },
             importString = {
                 type = "input",
-                name = "Import String",
-                desc = "1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'",
+                name = L["Import String"],
+                desc = L["1. Paste an import string in the box below\n2. Click Accept\n3. Click 'Import Profile'"],
                 multiline = 8,
                 width = "full",
                 get = function() return self.importString or "" end,
@@ -720,12 +720,12 @@ function SDT:GetImportExportOptions()
             },
             importButton = {
                 type = "execute",
-                name = "Import Profile",
-                desc = "Import the profile string from above (after clicking Accept)",
-                confirm = function() return "This will overwrite your current profile. Are you sure?" end,
+                name = L["Import Profile"],
+                desc = L["Import the profile string from above (after clicking Accept)"],
+                confirm = function() return L["This will overwrite your current profile. Are you sure?"] end,
                 func = function()
                     if not self.importString or self.importString == "" then
-                        self:Print("Please paste an import string and click Accept first")
+                        self:Print(L["Please paste an import string and click Accept first"])
                         return
                     end
                     

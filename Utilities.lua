@@ -3,11 +3,6 @@ local addonName, SDT = ...
 local L = SDT.L
 
 ----------------------------------------------------
--- Library Instances (already set in Core.lua)
-----------------------------------------------------
--- SDT.LSM, SDT.LDB, etc. are initialized in Core.lua
-
-----------------------------------------------------
 -- Lua Locals
 ----------------------------------------------------
 local format = string.format

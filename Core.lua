@@ -167,12 +167,12 @@ function SDT:HandleSlashCommand(msg)
     elseif command == "lock" then
         self:ToggleLock()
     elseif command == "version" then
-        self:Print(format("%s %s: |cff8888ff%s|r", self.L["Simple Datatexts"], self.L["Version"], self.cache.version))
+        self:Print(format("%s %s: |cff8888ff%s|r", L["Simple Datatexts"], L["Version"], self.cache.version))
     else
-        self:Print(self.L["Usage"] .. ":")
-        self:Print("/sdt config - " .. self.L["Settings"])
-        self:Print("/sdt lock - " .. self.L["Lock/Unlock"])
-        self:Print("/sdt version - " .. self.L["Version"])
+        self:Print(L["Usage"] .. ":")
+        self:Print("/sdt config - " .. L["Settings"])
+        self:Print("/sdt lock - " .. L["Lock/Unlock"])
+        self:Print("/sdt version - " .. L["Version"])
     end
 end
 
@@ -352,7 +352,7 @@ function SDT:RebuildSlots(bar)
         else
             slot.module = nil
             if slot.moduleFrame then slot.moduleFrame:Hide() end
-            slot.text:SetText(assignedName or self.L["(empty)"])
+            slot.text:SetText(assignedName or L["(empty)"])
         end
 
         slot:EnableMouse(true)
@@ -397,13 +397,13 @@ function SDT:ShowSlotDropdown(slot, bar)
     -- Create the context menu at the cursor
     MenuUtil.CreateContextMenu(slot, function(owner, root)
         -- Empty option
-        root:CreateButton(self.L["(empty)"], function()
+        root:CreateButton(L["(empty)"], function()
             self.db.profile.bars[bar:GetName()].slots[slot.index] = nil
             self:RebuildSlots(bar)
         end)
 
         -- Spacer option
-        root:CreateButton(self.L["(spacer)"], function()
+        root:CreateButton(L["(spacer)"], function()
             self.db.profile.bars[bar:GetName()].slots[slot.index] = "(spacer)"
             self:RebuildSlots(bar)
         end)
