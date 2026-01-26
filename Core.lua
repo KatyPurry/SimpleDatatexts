@@ -187,12 +187,22 @@ function SDT:HandleSlashCommand(msg)
         self:OpenConfig()
     elseif command == "lock" then
         self:ToggleLock()
+    elseif command == "minimap" then
+        self.db.profile.minimap.hide = not self.db.profile.minimap.hide
+        if self.db.profile.minimap.hide then
+            SDT.Icon:Hide("SimpleDatatexts")
+            self:Print(L["Minimap Icon Disabled"])
+        else
+            SDT.Icon:Show("SimpleDatatexts")
+            self:Print(L["Minimap Icon Enabled"])
+        end
     elseif command == "version" then
         self:Print(format("%s %s: |cff8888ff%s|r", L["Simple Datatexts"], L["Version"], self.cache.version))
     else
         self:Print(L["Usage"] .. ":")
         self:Print("/sdt config - " .. L["Settings"])
         self:Print("/sdt lock - " .. L["Lock/Unlock"])
+        self:Print("/sdt minimap - " .. L["Toggle Minimap Icon"])
         self:Print("/sdt version - " .. L["Version"])
     end
 end
