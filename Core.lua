@@ -6,12 +6,26 @@ SDT = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0")
 _G.SimpleDatatexts = SDT
 
 ----------------------------------------------------
+-- Initialize Localization
+----------------------------------------------------
+SDT.L = SDT.L or {}
+local L = SDT.L
+
+if not getmetatable(L) then
+    setmetatable(L, {
+        __index = function(_, key)
+            return key
+        end
+    })
+end
+
+----------------------------------------------------
 -- Library Instances
 ----------------------------------------------------
 SDT.LSM = LibStub("LibSharedMedia-3.0")
 SDT.LDB = LibStub("LibDataBroker-1.1")
 SDT.LibDeflate = LibStub:GetLibrary("LibDeflate")
-SDT.LibSerialize = LibStub:GetLibrary("LibSerialize")
+SDT.AceSerializer = LibStub("AceSerializer-3.0")
 
 ----------------------------------------------------
 -- Addon Tables

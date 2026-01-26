@@ -266,7 +266,7 @@ function SDT:ExportProfile()
         version = self.cache.version,
     }
     
-    local serialized = self.LibSerialize:Serialize(profileData)
+    local serialized = self.AceSerializer:Serialize(profileData)
     if not serialized then
         self:Print("Error serializing profile data")
         return nil
@@ -303,7 +303,7 @@ function SDT:ImportProfile(importString)
         return false
     end
     
-    local success, profileData = self.LibSerialize:Deserialize(decompressed)
+    local success, profileData = self.AceSerializer:Deserialize(decompressed)
     if not success or not profileData then
         self:Print("Error deserializing profile data")
         return false
