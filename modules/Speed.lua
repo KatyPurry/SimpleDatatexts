@@ -91,7 +91,7 @@ function mod.Create(slotFrame)
         end
     end
 
-    -- OnUpdate for continuous speed monitoring
+    --[[ OnUpdate for continuous speed monitoring
     local timeSinceLastUpdate = 0
     local updateInterval = 0.1 -- Update every 0.1 seconds
     
@@ -101,7 +101,9 @@ function mod.Create(slotFrame)
             UpdateSpeed()
             timeSinceLastUpdate = 0
         end
-    end)
+    end)]]
+    local updateKey = "Speed_" .. slotFrame:GetName()
+    SDT.UpdateTicker:Register(updateKey, UpdateSpeed, 0.1)
 
     f:SetScript("OnEvent", OnEvent)
     f:RegisterEvent("PLAYER_ENTERING_WORLD")

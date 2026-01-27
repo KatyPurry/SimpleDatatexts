@@ -26,6 +26,11 @@ local UnitLevel       = UnitLevel
 local GetBuildInfo    = GetBuildInfo
 
 ----------------------------------------------------
+-- Constants
+----------------------------------------------------
+local EXPERIENCE_BAR_DIVIDERS = 9
+
+----------------------------------------------------
 -- Helper Function: Format Large Numbers
 ----------------------------------------------------
 local function FormatValue(value)
@@ -63,6 +68,12 @@ function mod.Create(slotFrame)
     local function CreateBarDisplay()
         if barFrame then return end
 
+        -- Verify slotFrame is valid before creating children
+        if not slotFrame or not slotFrame:IsObjectType("Frame") then
+            error("CreateBarDisplay called with invalid slotFrame")
+            return
+        end
+
         barFrame = CreateFrame("Frame", nil, slotFrame)
         barFrame:SetAllPoints(slotFrame)
         barFrame:EnableMouse(false)
@@ -87,7 +98,7 @@ function mod.Create(slotFrame)
 
         -- Dividers (every 10%)
         barDividers = {}
-        for i = 1, 9 do  -- 9 dividers for 10%, 20%, 30%, etc.
+        for i = 1, EXPERIENCE_BAR_DIVIDERS do  -- 9 dividers for 10%, 20%, 30%, etc.
             local divider = barFrame:CreateTexture(nil, "OVERLAY")
             divider:SetWidth(1)
             divider:SetColorTexture(0.3, 0.3, 0.3, 0.8)
@@ -99,7 +110,7 @@ function mod.Create(slotFrame)
     end
 
     local function UpdateBarHeight()
-        if not barFill then return end
+        if not barBg or not barFill then return end
     
         local heightPercent = SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)
         local slotHeight = slotFrame:GetHeight()
@@ -118,7 +129,7 @@ function mod.Create(slotFrame)
     end
 
     local function UpdateBarDividers()
-        if not barDividers then return end
+        if not barDividers or #barDividers == 0 then return end
     
         local heightPercent = SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)
         local slotHeight = slotFrame:GetHeight()

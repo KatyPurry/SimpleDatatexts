@@ -37,6 +37,7 @@ Locales/ruRU.lua
 Database.lua
 Config.lua
 Utilities.lua
+UpdateTicker.lua
 
 # Ara
 Ara_Broker_Guild_Friends.lua

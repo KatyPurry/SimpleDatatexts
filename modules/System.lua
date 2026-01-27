@@ -29,6 +29,13 @@ local enteredFrame = false
 local wait = 0
 
 ----------------------------------------------------
+-- Cache Locals
+----------------------------------------------------
+local addonDataCache = nil
+local lastCacheUpdate = 0
+local CACHE_DURATION = 2 -- Cache data for 2 seconds
+
+----------------------------------------------------
 -- Status Colors
 ----------------------------------------------------
 local statusColors = {
@@ -61,12 +68,68 @@ local function StatusColor(fps, ping)
 end
 
 ----------------------------------------------------
+-- Get Cached Addon Data
+----------------------------------------------------
+local function GetCachedAddonData()
+    local now = GetTime()
+    
+    -- Return cached data if still fresh
+    if addonDataCache and (now - lastCacheUpdate) < CACHE_DURATION then
+        return addonDataCache
+    end
+    
+    -- Update cache
+    UpdateAddOnMemoryUsage()
+    local cpuProfiling = GetCVarBool("scriptProfile")
+    if cpuProfiling then
+        UpdateAddOnCPUUsage()
+    end
+    
+    local totalMEM, totalCPU = 0, 0
+    local infoDisplay = {}
+    
+    for i, data in ipairs(SDT.cache.addonList) do
+        if IsAddOnLoaded(data.index) then
+            local mem = GetAddOnMemoryUsage(data.index)
+            totalMEM = totalMEM + mem
+            local cpu = cpuProfiling and GetAddOnCPUUsage(data.index) or nil
+            totalCPU = totalCPU + (cpu or 0)
+            
+            local displayData = {
+                index = data.index,
+                title = data.title,
+                mem = mem,
+                cpu = cpu,
+                sort = cpuProfiling and (cpu or mem) or mem
+            }
+            tinsert(infoDisplay, displayData)
+        end
+    end
+    
+    -- Sort by usage
+    table.sort(infoDisplay, function(a, b) return a.sort > b.sort end)
+    
+    addonDataCache = {
+        totalMEM = totalMEM,
+        totalCPU = totalCPU,
+        cpuProfiling = cpuProfiling,
+        addons = infoDisplay,
+        timestamp = now
+    }
+    
+    lastCacheUpdate = now
+    
+    return addonDataCache
+end
+
+----------------------------------------------------
 -- Tooltip Creation Function
 ----------------------------------------------------
 function mod.OnEnter(self)
     local anchor = SDT:FindBestAnchorPoint(self)
     GameTooltip:SetOwner(self, anchor)
     GameTooltip:ClearLines()
+
     if not SDT.db.profile.hideModuleTitle then
         SDT:AddTooltipHeader(GameTooltip, 14, L["SYSTEM"])
         SDT:AddTooltipLine(GameTooltip, 12, " ")
@@ -79,48 +142,38 @@ function mod.OnEnter(self)
     SDT:AddTooltipLine(GameTooltip, 12, L["Home Latency:"], homePing .. " ms", .69, .31, .31, .84, .75, .65)
     SDT:AddTooltipLine(GameTooltip, 12, L["World Latency:"], worldPing .. " ms", .69, .31, .31, .84, .75, .65)
 
-    -- Update memory & CPU usage
-    UpdateAddOnMemoryUsage()
-    local cpuProfiling = GetCVarBool("scriptProfile")
-    if cpuProfiling then
-        UpdateAddOnCPUUsage()
-    end
-
-    local totalMEM, totalCPU = 0, 0
-    local infoDisplay = {}
-    for i, data in ipairs(SDT.cache.addonList) do
-        if IsAddOnLoaded(data.index) then
-            local mem = GetAddOnMemoryUsage(data.index)
-            totalMEM = totalMEM + mem
-            local cpu = cpuProfiling and GetAddOnCPUUsage(data.index) or nil
-            totalCPU = totalCPU + (cpu or 0)
-
-            local displayData = {
-                index = data.index,
-                title = data.title,
-                mem = mem,
-                cpu = cpu,
-                sort = cpuProfiling and (cpu or mem) or mem
-            }
-            tinsert(infoDisplay, displayData)
-        end
-    end
-
-    -- Sort by usage
-    tsort(infoDisplay, function(a,b) return a.sort > b.sort end)
+    -- Use cached data if not stale
+    local cachedData = GetCachedAddonData()
 
     -- Display addons
-    SDT:AddTooltipLine(GameTooltip, 12, L["Total Memory:"], FormatMem(totalMEM), .69, .31, .31, .84, .75, .65)
     SDT:AddTooltipLine(GameTooltip, 12, " ")
-    for _, data in ipairs(infoDisplay) do
-        local memStr = FormatMem(data.mem or 0)
-        if cpuProfiling then
-            local cpuStr = data.cpu and format("%d ms", floor(data.cpu)) or "0 ms"
-            SDT:AddTooltipLine(GameTooltip, 12, data.title, memStr.." / "..cpuStr)
+    SDT:AddTooltipLine(GameTooltip, 12, L["Total Memory:"], FormatMem(cachedData.totalMEM), .69, .31, .31, .84, .75, .65)
+    SDT:AddTooltipLine(GameTooltip, 12, " ")
+
+    if cachedData.cpuProfiling then
+        SDT:AddTooltipLine(GameTooltip, 12, L["Total CPU:"], FormatMem(cachedData.totalCPU), .69, .31, .31, .84, .75, .65)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, L["Top Addons by CPU:"])
+    else
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, L["Top Addons by Memory:"])
+    end
+
+    -- Display top 10 addons from cached data
+    for i = 1, min(10, #cachedData.addons) do
+        local addon = cachedData.addons[i]
+        if cachedData.cpuProfiling then
+            SDT:AddTooltipLine(GameTooltip, 11, 
+                addon.title, 
+                FormatMem(addon.cpu) .. " / " .. FormatMem(addon.mem), 
+                .84, .75, .65, .84, .75, .65
+            )
         else
-            local red = totalMEM > 0 and data.mem / totalMEM or 0
-		    local green = (1 - red) + .5
-            SDT:AddTooltipLine(GameTooltip, 12, data.title, memStr, 1, 1, 1, red or 1, green or 1, 0)
+            SDT:AddTooltipLine(GameTooltip, 11, 
+                addon.title, 
+                FormatMem(addon.mem), 
+                .84, .75, .65, .84, .75, .65
+            )
         end
     end
 

@@ -14,6 +14,9 @@ local L = SDT.L
 if not getmetatable(L) then
     setmetatable(L, {
         __index = function(_, key)
+            if SDT.db and SDT.db.profile.debugMode then
+                SDT:Print("DEBUG - Missing translation: " .. key)
+            end
             return key
         end
     })
@@ -139,11 +142,14 @@ end
 -- Create Module List
 ----------------------------------------------------
 function SDT:CreateModuleList()
-    wipe(self.cache.moduleNames)
-    for name in pairs(self.modules) do
-        tinsert(self.cache.moduleNames, name)
+    if self.cache.moduleNamesDirty or not self.cache.moduleNames then
+        wipe(self.cache.moduleNames)
+        for name in pairs(self.modules) do
+            tinsert(self.cache.moduleNames, name)
+        end
+        table.sort(self.cache.moduleNames)
+        self.cache.moduleNamesDirty = false
     end
-    table.sort(self.cache.moduleNames)
 end
 
 ----------------------------------------------------
@@ -226,6 +232,7 @@ end
 ----------------------------------------------------
 function SDT:RegisterDataText(name, module)
     self.modules[name] = module
+    self.cache.moduleNamesDirty = true
 end
 
 ----------------------------------------------------
@@ -337,7 +344,25 @@ function SDT:RebuildSlots(bar)
     if bar.slots then
         for _, s in ipairs(bar.slots) do
             if s.moduleFrame then
+                -- Unregister events
+                s.moduleFrame:UnregisterAllEvents()
+
+                -- Clear scripts
+                s.moduleFrame:SetScript("OnUpdate", nil)
+                s.moduleFrame:SetScript("OnEvent", nil)
+                s.moduleFrame:SetScript("OnEnter", nil)
+                s.moduleFrame:SetScript("OnLeave", nil)
+                s.moduleFrame:SetScript("OnShow", nil)
+                s.moduleFrame:SetScript("OnHide", nil)
+
+                -- Unregister update ticker
+                if SDT.UpdateTicker then
+                    SDT.UpdateTicker:UnregisterPrefix(s.module .. "_")
+                end
+
+                -- Hide and clear visuals
                 s.moduleFrame:Hide()
+                s.moduleFrame:ClearAllPoints()
                 s.moduleFrame:SetParent(nil)
                 s.moduleFrame = nil
             end

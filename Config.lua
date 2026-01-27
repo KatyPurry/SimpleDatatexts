@@ -712,7 +712,7 @@ function SDT:GetImportExportOptions()
                 multiline = 8,
                 width = "full",
                 get = function() return self.exportString or "" end,
-                set = function(_, val) self.exportString = val end,
+                set = function() end,
                 order = 12,
             },
             -- IMPORT SECTION

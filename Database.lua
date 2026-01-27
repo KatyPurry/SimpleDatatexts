@@ -320,24 +320,41 @@ function SDT:ImportProfile(importString)
         return false
     end
 
+    if #importString > 100000 then  -- 100 KB
+        self:Print(L["Import string is too large"])
+        return false
+    end
+
     -- Strip whitespace and newlines
     importString = importString:gsub("%s", "")
 
-    if importString:sub(1, 4) ~= "SDT1" then
-        self:Print(L["Invalid import string: Incorrect version"])
+    if not importString:match("^SDT1:") then
+        self:Print(L["Invalid import string format"])
         return false
     end
     
-    local rawString = importString:sub(6)
-    local decoded = self.LibDeflate:DecodeForPrint(rawString)
+    -- Strip version prefix
+    local encoded = importString:sub(6)
+
+    local decoded = self.LibDeflate:DecodeForPrint(encoded)
     if not decoded then
         self:Print(L["Error decoding import string"])
+        return false
+    end
+
+    if #decoded > 150000 then  -- 150 KB (allows for encoding overhead)
+        self:Print(L["Import data too large"])
         return false
     end
     
     local decompressed = self.LibDeflate:DecompressDeflate(decoded)
     if not decompressed then
         self:Print(L["Error decompressing data"])
+        return false
+    end
+
+    if #decompressed > 500000 then  -- 500 KB uncompressed (very generous)
+        self:Print(L["Import data too large after decompression"])
         return false
     end
     
