@@ -102,7 +102,7 @@ function mod.Create(slotFrame)
             timeSinceLastUpdate = 0
         end
     end)]]
-    local updateKey = "Speed_" .. slotFrame:GetName()
+    local updateKey = "Speed_" .. (slotFrame:GetName() or tostring(slotFrame))
     SDT.UpdateTicker:Register(updateKey, UpdateSpeed, 0.1)
 
     f:SetScript("OnEvent", OnEvent)
