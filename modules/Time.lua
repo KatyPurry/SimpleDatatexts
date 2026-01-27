@@ -2,7 +2,6 @@
 -- Time & Lockout datatext adapted from ElvUI for Simple DataTexts (SDT)
 local SDT = SimpleDatatexts
 local L = SDT.L
-local SDTC = SDT.cache
 
 local mod = {}
 
@@ -27,6 +26,7 @@ local GetSavedInstanceInfo = GetSavedInstanceInfo
 local EJ_GetNumTiers, EJ_SelectTier, EJ_GetInstanceByIndex = EJ_GetNumTiers, EJ_SelectTier, EJ_GetInstanceByIndex
 local C_DateAndTime_GetSecondsUntilDailyReset = C_DateAndTime.GetSecondsUntilDailyReset
 local C_DateAndTime_GetSecondsUntilWeeklyReset = C_DateAndTime.GetSecondsUntilWeeklyReset
+local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
 local TimeManagerFrame = TimeManagerFrame
 local GameTimeFrame = GameTimeFrame
 local ToggleFrame = ToggleFrame
@@ -36,6 +36,7 @@ local GameTooltip = GameTooltip
 -- Constants
 ----------------------------------------------------
 local TIMEMANAGER_TOOLTIP_LOCALTIME = TIMEMANAGER_TOOLTIP_LOCALTIME
+local TIMEMANAGER_TOOLTIP_REALMTIME = TIMEMANAGER_TOOLTIP_REALMTIME
 local DAILY_RESET = format('%s %s', DAILY, RESET)
 local WEEKLY_RESET = format('%s %s', WEEKLY, RESET)
 local AMPM = { TIMEMANAGER_PM, TIMEMANAGER_AM }
@@ -50,10 +51,18 @@ local OVERRIDE_ICON = [[Interface\EncounterJournal\UI-EJ-Dungeonbutton-%s]]
 -- Misc Locals
 ----------------------------------------------------
 local enteredFrame = false
-local updateTime = 5
 local lockedInstances = { raids = {}, dungeons = {} }
 local collectedImages = false
 local instanceIconByName = {}
+
+----------------------------------------------------
+-- Module Config
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting("Time", "checkbox", L["Display Realm Time"], "useRealmTime", false)
+end
+
+SetupModuleConfig()
 
 ----------------------------------------------------
 -- Time Helpers
@@ -75,13 +84,36 @@ local function ConvertTime(h, m, s)
     end
 end
 
-local function GetTimeValues()
-    local dateTable = date("*t") -- simplified: can adjust for localTime/db.localTime
+-- Get local time values
+local function GetLocalTimeValues()
+    local dateTable = date("*t")
     return ConvertTime(dateTable.hour, dateTable.min, dateTable.sec)
 end
 
+-- Get realm time values
+local function GetRealmTimeValues()
+    local realmTime = C_DateAndTime_GetCurrentCalendarTime()
+    local dateTable = {
+        hour = realmTime.hour,
+        min = realmTime.minute,
+        sec = realmTime.second or 0
+    }
+    return ConvertTime(dateTable.hour, dateTable.min, dateTable.sec)
+end
+
+-- Get the time values to display (based on setting)
+local function GetDisplayTimeValues()
+    local useRealmTime = SDT:GetModuleSetting("Time", "useRealmTime", false)
+    
+    if useRealmTime then
+        return GetRealmTimeValues()
+    else
+        return GetLocalTimeValues()
+    end
+end
+
 function SDT:GetTimeValues()
-    return GetTimeValues()
+    return GetDisplayTimeValues()
 end
 
 ----------------------------------------------------
@@ -127,20 +159,30 @@ function mod.Create(slotFrame)
     -- Update logic
     ----------------------------------------------------
     local function UpdateText()
-        local Hr, Min, Sec, AmPm = GetTimeValues()
+        local Hr, Min, Sec, AmPm = GetDisplayTimeValues()
         local textString = format("%d:%02d %s", Hr, Min, AMPM[AmPm] or "")
         text:SetText(SDT:ColorText(textString))
     end
 
-    f:SetScript("OnUpdate", function(self, elapsed)
-        self.timeElapsed = (self.timeElapsed or updateTime) - elapsed
-        if self.timeElapsed > 0 then return end
-        self.timeElapsed = updateTime
-
-        UpdateText()
-    end)
+    -- Register with UpdateTicker for 5 second updates
+    local updateKey = "Time_" .. (slotFrame:GetName() or tostring(slotFrame))
+    SDT.UpdateTicker:Register(updateKey, UpdateText, 5)
     
     f.Update = UpdateText
+
+    ----------------------------------------------------
+    -- Cleanup on frame release
+    ----------------------------------------------------
+    f:SetScript("OnHide", function()
+        -- Unregister from UpdateTicker when hidden
+        SDT.UpdateTicker:Unregister(updateKey, 5)
+    end)
+    
+    f:SetScript("OnShow", function()
+        -- Re-register when shown
+        SDT.UpdateTicker:Register(updateKey, UpdateText, 5)
+        UpdateText()
+    end)
 
     ----------------------------------------------------
     -- Event Handler
@@ -228,8 +270,12 @@ function mod.Create(slotFrame)
         SDT:AddTooltipLine(GameTooltip, 12, " ")
 
         -- Local/realm time
-        local Hr, Min, Sec, AmPm = GetTimeValues()
-        SDT:AddTooltipLine(GameTooltip, 12, TIMEMANAGER_TOOLTIP_LOCALTIME, format('%02d:%02d:%02d', Hr, Min, Sec), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+        local localHr, localMin, localSec, localAmPm = GetLocalTimeValues()
+        local realmHr, realmMin, realmSec, realmAmPm = GetRealmTimeValues()
+        
+        SDT:AddTooltipLine(GameTooltip, 12, TIMEMANAGER_TOOLTIP_LOCALTIME, format('%02d:%02d:%02d', localHr, localMin, localSec), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+        SDT:AddTooltipLine(GameTooltip, 12, TIMEMANAGER_TOOLTIP_REALMTIME, format('%02d:%02d:%02d', realmHr, realmMin, realmSec), 1,1,1, lockoutColorNormal.r, lockoutColorNormal.g, lockoutColorNormal.b)
+        
         GameTooltip:Show()
     end)
     

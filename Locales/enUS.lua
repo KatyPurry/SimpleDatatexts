@@ -267,6 +267,7 @@ L["MS"] = "MS"
 L["TIME"] = "TIME"
 L["Saved Raid(s)"] = "Saved Raid(s)"
 L["Saved Dungeon(s)"] = "Saved Dungeon(s)"
+L["Display Realm Time"] = "Display Realm Time"
 
 -- ----------------------------
 -- modules/Versatility.lua

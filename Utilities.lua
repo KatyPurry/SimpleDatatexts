@@ -32,7 +32,6 @@ SDT.excludedModules = {
     ["HidingBar1"] = true,
     ["Mail"] = true,
     ["System"] = true,
-    ["Time"] = true,
 }
 
 function SDT:ExcludedModule(moduleName)

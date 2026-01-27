@@ -271,6 +271,7 @@ L["MS"] = "MS"
 L["TIME"] = "TEMPO"
 L["Saved Raid(s)"] = "Raids salvos"
 L["Saved Dungeon(s)"] = "Masmorras salvas"
+L["Display Realm Time"] = "Exibir horário do reino"
 
 -- ----------------------------
 -- modules/Versatility.lua

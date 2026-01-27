@@ -270,6 +270,7 @@ L["MS"] = "MS"
 L["TIME"] = "ZEIT"
 L["Saved Raid(s)"] = "Gespeicherte Raids"
 L["Saved Dungeon(s)"] = "Gespeicherte Dungeons"
+L["Display Realm Time"] = "Realmzeit anzeigen"
 
 -- ----------------------------
 -- modules/Versatility.lua
