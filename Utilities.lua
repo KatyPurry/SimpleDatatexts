@@ -26,7 +26,6 @@ local UIParent = UIParent
 SDT.excludedModules = {
     ["Coordinates"] = true,
     ["Currency"] = true,
-    ["Experience"] = true,
     ["Friends"] = true,
     ["Guild"] = true,
     ["HidingBar1"] = true,
@@ -217,17 +216,38 @@ end
 ----------------------------------------------------
 -- Module Settings (for modules that need config)
 ----------------------------------------------------
-function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, defaultValue)
+function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, defaultValue, ...)
     -- Queue settings to be added to the config system
     self.queuedModuleSettings = self.queuedModuleSettings or {}
     self.queuedModuleSettings[moduleName] = self.queuedModuleSettings[moduleName] or {}
     
-    table.insert(self.queuedModuleSettings[moduleName], {
+    local setting = {
         settingType = settingType,
         label = label,
         settingKey = settingKey,
         defaultValue = defaultValue,
-    })
+    }
+
+    -- Handle extra parameters for different setting types
+    if settingType == "select" then
+        setting.values = select(1, ...)
+    elseif settingType == "range" then
+        setting.min = select(1, ...)
+        setting.max = select(2, ...)
+        setting.step = select(3, ...)
+    elseif settingType == "description" then
+        -- Description can have optional fontSize parameter
+        setting.fontSize = select(1, ...) or "medium"
+    end
+    
+    table.insert(self.queuedModuleSettings[moduleName], setting)
+end
+
+----------------------------------------------------
+-- Helper function to add a separator/newline
+----------------------------------------------------
+function SDT:AddModuleConfigSeparator(moduleName, label)
+    self:AddModuleConfigSetting(moduleName, "header", label or " ", nil, nil)
 end
 
 ----------------------------------------------------

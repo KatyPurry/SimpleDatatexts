@@ -31,6 +31,37 @@ local GetBuildInfo    = GetBuildInfo
 local EXPERIENCE_BAR_DIVIDERS = 9
 
 ----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    -- Format dropdown
+    SDT:AddModuleConfigSetting("Experience", "select", L["Display Format"], "expFormat", 1, {
+        [1] = "XP / Max",
+        [2] = "XP / Max (Percent)",
+        [3] = "XP / Max (Percent) (Remaining)"
+    })
+
+    -- Bar Toggles
+    SDT:AddModuleConfigSeparator("Experience", L["Bar Toggles"])
+    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Show Graphical Bar"], "expShowGraphicalBar", true)
+    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Hide Blizzard XP Bar"], "expHideBlizzardBar", false)
+
+    -- Bar Appearance Settings
+    SDT:AddModuleConfigSeparator("Experience", L["Bar Appearance"])
+    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Bar Use Class Color"], "expBarUseClassColor", true)
+    SDT:AddModuleConfigSetting("Experience", "color", L["Bar Custom Color"], "expBarColor", "#4080FF")
+    SDT:AddModuleConfigSetting("Experience", "range", L["Bar Height (%)"], "expBarHeightPercent", 100, 10, 100, 5)
+
+    -- Text Settings
+    SDT:AddModuleConfigSeparator("Experience", L["Text Appearance"])
+    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Text Use Class Color"], "expTextUseClassColor", false)
+    SDT:AddModuleConfigSetting("Experience", "color", L["Text Custom Color"], "expTextColor", "#FFFFFF")
+    SDT:AddModuleConfigSetting("Experience", "range", L["Bar Font Size"], "expTextFontSize", 12, 8, 24, 1)
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Helper Function: Format Large Numbers
 ----------------------------------------------------
 local function FormatValue(value)
@@ -326,8 +357,6 @@ function mod.Create(slotFrame)
             format("%.2f%%", xpPercent),
             1, 0.82, 0, 1, 1, 1
         )
-        SDT:AddTooltipLine(GameTooltip, 12, " ")
-        SDT:AddTooltipLine(GameTooltip, 12, L["Configure in settings"], 0.7, 0.7, 0.7)
 
         GameTooltip:Show()
     end)

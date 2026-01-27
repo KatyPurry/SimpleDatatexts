@@ -646,14 +646,14 @@ function SDT:GetModuleSpecificArgs(moduleName)
     -- Add any queued settings
     if self.queuedModuleSettings and self.queuedModuleSettings[moduleName] then
         for idx, setting in ipairs(self.queuedModuleSettings[moduleName]) do
-            args["setting" .. idx] = self:ConvertSettingToArg(moduleName, setting)
+            args["setting" .. idx] = self:ConvertSettingToArg(moduleName, setting, idx + 1)
         end
     end
     
     return args
 end
 
-function SDT:ConvertSettingToArg(moduleName, setting)
+function SDT:ConvertSettingToArg(moduleName, setting, order)
     if setting.settingType == "checkbox" then
         return {
             type = "toggle",
@@ -663,9 +663,71 @@ function SDT:ConvertSettingToArg(moduleName, setting)
                 self:SetModuleSetting(moduleName, setting.settingKey, val)
                 self:UpdateAllModules()
             end,
+            order = order,
+        }
+    elseif setting.settingType == "select" then
+        return {
+            type = "select",
+            name = setting.label,
+            values = setting.values or {},
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModules()
+            end,
+            order = order,
+        }
+    elseif setting.settingType == "range" then
+        return {
+            type = "range",
+            name = setting.label,
+            min = setting.min or 0,
+            max = setting.max or 100,
+            step = setting.step or 1,
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModules()
+            end,
+            order = order,
+        }
+    elseif setting.settingType == "color" then
+        return {
+            type = "color",
+            name = setting.label,
+            hasAlpha = false,
+            get = function()
+                local hexColor = self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue)
+                local color = hexColor:gsub("#", "")
+                local r = tonumber(color:sub(1, 2), 16) / 255
+                local g = tonumber(color:sub(3, 4), 16) / 255
+                local b = tonumber(color:sub(5, 6), 16) / 255
+                return r, g, b
+            end,
+            set = function(_, r, g, b)
+                local hexColor = string.format("#%02X%02X%02X", r*255, g*255, b*255)
+                self:SetModuleSetting(moduleName, setting.settingKey, hexColor)
+                self:UpdateAllModules()
+            end,
+            order = order,
+        }
+    elseif setting.settingType == "description" then
+        return {
+            type = "description",
+            name = setting.label,
+            fontSize = setting.fontSize or "medium",
+            order = order,
+        }
+    elseif setting.settingType == "header" then
+        return {
+            type = "header",
+            name = setting.label,
+            order = order,
         }
     end
-    -- Add other setting types as needed
+
+    -- Fallback
+    return nil
 end
 
 ----------------------------------------------------
