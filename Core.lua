@@ -179,6 +179,12 @@ function SDT:RegisterSlashCommands()
     SlashCmdList["SIMPLEDATATEXTS"] = function(msg)
         self:HandleSlashCommand(msg)
     end
+
+    if not SlashCmdList["RELOADUI"] then
+        SLASH_RELOADUI1 = "/rl"
+        SlashCmdList["RELOADUI"] = _G.ReloadUI
+    end
+
 end
 
 function SDT:HandleSlashCommand(msg)
