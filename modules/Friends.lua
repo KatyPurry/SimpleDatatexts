@@ -1,7 +1,6 @@
 -- modules/Friends.lua
 -- Friends list datatext imported from Ara_Broker_Guild_Friends for Simple DataTexts (SDT)
 local SDT = SimpleDatatexts
-local SDTC = SDT.cache
 local L = SDT.L
 local LDB = LibStub("LibDataBroker-1.1")
 

@@ -1,7 +1,6 @@
 -- modules/Speed.lua
 -- Speed datatext for Simple DataTexts (SDT)
 local SDT = SimpleDatatexts
-local SDTC = SDT.cache
 local L = SDT.L
 
 local mod = {}

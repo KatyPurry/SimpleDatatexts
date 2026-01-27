@@ -2,7 +2,6 @@
 -- Backpack Currency datatext adapted from ElvUI for Simple DataTexts (SDT)
 local SDT = SimpleDatatexts
 local L = SDT.L
-local SDTC = SDT.cache
 
 local mod = {}
 

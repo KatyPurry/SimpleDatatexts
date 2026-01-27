@@ -1,7 +1,6 @@
 -- modules/LDBObjects.lua
 -- Datatexts for LDB objects not already handled by other modules
 local SDT = SimpleDatatexts
-local SDTC = SDT.cache
 local L = SDT.L
 local LDB = LibStub("LibDataBroker-1.1")
 
