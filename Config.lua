@@ -711,6 +711,57 @@ function SDT:ConvertSettingToArg(moduleName, setting, order)
             end,
             order = order,
         }
+    elseif setting.settingType == "font" then
+        return {
+            type = "select",
+            name = setting.label,
+            dialogControl = "LSM30_Font",
+            values = function() return SDT.LSM:HashTable("font") end,
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModules()
+            end,
+            disabled = function()
+                -- Disable font settings if override is not enabled
+                return not self:GetModuleSetting(moduleName, "overrideFont", false)
+            end,
+            order = order,
+        }
+    elseif setting.settingType == "fontOutline" then
+        return {
+            type = "select",
+            name = setting.label,
+            values = setting.values or {},
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModules()
+            end,
+            disabled = function()
+                -- Disable font settings if override is not enabled
+                return not self:GetModuleSetting(moduleName, "overrideFont", false)
+            end,
+            order = order,
+        }
+    elseif setting.settingType == "fontSize" then
+        return {
+            type = "range",
+            name = setting.label,
+            min = setting.min or 0,
+            max = setting.max or 100,
+            step = setting.step or 1,
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModules()
+            end,
+            disabled = function()
+                -- Disable font settings if override is not enabled
+                return not self:GetModuleSetting(moduleName, "overrideFont", false)
+            end,
+            order = order,
+        }
     elseif setting.settingType == "description" then
         return {
             type = "description",

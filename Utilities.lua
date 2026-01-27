@@ -148,6 +148,35 @@ function SDT:ApplyFont()
     end
 end
 
+function SDT:ApplyModuleFont(moduleName, textObject)
+    if not moduleName or not textObject then return end
+    
+    local overrideFont = self:GetModuleSetting(moduleName, "overrideFont", false)
+    if overrideFont then
+        -- Apply module font when override is enabled
+        local fontName = self:GetModuleSetting(moduleName, "font", "Friz Quadrata TT")
+        local fontSize = self:GetModuleSetting(moduleName, "fontSize", 12)
+        local fontOutline = self:GetModuleSetting(moduleName, "fontOutline", "NONE")
+        
+        local fontPath = self.LSM:Fetch("font", fontName) or STANDARD_TEXT_FONT
+        local outline = (fontOutline == "NONE") and "" or fontOutline
+        
+        textObject:SetFont(fontPath, fontSize, outline)
+        return true
+    else
+        -- Apply global font when override is disabled
+        local fontPath = self.LSM:Fetch("font", self.db.profile.font) or STANDARD_TEXT_FONT
+        local fontSize = self.db.profile.fontSize or 12
+        local fontOutline = self.db.profile.fontOutline or "NONE"
+        local outline = (fontOutline == "NONE") and "" or fontOutline
+        
+        textObject:SetFont(fontPath, fontSize, outline)
+        return false
+    end
+    
+    return false
+end
+
 ----------------------------------------------------
 -- Anchor Point Helper
 ----------------------------------------------------
@@ -229,9 +258,9 @@ function SDT:AddModuleConfigSetting(moduleName, settingType, label, settingKey, 
     }
 
     -- Handle extra parameters for different setting types
-    if settingType == "select" then
+    if settingType == "select" or settingType == "fontOutline" then
         setting.values = select(1, ...)
-    elseif settingType == "range" then
+    elseif settingType == "range" or settingType == "fontSize" then
         setting.min = select(1, ...)
         setting.max = select(2, ...)
         setting.step = select(3, ...)
@@ -255,7 +284,7 @@ end
 ----------------------------------------------------
 function SDT:NextBarID()
     local n = 1
-    while self.db.profile.bars["SDT_Bar" .. n] do
+    while self.db.profile.bars["SDT_Bar" .. n] and self.db.profile.bars["SDT_Bar" .. n].name do
         n = n + 1
     end
     return n
