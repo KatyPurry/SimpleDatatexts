@@ -6,11 +6,30 @@ local L = SDT.L
 local mod = {}
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Mastery"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Mastery", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Mastery", "checkbox", L["Hide Decimals"], "hideDecimals", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Decimals"], "hideDecimals", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -37,10 +56,11 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateMastery()
         currentMastery = GetMasteryEffect() or 0
-        local showLabel = SDT:GetModuleSetting("Mastery", "showLabel", true)
-        local hideDecimals = SDT:GetModuleSetting("Mastery", "hideDecimals", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
         local textString = (showLabel and L["Mastery:"].." " or "") .. SDT:FormatPercent(currentMastery, hideDecimals)
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateMastery
 
@@ -120,6 +140,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Mastery", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

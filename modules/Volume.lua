@@ -68,11 +68,30 @@ local deviceMenu = {{ text = L["Output Audio Device"], isTitle = true, notChecka
 local SOUND = SOUND
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Volume"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Volume", "checkbox", L["Show Label"], "showLabel", true)
-	SDT:AddModuleConfigSetting("Volume", "checkbox", L["Show Short Label"], "showShortLabel", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+	SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Short Label"], "showShortLabel", false)
+
+	-- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -101,8 +120,8 @@ function mod.Create(slotFrame)
 	    local color = GetCVarBool(AudioStreams[1].Enabled) and GetCVarBool(stream.Enabled) and '00FF00' or 'FF3333'
 	    local level = (GetCVar(stream.Volume) or 0) * 100
 
-		local showLabel = SDT:GetModuleSetting("Volume", "showLabel", true)
-		local showShortLabel = SDT:GetModuleSetting("Volume", "showShortLabel", false)
+		local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+		local showShortLabel = SDT:GetModuleSetting(moduleName, "showShortLabel", false)
 		local shortLabels = {
 			[MASTER_VOLUME] = L["M. Vol"],
 			[FX_VOLUME] = L["FX"],
@@ -152,6 +171,7 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
 	local function UpdateDisplay()
 		slotFrame.text:SetText(SDT:ColorText(GetStreamString(activeStream)))
+		SDT:ApplyModuleFont(moduleName, slotFrame.text)
 	end
 	f.Update = UpdateDisplay
 
@@ -259,6 +279,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Volume", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

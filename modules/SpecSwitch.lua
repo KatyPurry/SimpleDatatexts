@@ -67,6 +67,7 @@ local STARTER_ID              = Constants.TraitConsts.STARTER_BUILD_TRAIT_CONFIG
 ----------------------------------------------------
 local activeString = strjoin('', '|cff00FF00', _G.ACTIVE_PETS or L["Active"], '|r')
 local inactiveString = strjoin('', '|cffFF0000', _G.FACTION_INACTIVE or L["Inactive"], '|r')
+local moduleName = "Talent/Loot Specialization"
 
 ----------------------------------------------------
 -- Lists
@@ -83,12 +84,26 @@ local loadoutList = { { text = L["Loadouts"], isTitle = true, notCheckable = tru
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", "Show Label", "showLabel", true)
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Icon"], "showSpecIcon", true)
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Specialization Text"], "showSpecText", true)
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Specialization Icon"], "showLootSpecIcon", true)
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loot Specialization Text"], "showLootSpecText", true)
-    SDT:AddModuleConfigSetting("Talent/Loot Specialization", "checkbox", L["Show Loadout"], "showLoadout", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Specialization Icon"], "showSpecIcon", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Specialization Text"], "showSpecText", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Loot Specialization Icon"], "showLootSpecIcon", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Loot Specialization Text"], "showLootSpecText", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Loadout"], "showLoadout", true)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -242,23 +257,25 @@ function mod.Create(slotFrame)
 
         -- Get our module settings
         local settings = {
-            showLabel = SDT:GetModuleSetting("Talent/Loot Specialization", "showLabel", true),
-            showSpecIcon = SDT:GetModuleSetting("Talent/Loot Specialization", "showSpecIcon", true),
-            showSpecText = SDT:GetModuleSetting("Talent/Loot Specialization", "showSpecText", true),
-            showLootSpecIcon = SDT:GetModuleSetting("Talent/Loot Specialization", "showLootSpecIcon", true),
-            showLootSpecText = SDT:GetModuleSetting("Talent/Loot Specialization", "showLootSpecText", true),
-            showLoadout = SDT:GetModuleSetting("Talent/Loot Specialization", "showLoadout", true)
+            showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true),
+            showSpecIcon = SDT:GetModuleSetting(moduleName, "showSpecIcon", true),
+            showSpecText = SDT:GetModuleSetting(moduleName, "showSpecText", true),
+            showLootSpecIcon = SDT:GetModuleSetting(moduleName, "showLootSpecIcon", true),
+            showLootSpecText = SDT:GetModuleSetting(moduleName, "showLootSpecText", true),
+            showLoadout = SDT:GetModuleSetting(moduleName, "showLoadout", true)
         }
 
         local specIndex = GetSpecialization()
         if not specIndex then
             text:SetText("|cff9d9d9d?") -- can't determine spec yet
+            SDT:ApplyModuleFont(moduleName, text)
             return
         end
 
         local infoID, infoName, _, infoIcon = GetSpecializationInfo(specIndex)
         if not infoID then
             text:SetText("|cff9d9d9d?") -- can't determine spec yet
+            SDT:ApplyModuleFont(moduleName, text)
             return
         end
 
@@ -322,6 +339,7 @@ function mod.Create(slotFrame)
 
         local display = table.concat(displayParts, " / ")
         text:SetText(SDT:ColorText(display))
+        SDT:ApplyModuleFont(moduleName, text)
     end
 
     f.Update = UpdateDisplay
@@ -464,6 +482,6 @@ function mod.Create(slotFrame)
 end
 
 -- Register with SDT
-SDT:RegisterDataText("Talent/Loot Specialization", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

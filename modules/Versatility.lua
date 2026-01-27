@@ -31,11 +31,30 @@ local STAT_VERSATILITY            = STAT_VERSATILITY
 local VERSATILITY_TOOLTIP_FORMAT  = VERSATILITY_TOOLTIP_FORMAT
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Versatility"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Versatility", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Versatility", "checkbox", L["Hide Decimals"], "hideDecimals", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Decimals"], "hideDecimals", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -63,10 +82,11 @@ function mod.Create(slotFrame)
     local function UpdateVersatility()
         currentVers = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
         versReduction = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_TAKEN)
-        local showLabel = SDT:GetModuleSetting("Versatility", "showLabel", true)
-        local hideDecimals = SDT:GetModuleSetting("Versatility", "hideDecimals", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
         local textString = (showLabel and L["Vers:"].." " or "") .. SDT:FormatPercent(currentVers, hideDecimals)
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
 
     f.Update = UpdateVersatility
@@ -119,6 +139,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Versatility", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

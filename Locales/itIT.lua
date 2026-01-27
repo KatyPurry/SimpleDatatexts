@@ -11,6 +11,10 @@ end
 L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(vuoto)"
 L["(spacer)"] = "(spazio)"
+L["Display Font:"] = "Font:"
+L["Font Settings"] = "Impostazioni Font"
+L["Font Size"] = "Dimensione Font"
+L["Font Outline"] = "Contorno Font"
 L["Settings"] = "Impostazioni"
 
 -- ----------------------------
@@ -49,10 +53,6 @@ L["Profile imported successfully!"] = "Profilo importato con successo!"
 -- ----------------------------
 L["Colors"] = "Colori"
 L["Custom Color"] = "Colore Personalizzato"
-L["Display Font:"] = "Font:"
-L["Font Settings"] = "Impostazioni Font"
-L["Font Size"] = "Dimensione Font"
-L["Font Outline"] = "Contorno Font"
 L["Global"] = "Globale"
 L["Global Settings"] = "Impostazioni Globali"
 L["Hide Module Title in Tooltip"] = "Nascondi titolo modulo nel tooltip"
@@ -178,10 +178,9 @@ L["Bar Appearance"] = "Aspetto barra"
 L["Bar Height (%)"] = "Altezza barra (%)"
 L["Bar Use Class Color"] = "Usa colore classe per barra"
 L["Bar Custom Color"] = "Colore personalizzato barra"
-L["Text Appearance"] = "Aspetto testo"
+L["Text Color"] = "Colore del testo"
 L["Text Use Class Color"] = "Usa colore classe per testo"
 L["Text Custom Color"] = "Colore personalizzato testo"
-L["Bar Font Size"] = "Dimensione carattere barra"
 
 -- ----------------------------
 -- modules/Friends.lua
@@ -278,6 +277,7 @@ L["Total Memory:"] = "Memoria totale:"
 L["(Shift Click) Collect Garbage"] = "(Shift + Click) Pulisci memoria"
 L["FPS"] = "FPS"
 L["MS"] = "MS"
+L["Top Addons in Tooltip"] = "Migliori addon nel tooltip"
 
 -- ----------------------------
 -- modules/Time.lua

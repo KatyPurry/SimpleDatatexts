@@ -16,6 +16,28 @@ local format      = string.format
 -- LDB Object Local
 ----------------------------------------------------
 local ara = LDB:GetDataObjectByName("|cFFFFB366Ara|r Friends")
+local moduleName = "Friends"
+
+----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
+end
+
+SetupModuleConfig()
 
 ----------------------------------------------------
 -- Module wrapper for SDT
@@ -41,6 +63,7 @@ function mod.Create(slotFrame)
     local function Update()
         local txt = ara.text or ""
         text:SetText(SDT:ColorText(txt))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = Update
     SDT.friendFrame = f
@@ -81,6 +104,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Friends", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

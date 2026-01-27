@@ -22,11 +22,30 @@ local ITEM_MOD_STRENGTH_SHORT = ITEM_MOD_STRENGTH_SHORT
 local LE_UNIT_STAT_STRENGTH = LE_UNIT_STAT_STRENGTH
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Strength"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Strength", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Strength", "checkbox", L["Show Short Label"], "showShortLabel", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Short Label"], "showShortLabel", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -53,10 +72,11 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateStrength()
         currentStr = UnitStat("player", LE_UNIT_STAT_STRENGTH)
-        local showLabel = SDT:GetModuleSetting("Strength", "showLabel", true)
-        local showShortLabel = SDT:GetModuleSetting("Strength", "showShortLabel", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local showShortLabel = SDT:GetModuleSetting(moduleName, "showShortLabel", false)
         local textString = (showLabel and (showShortLabel and L["Str"] or ITEM_MOD_STRENGTH_SHORT)..": " or "")..currentStr
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateStrength
 
@@ -84,6 +104,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Strength", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

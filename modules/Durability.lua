@@ -35,6 +35,11 @@ local REPAIR_COST = REPAIR_COST
 local UNKNOWN     = UNKNOWN
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Durability"
+
+----------------------------------------------------
 -- Inventory Slots
 ----------------------------------------------------
 local slots = {
@@ -80,9 +85,23 @@ end
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Durability", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Durability", "checkbox", L["Show Short Label"], "showShortLabel", false)
-    SDT:AddModuleConfigSetting("Durability", "checkbox", L["Hide Decimals"], "hideDecimals", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Short Label"], "showShortLabel", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Decimals"], "hideDecimals", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -147,12 +166,13 @@ function mod.Create(slotFrame)
         -- colorize percent
         local r, g, b = ColorGradient(totalDurability / 100)
         local durabilityHex = format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
-        local showLabel = SDT:GetModuleSetting("Durability", "showLabel", true)
-        local showShortLabel = SDT:GetModuleSetting("Durability", "showShortLabel", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local showShortLabel = SDT:GetModuleSetting(moduleName, "showShortLabel", false)
         local labelString = (showLabel and SDT:ColorText(showShortLabel and L["Dur:"] or L["Durability:"]) or "")
-        local hideDecimals = SDT:GetModuleSetting("Durability", "hideDecimals", false)
+        local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
         local textString = format("%s%s%s|r", labelString.." ", durabilityHex, SDT:FormatPercent(totalDurability, hideDecimals, true))
         text:SetText(textString)
+        SDT:ApplyModuleFont(moduleName, text)
 
         -- pulse if below threshold
         if totalDurability <= percThreshold then
@@ -193,7 +213,7 @@ function mod.Create(slotFrame)
         GameTooltip:SetOwner(self, anchor)
         GameTooltip:ClearLines()
         if not SDT.db.profile.hideModuleTitle then
-            SDT:AddTooltipHeader(GameTooltip, 14, DURABILITY or "Durability")
+            SDT:AddTooltipHeader(GameTooltip, 14, DURABILITY or moduleName)
             SDT:AddTooltipLine(GameTooltip, 12, " ")
         end
 
@@ -237,6 +257,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Durability", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

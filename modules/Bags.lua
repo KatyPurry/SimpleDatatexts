@@ -26,9 +26,10 @@ local GetContainerNumFreeSlots   = C_Container.GetContainerNumFreeSlots
 local GetContainerNumSlots       = C_Container.GetContainerNumSlots
 
 ----------------------------------------------------
--- Useful Tables
+-- File Locals
 ----------------------------------------------------
 local bagData = {}
+local moduleName = "Bags"
 
 ----------------------------------------------------
 -- Utility
@@ -53,7 +54,21 @@ end
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Bags", "checkbox", "Show Label", "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", "Show Label", "showLabel", true)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -99,9 +114,10 @@ function mod.Create(slotFrame)
             end
         end
 
-        local showLabel = SDT:GetModuleSetting("Bags", "showLabel", true)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
         local textString = (showLabel and L["Bags"] .. ": " or "") .. (totalNormal - freeNormal) .. "/" .. totalNormal
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateBags
 
@@ -175,6 +191,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Bags", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

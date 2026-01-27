@@ -37,13 +37,28 @@ local PET_BONUS_TOOLTIP_RANGED_ATTACK_POWER = PET_BONUS_TOOLTIP_RANGED_ATTACK_PO
 ----------------------------------------------------
 local isHunter = SDTC.playerClass == 'HUNTER'
 local totalAP  = 0
+local moduleName = "Attack Power"
 
 ----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Attack Power", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Attack Power", "checkbox", L["Show Short Label"], "showShortLabel", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Short Label"], "showShortLabel", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -69,10 +84,11 @@ function mod.Create(slotFrame)
     local function UpdateAP()
         local base, posBuff, negBuff = (isHunter and UnitRangedAttackPower or UnitAttackPower)("player")
         totalAP = base + posBuff + negBuff
-        local showLabel = SDT:GetModuleSetting("Attack Power", "showLabel", true)
-        local showShortLabel = SDT:GetModuleSetting("Attack Power", "showShortLabel", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local showShortLabel = SDT:GetModuleSetting(moduleName, "showShortLabel", false)
         local textString = (showLabel and (showShortLabel and L["AP"] or ATTACK_POWER)..": " or "")..totalAP
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateAP
 
@@ -137,6 +153,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Attack Power", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

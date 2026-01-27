@@ -28,6 +28,11 @@ local COPPER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10
 local ICON_FMT = '|T%s:16:16:0:0:64:64:4:60:4:60|t'
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Currency"
+
+----------------------------------------------------
 -- Helpers
 ----------------------------------------------------
 local function FormatMoney(copper, classColor)
@@ -51,6 +56,27 @@ end
 -- State
 ----------------------------------------------------
 local goldText = "0"
+
+----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
+end
+
+SetupModuleConfig()
 
 ----------------------------------------------------
 -- Update logic
@@ -80,6 +106,7 @@ local function UpdateDisplay(self)
 
     if self.text then
         self.text:SetText(SDT:ColorText(display))
+        SDT:ApplyModuleFont(moduleName, self.text)
     end
 end
 
@@ -181,6 +208,6 @@ end
 ----------------------------------------------------
 -- Register
 ----------------------------------------------------
-SDT:RegisterDataText("Currency", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

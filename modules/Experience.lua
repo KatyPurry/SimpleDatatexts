@@ -31,32 +31,50 @@ local GetBuildInfo    = GetBuildInfo
 local EXPERIENCE_BAR_DIVIDERS = 9
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Experience"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
     -- Format dropdown
-    SDT:AddModuleConfigSetting("Experience", "select", L["Display Format"], "expFormat", 1, {
+    SDT:AddModuleConfigSetting(moduleName, "select", L["Display Format"], "expFormat", 1, {
         [1] = "XP / Max",
         [2] = "XP / Max (Percent)",
         [3] = "XP / Max (Percent) (Remaining)"
     })
 
     -- Bar Toggles
-    SDT:AddModuleConfigSeparator("Experience", L["Bar Toggles"])
-    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Show Graphical Bar"], "expShowGraphicalBar", true)
-    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Hide Blizzard XP Bar"], "expHideBlizzardBar", false)
+    SDT:AddModuleConfigSeparator(moduleName, L["Bar Toggles"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Graphical Bar"], "expShowGraphicalBar", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Blizzard XP Bar"], "expHideBlizzardBar", false)
 
     -- Bar Appearance Settings
-    SDT:AddModuleConfigSeparator("Experience", L["Bar Appearance"])
-    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Bar Use Class Color"], "expBarUseClassColor", true)
-    SDT:AddModuleConfigSetting("Experience", "color", L["Bar Custom Color"], "expBarColor", "#4080FF")
-    SDT:AddModuleConfigSetting("Experience", "range", L["Bar Height (%)"], "expBarHeightPercent", 100, 10, 100, 5)
+    SDT:AddModuleConfigSeparator(moduleName, L["Bar Appearance"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Bar Use Class Color"], "expBarUseClassColor", true)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Bar Custom Color"], "expBarColor", "#4080FF")
+    SDT:AddModuleConfigSetting(moduleName, "range", L["Bar Height (%)"], "expBarHeightPercent", 100, 10, 100, 5)
 
     -- Text Settings
-    SDT:AddModuleConfigSeparator("Experience", L["Text Appearance"])
-    SDT:AddModuleConfigSetting("Experience", "checkbox", L["Text Use Class Color"], "expTextUseClassColor", false)
-    SDT:AddModuleConfigSetting("Experience", "color", L["Text Custom Color"], "expTextColor", "#FFFFFF")
-    SDT:AddModuleConfigSetting("Experience", "range", L["Bar Font Size"], "expTextFontSize", 12, 8, 24, 1)
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Text Use Class Color"], "expTextUseClassColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "expTextColor", "#FFFFFF")
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -123,10 +141,6 @@ function mod.Create(slotFrame)
         barText:SetShadowColor(0, 0, 0, 1)
         barText:SetShadowOffset(1, -1)
 
-        -- Text font size
-        local fontSize = SDT:GetModuleSetting("Experience", "expTextFontSize", 12)
-        barText:SetFont(barText:GetFont(), fontSize, "OUTLINE")
-
         -- Dividers (every 10%)
         barDividers = {}
         for i = 1, EXPERIENCE_BAR_DIVIDERS do  -- 9 dividers for 10%, 20%, 30%, etc.
@@ -143,7 +157,7 @@ function mod.Create(slotFrame)
     local function UpdateBarHeight()
         if not barBg or not barFill then return end
     
-        local heightPercent = SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)
+        local heightPercent = SDT:GetModuleSetting(moduleName, "expBarHeightPercent", 100)
         local slotHeight = slotFrame:GetHeight()
         local barHeight = (slotHeight * heightPercent) / 100
         local slotWidth = slotFrame:GetWidth()
@@ -162,7 +176,7 @@ function mod.Create(slotFrame)
     local function UpdateBarDividers()
         if not barDividers or #barDividers == 0 then return end
     
-        local heightPercent = SDT:GetModuleSetting("Experience", "expBarHeightPercent", 100)
+        local heightPercent = SDT:GetModuleSetting(moduleName, "expBarHeightPercent", 100)
         local slotHeight = slotFrame:GetHeight()
         local barHeight = (slotHeight * heightPercent) / 100
     
@@ -175,10 +189,10 @@ function mod.Create(slotFrame)
     end
 
     local function GetBarColor()
-        if SDT:GetModuleSetting("Experience", "expBarUseClassColor", true) then
+        if SDT:GetModuleSetting(moduleName, "expBarUseClassColor", true) then
             return SDTC.colorR, SDTC.colorG, SDTC.colorB, 1
         else
-            local colorSetting = SDT:GetModuleSetting("Experience", "expBarColor", "#4080FF")
+            local colorSetting = SDT:GetModuleSetting(moduleName, "expBarColor", "#4080FF")
             local color = colorSetting:gsub("#", "")
             local r = tonumber(color:sub(1, 2), 16) / 255
             local g = tonumber(color:sub(3, 4), 16) / 255
@@ -188,10 +202,10 @@ function mod.Create(slotFrame)
     end
 
     local function GetColoredText(textString)
-        if SDT:GetModuleSetting("Experience", "expTextUseClassColor", true) then
+        if SDT:GetModuleSetting(moduleName, "expTextUseClassColor", true) then
             return SDT:ColorText(textString)
         else
-            local colorSetting = SDT:GetModuleSetting("Experience", "expTextColor", "#FFFFFF")
+            local colorSetting = SDT:GetModuleSetting(moduleName, "expTextColor", "#FFFFFF")
             return format("|cff%s%s|r", colorSetting:gsub("#", ""), textString)
         end
     end
@@ -206,7 +220,8 @@ function mod.Create(slotFrame)
         local isMaxLevel = TOC < 120001 and SDTC.playerLevel >= 80 or SDTC.playerLevel >= 90
         
         if isMaxLevel then
-            text:SetText(SDT:ColorText(L["Max Level"]))
+            text:SetText(GetColoredText(L["Max Level"]))
+            SDT:ApplyModuleFont(moduleName, text)
             if barFrame then barFrame:Hide() end
             return
         end
@@ -215,7 +230,8 @@ function mod.Create(slotFrame)
         maxXP = UnitXPMax("player")
 
         if maxXP <= 0 then
-            text:SetText(SDT:ColorText(L["N/A"]))
+            text:SetText(GetColoredText(L["N/A"]))
+            SDT:ApplyModuleFont(moduleName, text)
             if barFrame then barFrame:Hide() end
             return
         end
@@ -224,9 +240,9 @@ function mod.Create(slotFrame)
         local xpRemaining = maxXP - currentXP
 
         local textString = ""
-        local format_mode = SDT:GetModuleSetting("Experience", "expFormat", 1)
+        local format_mode = SDT:GetModuleSetting(moduleName, "expFormat", 1)
 
-        local showingBar = SDT:GetModuleSetting("Experience", "expShowGraphicalBar", true)
+        local showingBar = SDT:GetModuleSetting(moduleName, "expShowGraphicalBar", true)
 
         -- Format mode 1: XP / XPMax
         if format_mode == 1 then
@@ -273,14 +289,12 @@ function mod.Create(slotFrame)
             barFill:SetColorTexture(r, g, b, 0.8)
             
             -- Update font size from settings
-            local fontPath = LSM:Fetch("font", SDT.db.profile.font) or STANDARD_TEXT_FONT
-            local fontSize = SDT:GetModuleSetting("Experience", "expTextFontSize", 12)
-            barText:SetFont(fontPath, fontSize, "")
+            SDT:ApplyModuleFont(moduleName, barText)
         elseif barFrame then
             barFrame:Hide()
         end
 
-        local textOutput = showingBar and GetColoredText(textString) or SDT:ColorText(textString)
+        local textOutput = GetColoredText(textString)
         if showingBar then
             text:SetText("")
             barText:SetText(textOutput)
@@ -289,8 +303,11 @@ function mod.Create(slotFrame)
             text:SetText(textOutput)
         end
 
+        -- Apply Module Font
+        SDT:ApplyModuleFont(moduleName, text)
+
         -- Hide Blizzard XP bar
-        if SDT:GetModuleSetting("Experience", "expHideBlizzardBar", false) then
+        if SDT:GetModuleSetting(moduleName, "expHideBlizzardBar", false) then
             StatusTrackingBarManager:UnregisterAllEvents()
 		    StatusTrackingBarManager:Hide()
             SDT.BlizzardXPBarHidden = true
@@ -373,6 +390,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Experience", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

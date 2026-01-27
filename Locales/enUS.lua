@@ -2,11 +2,15 @@ local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
 -- ----------------------------
--- Global
+-- Global - Multiple Files
 -- ----------------------------
 L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(empty)"
 L["(spacer)"] = "(spacer)"
+L["Display Font:"] = "Display Font:"
+L["Font Settings"] = "Font Settings"
+L["Font Size"] = "Font Size"
+L["Font Outline"] = "Font Outline"
 L["Settings"] = "Settings"
 
 -- ----------------------------
@@ -45,10 +49,6 @@ L["Profile imported successfully!"] = "Profile imported successfully!"
 -- ----------------------------
 L["Colors"] = "Colors"
 L["Custom Color"] = "Custom Color"
-L["Display Font:"] = "Display Font:"
-L["Font Settings"] = "Font Settings"
-L["Font Size"] = "Font Size"
-L["Font Outline"] = "Font Outline"
 L["Global"] = "Global"
 L["Global Settings"] = "Global Settings"
 L["Hide Module Title in Tooltip"] = "Hide Module Title in Tooltip"
@@ -174,10 +174,9 @@ L["Bar Appearance"] = "Bar Appearance"
 L["Bar Height (%)"] = "Bar Height (%)"
 L["Bar Use Class Color"] = "Bar Use Class Color"
 L["Bar Custom Color"] = "Bar Custom Color"
-L["Text Appearance"] = "Text Appearance"
+L["Text Color"] = "Text Color"
 L["Text Use Class Color"] = "Text Use Class Color"
 L["Text Custom Color"] = "Text Custom Color"
-L["Bar Font Size"] = "Bar Font Size"
 
 -- ----------------------------
 -- modules/Friends.lua
@@ -274,6 +273,7 @@ L["Total Memory:"] = "Total Memory:"
 L["(Shift Click) Collect Garbage"] = "(Shift Click) Collect Garbage"
 L["FPS"] = "FPS"
 L["MS"] = "MS"
+L["Top Addons in Tooltip"] = "Top Addons in Tooltip"
 
 -- ----------------------------
 -- modules/Time.lua

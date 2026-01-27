@@ -26,6 +26,7 @@ local ipairs = ipairs
 local pairs = pairs
 local enteredFrame = false
 local wait = 0
+local moduleName = "System"
 
 ----------------------------------------------------
 -- Cache Locals
@@ -43,6 +44,29 @@ local statusColors = {
     '|cffFF9000', -- orange
     '|cffD80909', -- red
 }
+
+----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting(moduleName, "range", L["Top Addons in Tooltip"], "addonQty", 10, 1, 30, 1)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
+end
+
+SetupModuleConfig()
 
 ----------------------------------------------------
 -- Format Memory
@@ -158,8 +182,9 @@ function mod.OnEnter(self)
         SDT:AddTooltipLine(GameTooltip, 12, L["Top Addons by Memory:"])
     end
 
-    -- Display top 10 addons from cached data
-    for i = 1, min(10, #cachedData.addons) do
+    -- Display top addons from cached data
+    local addonQty = SDT:GetModuleSetting(moduleName, "addonQty", 10)
+    for i = 1, min(addonQty, #cachedData.addons) do
         local addon = cachedData.addons[i]
         if cachedData.cpuProfiling then
             SDT:AddTooltipLine(GameTooltip, 11, 
@@ -228,6 +253,7 @@ function mod.Create(slotFrame)
         local latency = worldPing
         local textString = SDT:ColorText(L["FPS"] .. ": ") .. StatusColor(fps) .. SDT:ColorText(" " .. L["MS"] .. ": ") .. StatusColor(nil, latency)
         text:SetText(textString)
+        SDT:ApplyModuleFont(moduleName, text)
     end
 
     f:SetScript("OnUpdate", function(self, elapsed)
@@ -261,6 +287,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("System", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

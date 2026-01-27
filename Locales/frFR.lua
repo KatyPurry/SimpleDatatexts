@@ -11,6 +11,10 @@ end
 L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(vide)"
 L["(spacer)"] = "(espace)"
+L["Display Font:"] = "Police :"
+L["Font Settings"] = "Paramètres de Police"
+L["Font Size"] = "Taille de Police"
+L["Font Outline"] = "Contour de Police"
 L["Settings"] = "Paramètres"
 
 -- ----------------------------
@@ -49,10 +53,6 @@ L["Profile imported successfully!"] = "Profil importé avec succès !"
 -- ----------------------------
 L["Colors"] = "Couleurs"
 L["Custom Color"] = "Couleur Personnalisée"
-L["Display Font:"] = "Police :"
-L["Font Settings"] = "Paramètres de Police"
-L["Font Size"] = "Taille de Police"
-L["Font Outline"] = "Contour de Police"
 L["Global"] = "Global"
 L["Global Settings"] = "Paramètres Globaux"
 L["Hide Module Title in Tooltip"] = "Masquer le titre du module dans l'infobulle"
@@ -178,10 +178,9 @@ L["Bar Appearance"] = "Apparence de la barre"
 L["Bar Height (%)"] = "Hauteur de la barre (%)"
 L["Bar Use Class Color"] = "Utiliser la couleur de classe pour la barre"
 L["Bar Custom Color"] = "Couleur personnalisée de la barre"
-L["Text Appearance"] = "Apparence du texte"
+L["Text Color"] = "Couleur du texte"
 L["Text Use Class Color"] = "Utiliser la couleur de classe pour le texte"
 L["Text Custom Color"] = "Couleur personnalisée du texte"
-L["Bar Font Size"] = "Taille de police de la barre"
 
 -- ----------------------------
 -- modules/Friends.lua
@@ -278,6 +277,7 @@ L["Total Memory:"] = "Mémoire totale :"
 L["(Shift Click) Collect Garbage"] = "(Maj + clic) Collecter les déchets"
 L["FPS"] = "FPS"
 L["MS"] = "MS"
+L["Top Addons in Tooltip"] = "Meilleurs addons dans l'infobulle"
 
 -- ----------------------------
 -- modules/Time.lua

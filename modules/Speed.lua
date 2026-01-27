@@ -24,11 +24,30 @@ local IsFlying = IsFlying
 local BASE_MOVEMENT_SPEED = 7 -- Base player run speed in yards per second
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Speed"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Speed", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Speed", "checkbox", L["Show as Percentage"], "showAsPercentage", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show as Percentage"], "showAsPercentage", true)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -61,8 +80,8 @@ function mod.Create(slotFrame)
             currentSpeed = GetUnitSpeed("player")
         end
         
-        local showLabel = SDT:GetModuleSetting("Speed", "showLabel", true)
-        local showAsPercentage = SDT:GetModuleSetting("Speed", "showAsPercentage", true)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local showAsPercentage = SDT:GetModuleSetting(moduleName, "showAsPercentage", true)
         
         local displayValue
         if showAsPercentage then
@@ -76,6 +95,7 @@ function mod.Create(slotFrame)
         local label = showLabel and L["Speed: "] or ""
         local textString = label..displayValue
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateSpeed
 
@@ -117,6 +137,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Speed", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

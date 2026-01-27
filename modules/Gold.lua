@@ -43,12 +43,31 @@ local SILVER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10
 local COPPER_ICON = "|TInterface\\AddOns\\SimpleDatatexts\\textures\\Coins:10:10:0:0:64:32:0:21:1:20|t"
 
 ----------------------------------------------------
+-- File locals
+----------------------------------------------------
+local moduleName = "Gold"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Gold", "checkbox", L["Show Silver"], "showSilver", true)
-    SDT:AddModuleConfigSetting("Gold", "checkbox", L["Show Copper"], "showCopper", true)
-    SDT:AddModuleConfigSetting("Gold", "checkbox", L["Use Coin Icons"], "useCoinIcons", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Silver"], "showSilver", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Copper"], "showCopper", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Use Coin Icons"], "useCoinIcons", true)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -97,9 +116,9 @@ local function DisplayCurrencyInfo(tooltip)
 end
 
 local function FormatMoney(copper, classColor)
-    local showCopper = SDT:GetModuleSetting("Gold", "showCopper", true)
-    local showSilver = SDT:GetModuleSetting("Gold", "showSilver", true)
-    local useCoinIcons = SDT:GetModuleSetting("Gold", "useCoinIcons", true)
+    local showCopper = SDT:GetModuleSetting(moduleName, "showCopper", true)
+    local showSilver = SDT:GetModuleSetting(moduleName, "showSilver", true)
+    local useCoinIcons = SDT:GetModuleSetting(moduleName, "useCoinIcons", true)
     local g = BreakUpLargeNumbers(floor(copper / 10000))
     local s = floor((copper % 10000) / 100)
     local c = copper % 100
@@ -186,6 +205,7 @@ local function UpdateGold(self)
     -- Update displayed text
     if self.text then
         self.text:SetText(FormatMoney(newMoney, true))
+        SDT:ApplyModuleFont(moduleName, self.text)
     end
 end
 
@@ -317,6 +337,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Gold", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

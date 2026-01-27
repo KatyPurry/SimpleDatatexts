@@ -31,11 +31,30 @@ local STAT_HASTE_TOOLTIP = STAT_HASTE_TOOLTIP
 local ATTACK_SPEED = ATTACK_SPEED
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Haste"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Haste", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Haste", "checkbox", L["Hide Decimals"], "hideDecimals", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Decimals"], "hideDecimals", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -62,10 +81,11 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateHaste()
         currentHaste = GetHaste() or 0
-        local showLabel = SDT:GetModuleSetting("Haste", "showLabel", true)
-        local hideDecimals = SDT:GetModuleSetting("Haste", "hideDecimals", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
         local textString = (showLabel and L["Haste:"].." " or "") .. SDT:FormatPercent(currentHaste, hideDecimals)
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateHaste
 
@@ -134,6 +154,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Haste", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

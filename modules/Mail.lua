@@ -14,6 +14,32 @@ local HAVE_MAIL_FROM = HAVE_MAIL_FROM
 local MAIL_LABEL = MAIL_LABEL
 
 ----------------------------------------------------
+-- File locals
+----------------------------------------------------
+local moduleName = "Mail"
+
+----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
 -- Module Creation
 ----------------------------------------------------
 function mod.Create(slotFrame)
@@ -34,6 +60,7 @@ function mod.Create(slotFrame)
     local function OnEvent(self, event, ...)
         local mailText = HasNewMail() and L["New Mail"] or L["No Mail"]
         text:SetText(SDT:ColorText(mailText))
+        SDT:ApplyModuleFont(moduleName, text)
     end
 
     f.Update = function() OnEvent(f) end
@@ -80,6 +107,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Mail", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

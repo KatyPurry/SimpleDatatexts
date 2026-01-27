@@ -55,6 +55,20 @@ local function HandleLDBObject(name, obj)
     local function SetupModuleConfig()
         if modulesWithSettings[moduleName] then
             SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+
+            -- Font Settings
+            SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+            SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+            SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+            SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+            SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+                ["NONE"] = L["None"],
+                ["OUTLINE"] = "Outline",
+                ["THICKOUTLINE"] = "Thick Outline",
+                ["MONOCHROME"] = "Monochrome",
+                ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+                ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+            })
         end
     end
 
@@ -95,6 +109,7 @@ local function HandleLDBObject(name, obj)
                 txt = cleanObjText or cleanName or L["NO TEXT"]
             end
             text:SetText(SDT:ColorText(txt))
+            SDT:ApplyModuleFont(moduleName, text)
         end
         f.Update = Update
         SDT.LDBDatatexts[cleanName] = f

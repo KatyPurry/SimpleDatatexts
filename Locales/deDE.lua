@@ -11,6 +11,10 @@ end
 L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(leer)"
 L["(spacer)"] = "(Abstand)"
+L["Display Font:"] = "Schriftart:"
+L["Font Settings"] = "Schrifteinstellungen"
+L["Font Size"] = "Schriftgröße"
+L["Font Outline"] = "Schriftkontur"
 L["Settings"] = "Einstellungen"
 
 -- ----------------------------
@@ -49,10 +53,6 @@ L["Profile imported successfully!"] = "Profil erfolgreich importiert!"
 -- ----------------------------
 L["Colors"] = "Farben"
 L["Custom Color"] = "Benutzerdefinierte Farbe"
-L["Display Font:"] = "Schriftart:"
-L["Font Settings"] = "Schrifteinstellungen"
-L["Font Size"] = "Schriftgröße"
-L["Font Outline"] = "Schriftkontur"
 L["Global"] = "Global"
 L["Global Settings"] = "Globale Einstellungen"
 L["Hide Module Title in Tooltip"] = "Modultitel im Tooltip ausblenden"
@@ -177,10 +177,9 @@ L["Bar Appearance"] = "Leistenaussehen"
 L["Bar Height (%)"] = "Leistenhöhe (%)"
 L["Bar Use Class Color"] = "Klassenfarbe für Leiste verwenden"
 L["Bar Custom Color"] = "Benutzerdefinierte Leistenfarbe"
-L["Text Appearance"] = "Textaussehen"
+L["Text Color"] = "Textfarbe"
 L["Text Use Class Color"] = "Klassenfarbe für Text verwenden"
 L["Text Custom Color"] = "Benutzerdefinierte Textfarbe"
-L["Bar Font Size"] = "Schriftgröße der Leiste"
 
 -- ----------------------------
 -- modules/Friends.lua
@@ -277,6 +276,7 @@ L["Total Memory:"] = "Gesamtspeicher:"
 L["(Shift Click) Collect Garbage"] = "(Shift-Klick) Speicher freigeben"
 L["FPS"] = "FPS"
 L["MS"] = "MS"
+L["Top Addons in Tooltip"] = "Top-Addons im Tooltip"
 
 -- ----------------------------
 -- modules/Time.lua

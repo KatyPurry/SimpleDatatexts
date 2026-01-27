@@ -22,11 +22,30 @@ local ITEM_MOD_INTELLECT_SHORT = ITEM_MOD_INTELLECT_SHORT
 local LE_UNIT_STAT_INTELLECT = LE_UNIT_STAT_INTELLECT
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Intellect"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Intellect", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Intellect", "checkbox", L["Show Short Label"], "showShortLabel", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Short Label"], "showShortLabel", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -53,10 +72,11 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function UpdateIntellect()
         currentInt = UnitStat("player", LE_UNIT_STAT_INTELLECT)
-        local showLabel = SDT:GetModuleSetting("Intellect", "showLabel", true)
-        local showShortLabel = SDT:GetModuleSetting("Intellect", "showShortLabel", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local showShortLabel = SDT:GetModuleSetting(moduleName, "showShortLabel", false)
         local textString = (showLabel and (showShortLabel and L["Int"] or ITEM_MOD_INTELLECT_SHORT) .. ": " or "") .. currentInt
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateIntellect
 
@@ -84,6 +104,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Intellect", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

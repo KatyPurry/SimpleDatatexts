@@ -32,11 +32,30 @@ local MAX_SPELL_SCHOOLS    = MAX_SPELL_SCHOOLS
 local MELEE_CRIT_CHANCE    = MELEE_CRIT_CHANCE
 
 ----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Crit"
+
+----------------------------------------------------
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Crit", "checkbox", L["Show Label"], "showLabel", true)
-    SDT:AddModuleConfigSetting("Crit", "checkbox", L["Hide Decimals"], "hideDecimals", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Decimals"], "hideDecimals", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -86,10 +105,11 @@ function mod.Create(slotFrame)
 		    ratingIndex = CR_CRIT_MELEE
 	    end
 
-        local showLabel = SDT:GetModuleSetting("Crit", "showLabel", true)
-        local hideDecimals = SDT:GetModuleSetting("Crit", "hideDecimals", false)
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
         local textString = (showLabel and L["Crit"].." " or "") .. SDT:FormatPercent(critChance, hideDecimals)
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateCrit
 
@@ -139,6 +159,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Crit", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod

@@ -54,12 +54,27 @@ local enteredFrame = false
 local lockedInstances = { raids = {}, dungeons = {} }
 local collectedImages = false
 local instanceIconByName = {}
+local moduleName = "Time"
 
 ----------------------------------------------------
 -- Module Config
 ----------------------------------------------------
 local function SetupModuleConfig()
-    SDT:AddModuleConfigSetting("Time", "checkbox", L["Display Realm Time"], "useRealmTime", false)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Display Realm Time"], "useRealmTime", false)
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
 end
 
 SetupModuleConfig()
@@ -103,7 +118,7 @@ end
 
 -- Get the time values to display (based on setting)
 local function GetDisplayTimeValues()
-    local useRealmTime = SDT:GetModuleSetting("Time", "useRealmTime", false)
+    local useRealmTime = SDT:GetModuleSetting(moduleName, "useRealmTime", false)
     
     if useRealmTime then
         return GetRealmTimeValues()
@@ -162,6 +177,7 @@ function mod.Create(slotFrame)
         local Hr, Min, Sec, AmPm = GetDisplayTimeValues()
         local textString = format("%d:%02d %s", Hr, Min, AMPM[AmPm] or "")
         text:SetText(SDT:ColorText(textString))
+        SDT:ApplyModuleFont(moduleName, text)
     end
 
     -- Register with UpdateTicker for 5 second updates
@@ -297,6 +313,6 @@ end
 ----------------------------------------------------
 -- Register with SDT
 ----------------------------------------------------
-SDT:RegisterDataText("Time", mod)
+SDT:RegisterDataText(moduleName, mod)
 
 return mod
