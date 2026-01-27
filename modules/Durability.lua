@@ -83,6 +83,7 @@ end
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Durability", "checkbox", L["Show Label"], "showLabel", true)
     SDT:AddModuleConfigSetting("Durability", "checkbox", L["Show Short Label"], "showShortLabel", false)
+    SDT:AddModuleConfigSetting("Durability", "checkbox", L["Hide Decimals"], "hideDecimals", false)
 end
 
 SetupModuleConfig()
@@ -150,7 +151,8 @@ function mod.Create(slotFrame)
         local showLabel = SDT:GetModuleSetting("Durability", "showLabel", true)
         local showShortLabel = SDT:GetModuleSetting("Durability", "showShortLabel", false)
         local labelString = (showLabel and SDT:ColorText(showShortLabel and L["Dur:"] or L["Durability:"]) or "")
-        local textString = format("%s%s%s|r", labelString.." ", durabilityHex, SDT:FormatPercent(totalDurability))
+        local hideDecimals = SDT:GetModuleSetting("Durability", "hideDecimals", false)
+        local textString = format("%s%s%s|r", labelString.." ", durabilityHex, SDT:FormatPercent(totalDurability, hideDecimals, true))
         text:SetText(textString)
 
         -- pulse if below threshold
@@ -201,7 +203,7 @@ function mod.Create(slotFrame)
             local link = GetInventoryItemLink("player", slotIndex) or UNKNOWN
             local colorR, colorG, colorB = ColorGradient((perc or 0) / 100)
             local left = format("|T%s:14:14:0:0:64:64:4:60:4:60|t %s", texture or "", link)
-            local right = SDT:FormatPercent(perc or 0)
+            local right = SDT:FormatPercent(perc or 0, hideDecimals, true)
             SDT:AddTooltipLine(GameTooltip, 12, left, right, 1, 1, 1, colorR, colorG, colorB)
         end
 

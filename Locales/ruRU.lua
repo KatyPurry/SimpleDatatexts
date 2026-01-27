@@ -95,6 +95,9 @@ L["Width"] = "Ширина"
 -- Config.lua - Module Settings
 -- ----------------------------
 L["Module Settings"] = "Настройки модуля"
+L["Hide Decimals"] = "Скрыть десятичные знаки"
+L["Show Label"] = "Показывать метку"
+L["Show Short Label"] = "Показывать краткую метку"
 
 -- ----------------------------
 -- Config.lua - Import/Export

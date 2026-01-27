@@ -36,6 +36,7 @@ local VERSATILITY_TOOLTIP_FORMAT  = VERSATILITY_TOOLTIP_FORMAT
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Versatility", "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting("Versatility", "checkbox", L["Hide Decimals"], "hideDecimals", false)
 end
 
 SetupModuleConfig()
@@ -64,7 +65,8 @@ function mod.Create(slotFrame)
         currentVers = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
         versReduction = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_TAKEN)
         local showLabel = SDT:GetModuleSetting("Versatility", "showLabel", true)
-        local textString = (showLabel and L["Vers:"].." " or "") .. SDT:FormatPercent(currentVers)
+        local hideDecimals = SDT:GetModuleSetting("Versatility", "hideDecimals", false)
+        local textString = (showLabel and L["Vers:"].." " or "") .. SDT:FormatPercent(currentVers, hideDecimals)
         text:SetText(SDT:ColorText(textString))
     end
 

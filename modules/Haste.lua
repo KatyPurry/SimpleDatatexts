@@ -35,6 +35,7 @@ local ATTACK_SPEED = ATTACK_SPEED
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Haste", "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting("Haste", "checkbox", L["Hide Decimals"], "hideDecimals", false)
 end
 
 SetupModuleConfig()
@@ -62,7 +63,8 @@ function mod.Create(slotFrame)
     local function UpdateHaste()
         currentHaste = GetHaste() or 0
         local showLabel = SDT:GetModuleSetting("Haste", "showLabel", true)
-        local textString = (showLabel and L["Haste:"].." " or "") .. SDT:FormatPercent(currentHaste)
+        local hideDecimals = SDT:GetModuleSetting("Haste", "hideDecimals", false)
+        local textString = (showLabel and L["Haste:"].." " or "") .. SDT:FormatPercent(currentHaste, hideDecimals)
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateHaste

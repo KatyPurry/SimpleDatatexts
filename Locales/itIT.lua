@@ -95,6 +95,9 @@ L["Width"] = "Larghezza"
 -- Config.lua - Module Settings
 -- ----------------------------
 L["Module Settings"] = "Impostazioni Modulo"
+L["Hide Decimals"] = "Nascondi decimali"
+L["Show Label"] = "Mostra etichetta"
+L["Show Short Label"] = "Mostra etichetta breve"
 
 -- ----------------------------
 -- Config.lua - Import/Export

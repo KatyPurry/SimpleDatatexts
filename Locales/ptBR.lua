@@ -95,6 +95,9 @@ L["Width"] = "Largura"
 -- Config.lua - Module Settings
 -- ----------------------------
 L["Module Settings"] = "Configurações do Módulo"
+L["Hide Decimals"] = "Ocultar casas decimais"
+L["Show Label"] = "Mostrar rótulo"
+L["Show Short Label"] = "Mostrar rótulo curto"
 
 -- ----------------------------
 -- Config.lua - Import/Export

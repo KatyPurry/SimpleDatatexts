@@ -11,6 +11,7 @@ local mod = {}
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Mastery", "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting("Mastery", "checkbox", L["Hide Decimals"], "hideDecimals", false)
 end
 
 SetupModuleConfig()
@@ -38,7 +39,8 @@ function mod.Create(slotFrame)
     local function UpdateMastery()
         currentMastery = GetMasteryEffect() or 0
         local showLabel = SDT:GetModuleSetting("Mastery", "showLabel", true)
-        local textString = (showLabel and L["Mastery:"].." " or "") .. SDT:FormatPercent(currentMastery)
+        local hideDecimals = SDT:GetModuleSetting("Mastery", "hideDecimals", false)
+        local textString = (showLabel and L["Mastery:"].." " or "") .. SDT:FormatPercent(currentMastery, hideDecimals)
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateMastery

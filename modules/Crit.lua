@@ -37,6 +37,7 @@ local MELEE_CRIT_CHANCE    = MELEE_CRIT_CHANCE
 ----------------------------------------------------
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting("Crit", "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting("Crit", "checkbox", L["Hide Decimals"], "hideDecimals", false)
 end
 
 SetupModuleConfig()
@@ -87,7 +88,8 @@ function mod.Create(slotFrame)
 	    end
 
         local showLabel = SDT:GetModuleSetting("Crit", "showLabel", true)
-        local textString = (showLabel and L["Crit"] .. ": " or "") .. SDT:FormatPercent(critChance)
+        local hideDecimals = SDT:GetModuleSetting("Crit", "hideDecimals", false)
+        local textString = (showLabel and L["Crit"].." " or "") .. SDT:FormatPercent(critChance, hideDecimals)
         text:SetText(SDT:ColorText(textString))
     end
     f.Update = UpdateCrit

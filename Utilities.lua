@@ -34,8 +34,15 @@ SDT.excludedModules = {
     ["System"] = true,
 }
 
+SDT.allowedLDBModules = {
+    ["LDB: BugSack"] = true,
+    ["LDB: WIM"] = true,
+}
+
 function SDT:ExcludedModule(moduleName)
-    return self.excludedModules[moduleName] == true
+    if self.excludedModules[moduleName] then return true end
+    if moduleName:match("^LDB:") and not self.allowedLDBModules[moduleName] then return true end
+    return false
 end
 
 ----------------------------------------------------
@@ -164,8 +171,17 @@ end
 ----------------------------------------------------
 -- Format Helpers
 ----------------------------------------------------
-function SDT:FormatPercent(v)
-    return format("%.2f%%", v)
+function SDT:FormatPercent(v, hideDecimals, roundDown)
+    if hideDecimals then
+        if roundDown then
+            return format("%d%%", v)
+        else
+            -- Round to nearest integer using standard rounding (>= 0.5 rounds up)
+            return format("%d%%", v + 0.5)
+        end
+    else
+        return format("%.2f%%", v)
+    end
 end
 
 ----------------------------------------------------
