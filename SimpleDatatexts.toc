@@ -62,6 +62,7 @@ modules/Haste.lua
 modules/Intellect.lua
 modules/LDBObjects.lua
 modules/Mail.lua
+modules/MapName.lua
 modules/Mastery.lua
 modules/SpecSwitch.lua
 modules/Speed.lua
