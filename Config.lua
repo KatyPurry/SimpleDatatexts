@@ -238,7 +238,9 @@ function SDT:GetGeneralOptions()
             font = {
                 type = "select",
                 name = L["Display Font:"],
-                values = GetFontList,
+                --values = GetFontList,
+                dialogControl = "LSM30_Font",
+                values = function() return SDT.LSM:HashTable("font") end,
                 get = function() return self.db.profile.font end,
                 set = function(_, val)
                     self.db.profile.font = val
