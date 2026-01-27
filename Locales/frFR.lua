@@ -231,6 +231,21 @@ L["New Mail"] = "Nouveau courrier"
 L["No Mail"] = "Aucun courrier"
 
 -- ----------------------------
+-- modules/MapName.lua
+-- ----------------------------
+L["Map Name"] = "Nom de la carte"
+L["Zone Name"] = "Nom de zone"
+L["Subzone Name"] = "Nom de sous-zone"
+L["Zone - Subzone"] = "Zone - Sous-zone"
+L["Zone / Subzone (Two Lines)"] = "Zone / Sous-zone (Deux lignes)"
+L["Minimap Zone"] = "Zone de la minicarte"
+L["Show Zone on Tooltip"] = "Afficher la zone dans l'infobulle"
+L["Show Coordinates on Tooltip"] = "Afficher les coordonnées dans l'infobulle"
+L["Zone:"] = "Zone:"
+L["Subzone:"] = "Sous-zone:"
+L["Coordinates:"] = "Coordonnées:"
+
+-- ----------------------------
 -- modules/Mastery.lua
 -- ----------------------------
 L["Mastery:"] = "Maîtrise :"

@@ -230,6 +230,21 @@ L["New Mail"] = "Correo nuevo"
 L["No Mail"] = "Sin correo"
 
 -- ----------------------------
+-- modules/MapName.lua
+-- ----------------------------
+L["Map Name"] = "Nombre del mapa"
+L["Zone Name"] = "Nombre de zona"
+L["Subzone Name"] = "Nombre de subzona"
+L["Zone - Subzone"] = "Zona - Subzona"
+L["Zone / Subzone (Two Lines)"] = "Zona / Subzona (Dos líneas)"
+L["Minimap Zone"] = "Zona del minimapa"
+L["Show Zone on Tooltip"] = "Mostrar zona en tooltip"
+L["Show Coordinates on Tooltip"] = "Mostrar coordenadas en tooltip"
+L["Zone:"] = "Zona:"
+L["Subzone:"] = "Subzona:"
+L["Coordinates:"] = "Coordenadas:"
+
+-- ----------------------------
 -- modules/Mastery.lua
 -- ----------------------------
 L["Mastery:"] = "Maestría:"
