@@ -240,7 +240,7 @@ end
 
 local friendOnline, friendOffline = ERR_FRIEND_ONLINE_SS:gsub("|Hplayer:%%s|h%[%%s%]|h",""), ERR_FRIEND_OFFLINE_S:gsub("%%s","")
 function f:CHAT_MSG_SYSTEM( msg )
-	if InCombatLockdown() then return end
+	if InCombatLockdown() or issecretvalue(msg) then return end
 	if msg:find(friendOnline) or msg:find(friendOffline) then ShowFriends() end
 end
 
