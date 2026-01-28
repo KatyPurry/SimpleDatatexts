@@ -362,7 +362,7 @@ function SDT:GetPanelOptions()
                         type = "range",
                         name = L["Width"],
                         min = 100,
-                        max = 2000,
+                        max = self.cache.screenWidth,
                         step = 1,
                         get = function()
                             if not self.selectedBar then return 300 end
@@ -587,6 +587,9 @@ function SDT:GetSlotArgs()
             name = format(L["Slot %d:"], i),
             values = GetModuleList,
             get = function()
+                if not self.selectedBar or not self.db.profile.bars[self.selectedBar] then
+                    return ""
+                end
                 return self.db.profile.bars[self.selectedBar].slots[i] or ""
             end,
             set = function(_, val)

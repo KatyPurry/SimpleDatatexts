@@ -86,6 +86,14 @@ function SDT:BuildCache()
     self.cache.moduleNames = {}
 end
 
+function SDT:ScreenCache()
+    local width, height = GetPhysicalScreenSize()
+    self.cache.screenWidth = math.floor(GetScreenWidth())
+    self.cache.screenHeight = math.floor(GetScreenHeight())
+    self.cache.physicalWidth = width
+    self.cache.physicalHeight = height
+end
+
 ----------------------------------------------------
 -- Addon Initialization
 ----------------------------------------------------
@@ -104,6 +112,9 @@ function SDT:OnInitialize()
 end
 
 function SDT:OnEnable()
+    -- Cache screen size
+    self:ScreenCache()
+
     -- Register fonts
     self:RegisterFonts()
 
