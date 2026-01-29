@@ -59,6 +59,7 @@ modules/Friends.lua
 modules/Gold.lua
 modules/Guild.lua
 modules/Haste.lua
+modules/Hearthstone.lua
 modules/Intellect.lua
 modules/LDBObjects.lua
 modules/Mail.lua

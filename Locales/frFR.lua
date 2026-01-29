@@ -215,6 +215,18 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Objet LDB A
 L["Haste:"] = "Hâte :"
 
 -- ----------------------------
+-- modules/Hearthstone.lua
+-- ----------------------------
+L["Hearthstone"] = "Pierre de foyer"
+L["Selected Hearthstone"] = "Pierre de foyer sélectionnée"
+L["Random"] = "Aléatoire"
+L["Selected:"] = "Sélectionné :"
+L["Available Hearthstones:"] = "Pierres de foyer disponibles :"
+L["Left Click: Use Hearthstone"] = "Clic gauche : Utiliser la pierre de foyer"
+L["Right Click: Select Hearthstone"] = "Clic droit : Sélectionner la pierre de foyer"
+L["Cannot use hearthstone while in combat"] = "Impossible d'utiliser la pierre de foyer en combat"
+
+-- ----------------------------
 -- modules/Intellect.lua
 -- ----------------------------
 L["Int"] = "Int"

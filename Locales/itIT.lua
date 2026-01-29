@@ -215,6 +215,18 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Oggetto LDB
 L["Haste:"] = "Celerità:"
 
 -- ----------------------------
+-- modules/Hearthstone.lua
+-- ----------------------------
+L["Hearthstone"] = "Pietra del ritorno"
+L["Selected Hearthstone"] = "Pietra del ritorno selezionata"
+L["Random"] = "Casuale"
+L["Selected:"] = "Selezionato:"
+L["Available Hearthstones:"] = "Pietre del ritorno disponibili:"
+L["Left Click: Use Hearthstone"] = "Click sinistro: Usa pietra del ritorno"
+L["Right Click: Select Hearthstone"] = "Click destro: Seleziona pietra del ritorno"
+L["Cannot use hearthstone while in combat"] = "Impossibile usare la pietra del ritorno in combattimento"
+
+-- ----------------------------
 -- modules/Intellect.lua
 -- ----------------------------
 L["Int"] = "Int"

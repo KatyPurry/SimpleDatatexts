@@ -211,6 +211,18 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Ara Guild L
 L["Haste:"] = "Haste:"
 
 -- ----------------------------
+-- modules/Hearthstone.lua
+-- ----------------------------
+L["Hearthstone"] = "Hearthstone"
+L["Selected Hearthstone"] = "Selected Hearthstone"
+L["Random"] = "Random"
+L["Selected:"] = "Selected:"
+L["Available Hearthstones:"] = "Available Hearthstones:"
+L["Left Click: Use Hearthstone"] = "Left Click: Use Hearthstone"
+L["Right Click: Select Hearthstone"] = "Right Click: Select Hearthstone"
+L["Cannot use hearthstone while in combat"] = "Cannot use hearthstone while in combat"
+
+-- ----------------------------
 -- modules/Intellect.lua
 -- ----------------------------
 L["Int"] = "Int"

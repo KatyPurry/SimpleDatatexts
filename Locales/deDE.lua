@@ -214,6 +214,18 @@ L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Ara Guild L
 L["Haste:"] = "Tempotwertung:"
 
 -- ----------------------------
+-- modules/Hearthstone.lua
+-- ----------------------------
+L["Hearthstone"] = "Ruhestein"
+L["Selected Hearthstone"] = "Ausgewählter Ruhestein"
+L["Random"] = "Zufällig"
+L["Selected:"] = "Ausgewählt:"
+L["Available Hearthstones:"] = "Verfügbare Ruhesteine:"
+L["Left Click: Use Hearthstone"] = "Linksklick: Ruhestein benutzen"
+L["Right Click: Select Hearthstone"] = "Rechtsklick: Ruhestein auswählen"
+L["Cannot use hearthstone while in combat"] = "Ruhestein kann nicht im Kampf benutzt werden"
+
+-- ----------------------------
 -- modules/Intellect.lua
 -- ----------------------------
 L["Int"] = "Int"
