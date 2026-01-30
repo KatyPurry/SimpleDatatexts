@@ -66,6 +66,16 @@ function SDT:ColorText(text)
     return "|c"..color..text.."|r"
 end
 
+function SDT:ColorModuleText(moduleName, text)
+    local overrideColor = SDT:GetModuleSetting(moduleName, "overrideTextColor", false)
+    if overrideColor then
+        local colorSetting = SDT:GetModuleSetting(moduleName, "customTextColor", "#FFFFFF")
+        return format("|cff%s%s|r", colorSetting:gsub("#", ""), text)
+    else
+        return SDT:ColorText(text)
+    end
+end
+
 ----------------------------------------------------
 -- Tooltip Helpers
 ----------------------------------------------------
