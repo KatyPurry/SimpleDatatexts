@@ -15,6 +15,7 @@ L["Display Font:"] = "Schriftart:"
 L["Font Settings"] = "Schrifteinstellungen"
 L["Font Size"] = "Schriftgröße"
 L["Font Outline"] = "Schriftkontur"
+L["Override Global Font"] = "Globale Schriftart überschreiben"
 L["Settings"] = "Einstellungen"
 
 -- ----------------------------

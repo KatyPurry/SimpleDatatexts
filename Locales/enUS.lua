@@ -11,6 +11,7 @@ L["Display Font:"] = "Display Font:"
 L["Font Settings"] = "Font Settings"
 L["Font Size"] = "Font Size"
 L["Font Outline"] = "Font Outline"
+L["Override Global Font"] = "Override Global Font"
 L["Settings"] = "Settings"
 
 -- ----------------------------

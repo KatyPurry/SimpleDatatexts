@@ -15,6 +15,7 @@ L["Display Font:"] = "Fuente:"
 L["Font Settings"] = "Configuración de Fuente"
 L["Font Size"] = "Tamaño de Fuente"
 L["Font Outline"] = "Contorno de Fuente"
+L["Override Global Font"] = "Anular fuente global"
 L["Settings"] = "Opciones"
 
 -- ----------------------------

@@ -15,6 +15,7 @@ L["Display Font:"] = "Шрифт:"
 L["Font Settings"] = "Настройки шрифта"
 L["Font Size"] = "Размер шрифта"
 L["Font Outline"] = "Контур шрифта"
+L["Override Global Font"] = "Переопределить глобальный шрифт"
 L["Settings"] = "Настройки"
 
 -- ----------------------------

@@ -15,6 +15,7 @@ L["Display Font:"] = "Police :"
 L["Font Settings"] = "Paramètres de Police"
 L["Font Size"] = "Taille de Police"
 L["Font Outline"] = "Contour de Police"
+L["Override Global Font"] = "Remplacer la police globale"
 L["Settings"] = "Paramètres"
 
 -- ----------------------------
