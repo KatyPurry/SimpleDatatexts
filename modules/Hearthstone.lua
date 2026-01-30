@@ -65,12 +65,7 @@ local HEARTHSTONES = {
     { id = 228940, name = "Notorious Thread's Hearthstone", isToy = true },
     { id = 236687, name = "Explosive Hearthstone", isToy = true },
     { id = 245970, name = "P.O.S.T. Master's Express Hearthstone", isToy = true },
-    
-    -- Dalaran Hearthstone
-    { id = 140192, name = "Dalaran Hearthstone", isToy = false },
-    
-    -- Garrison Hearthstone
-    { id = 110560, name = "Garrison Hearthstone", isToy = false },
+    { id = 246565, name = "Cosmic Hearthstone", isToy = true },
 
     -- Other Items that can be used as Hearthstones
     { id = 28585, name = "Ruby Slippers", isToy = false },
