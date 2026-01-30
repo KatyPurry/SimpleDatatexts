@@ -35,6 +35,11 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show as Percentage"], "showAsPercentage", true)
 
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -94,7 +99,7 @@ function mod.Create(slotFrame)
         
         local label = showLabel and L["Speed: "] or ""
         local textString = label..displayValue
-        text:SetText(SDT:ColorText(textString))
+        text:SetText(SDT:ColorModuleText(moduleName, textString))
         SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateSpeed
@@ -110,17 +115,6 @@ function mod.Create(slotFrame)
         end
     end
 
-    --[[ OnUpdate for continuous speed monitoring
-    local timeSinceLastUpdate = 0
-    local updateInterval = 0.1 -- Update every 0.1 seconds
-    
-    f:SetScript("OnUpdate", function(self, elapsed)
-        timeSinceLastUpdate = timeSinceLastUpdate + elapsed
-        if timeSinceLastUpdate >= updateInterval then
-            UpdateSpeed()
-            timeSinceLastUpdate = 0
-        end
-    end)]]
     local updateKey = "Speed_" .. (slotFrame:GetName() or tostring(slotFrame))
     SDT.UpdateTicker:Register(updateKey, UpdateSpeed, 0.1)
 

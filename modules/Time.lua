@@ -62,6 +62,11 @@ local moduleName = "Time"
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Display Realm Time"], "useRealmTime", false)
 
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -176,7 +181,7 @@ function mod.Create(slotFrame)
     local function UpdateText()
         local Hr, Min, Sec, AmPm = GetDisplayTimeValues()
         local textString = format("%d:%02d %s", Hr, Min, AMPM[AmPm] or "")
-        text:SetText(SDT:ColorText(textString))
+        text:SetText(SDT:ColorModuleText(moduleName, textString))
         SDT:ApplyModuleFont(moduleName, text)
     end
 

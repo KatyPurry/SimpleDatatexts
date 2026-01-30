@@ -267,6 +267,11 @@ end
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
 
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -432,7 +437,7 @@ function mod.Create(slotFrame)
             displayText = showLabel and L["Key: "] .. L["None"] or L["No Key"]
         end
         
-        text:SetText(SDT:ColorText(displayText))
+        text:SetText(SDT:ColorModuleText(moduleName, displayText))
         SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = UpdateKeystone

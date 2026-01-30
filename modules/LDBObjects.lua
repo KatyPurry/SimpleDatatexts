@@ -56,6 +56,11 @@ local function HandleLDBObject(name, obj)
         if modulesWithSettings[moduleName] then
             SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
 
+            -- Text Settings
+            SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+            SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+            SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
             -- Font Settings
             SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
             SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -108,7 +113,7 @@ local function HandleLDBObject(name, obj)
             else
                 txt = cleanObjText or cleanName or L["NO TEXT"]
             end
-            text:SetText(SDT:ColorText(txt))
+            text:SetText(SDT:ColorModuleText(moduleName, txt))
             SDT:ApplyModuleFont(moduleName, text)
         end
         f.Update = Update

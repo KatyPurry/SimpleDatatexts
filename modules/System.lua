@@ -51,6 +51,11 @@ local statusColors = {
 local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "range", L["Top Addons in Tooltip"], "addonQty", 10, 1, 30, 1)
 
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -251,7 +256,7 @@ function mod.Create(slotFrame)
         local fps = floor(GetFramerate())
         local _, _, homePing, worldPing = GetNetStats()
         local latency = worldPing
-        local textString = SDT:ColorText(L["FPS"] .. ": ") .. StatusColor(fps) .. SDT:ColorText(" " .. L["MS"] .. ": ") .. StatusColor(nil, latency)
+        local textString = SDT:ColorModuleText(moduleName, L["FPS"] .. ": ") .. StatusColor(fps) .. SDT:ColorModuleText(moduleName, " " .. L["MS"] .. ": ") .. StatusColor(nil, latency)
         text:SetText(textString)
         SDT:ApplyModuleFont(moduleName, text)
     end

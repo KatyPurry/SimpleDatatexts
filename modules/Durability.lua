@@ -89,6 +89,11 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Short Label"], "showShortLabel", false)
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Decimals"], "hideDecimals", false)
 
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -168,7 +173,7 @@ function mod.Create(slotFrame)
         local durabilityHex = format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
         local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
         local showShortLabel = SDT:GetModuleSetting(moduleName, "showShortLabel", false)
-        local labelString = (showLabel and SDT:ColorText(showShortLabel and L["Dur:"] or L["Durability:"]) or "")
+        local labelString = (showLabel and SDT:ColorModuleText(moduleName, showShortLabel and L["Dur:"] or L["Durability:"]) or "")
         local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
         local textString = format("%s%s%s|r", labelString.." ", durabilityHex, SDT:FormatPercent(totalDurability, hideDecimals, true))
         text:SetText(textString)

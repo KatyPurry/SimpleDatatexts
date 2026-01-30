@@ -22,6 +22,11 @@ local moduleName = "Mail"
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -59,7 +64,7 @@ function mod.Create(slotFrame)
     ----------------------------------------------------
     local function OnEvent(self, event, ...)
         local mailText = HasNewMail() and L["New Mail"] or L["No Mail"]
-        text:SetText(SDT:ColorText(mailText))
+        text:SetText(SDT:ColorModuleText(moduleName, mailText))
         SDT:ApplyModuleFont(moduleName, text)
     end
 

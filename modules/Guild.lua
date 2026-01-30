@@ -31,6 +31,11 @@ local ara = LDB:GetDataObjectByName("|cFFFFB366Ara|r Guild")
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -93,7 +98,7 @@ function mod.Create(slotFrame)
     local function Update()
         local txt = ara.text or ""
         txt = shortenText(txt)
-        text:SetText(SDT:ColorText(txt))
+        text:SetText(SDT:ColorModuleText(moduleName, txt))
         SDT:ApplyModuleFont(moduleName, text)
     end
     f.Update = Update

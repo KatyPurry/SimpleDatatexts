@@ -79,6 +79,11 @@ local defaultHearthstone = "random"
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -182,7 +187,7 @@ local function UpdateDisplay(slotFrame)
     -- Update cooldown text
     local cdText = GetCooldownText(hsID)
     if cdText ~= "" then
-        cooldownText:SetText(cdText)
+        cooldownText:SetText(SDT:ColorModuleText(moduleName, cdText))
         cooldownText:Show()
         SDT:ApplyModuleFont(moduleName, cooldownText)
     else

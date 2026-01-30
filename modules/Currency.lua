@@ -61,6 +61,11 @@ local goldText = "0"
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -105,7 +110,7 @@ local function UpdateDisplay(self)
     end
 
     if self.text then
-        self.text:SetText(SDT:ColorText(display))
+        self.text:SetText(SDT:ColorModuleText(moduleName, display))
         SDT:ApplyModuleFont(moduleName, self.text)
     end
 end

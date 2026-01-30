@@ -91,6 +91,11 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Loot Specialization Text"], "showLootSpecText", true)
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Loadout"], "showLoadout", true)
 
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -338,7 +343,7 @@ function mod.Create(slotFrame)
         end
 
         local display = table.concat(displayParts, " / ")
-        text:SetText(SDT:ColorText(display))
+        text:SetText(SDT:ColorModuleText(moduleName, display))
         SDT:ApplyModuleFont(moduleName, text)
     end
 
@@ -352,14 +357,14 @@ function mod.Create(slotFrame)
         GameTooltip:SetOwner(self, SDT:FindBestAnchorPoint(self))
         GameTooltip:ClearLines()
         if not SDT.db.profile.hideModuleTitle then
-            SDT:AddTooltipHeader(GameTooltip, 14, SDT:ColorText(SPECIALIZATION))
+            SDT:AddTooltipHeader(GameTooltip, 14, SPECIALIZATION)
             SDT:AddTooltipLine(GameTooltip, 12, " ")
         end
 
         for i = 1, GetNumSpecializations() or 0 do
             local id, name, _, icon = GetSpecializationInfo(i)
             if id and name then
-                SDT:AddTooltipLine(GameTooltip, 12, strjoin(' ', SDT:ColorText(name), AddTexture(icon), (i == activeSpecIndex and activeString or inactiveString)), nil, 1, 1, 1)
+                SDT:AddTooltipLine(GameTooltip, 12, strjoin(' ', SDT:ColorModuleText(moduleName, name), AddTexture(icon), (i == activeSpecIndex and activeString or inactiveString)), nil, 1, 1, 1)
             end
         end
 

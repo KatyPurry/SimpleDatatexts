@@ -55,6 +55,11 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Copper"], "showCopper", true)
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Use Coin Icons"], "useCoinIcons", true)
 
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -115,17 +120,17 @@ local function DisplayCurrencyInfo(tooltip)
     end
 end
 
-local function FormatMoney(copper, classColor)
+local function FormatMoney(copper, customColor)
     local showCopper = SDT:GetModuleSetting(moduleName, "showCopper", true)
     local showSilver = SDT:GetModuleSetting(moduleName, "showSilver", true)
     local useCoinIcons = SDT:GetModuleSetting(moduleName, "useCoinIcons", true)
     local g = BreakUpLargeNumbers(floor(copper / 10000))
     local s = floor((copper % 10000) / 100)
     local c = copper % 100
-    if classColor then
-        local goldPart = SDT:ColorText(g) .. (useCoinIcons and GOLD_ICON or SDT:ColorText("g"))
-        local silverPart = SDT:ColorText(s) .. (useCoinIcons and SILVER_ICON or SDT:ColorText("s"))
-        local copperPart = SDT:ColorText(c) .. (useCoinIcons and COPPER_ICON or SDT:ColorText("c"))
+    if customColor then
+        local goldPart = SDT:ColorModuleText(moduleName, g) .. (useCoinIcons and GOLD_ICON or SDT:ColorModuleText(moduleName, "g"))
+        local silverPart = SDT:ColorModuleText(moduleName, s) .. (useCoinIcons and SILVER_ICON or SDT:ColorModuleText(moduleName, "s"))
+        local copperPart = SDT:ColorModuleText(moduleName, c) .. (useCoinIcons and COPPER_ICON or SDT:ColorModuleText(moduleName, "c"))
         local retString = goldPart
         if showSilver then
             retString = retString .. " " .. silverPart

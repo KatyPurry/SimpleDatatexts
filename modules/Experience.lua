@@ -59,8 +59,8 @@ local function SetupModuleConfig()
 
     -- Text Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
-    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Text Use Class Color"], "expTextUseClassColor", false)
-    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "expTextColor", "#FFFFFF")
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
 
     -- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
@@ -201,15 +201,6 @@ function mod.Create(slotFrame)
         end
     end
 
-    local function GetColoredText(textString)
-        if SDT:GetModuleSetting(moduleName, "expTextUseClassColor", true) then
-            return SDT:ColorText(textString)
-        else
-            local colorSetting = SDT:GetModuleSetting(moduleName, "expTextColor", "#FFFFFF")
-            return format("|cff%s%s|r", colorSetting:gsub("#", ""), textString)
-        end
-    end
-
     local currentXP = 0
     local maxXP = 0
     local xpPercent = 0
@@ -220,7 +211,7 @@ function mod.Create(slotFrame)
         local isMaxLevel = TOC < 120001 and SDTC.playerLevel >= 80 or SDTC.playerLevel >= 90
         
         if isMaxLevel then
-            text:SetText(GetColoredText(L["Max Level"]))
+            text:SetText(SDT:ColorModuleText(moduleName, L["Max Level"]))
             SDT:ApplyModuleFont(moduleName, text)
             if barFrame then barFrame:Hide() end
             return
@@ -230,7 +221,7 @@ function mod.Create(slotFrame)
         maxXP = UnitXPMax("player")
 
         if maxXP <= 0 then
-            text:SetText(GetColoredText(L["N/A"]))
+            text:SetText(SDT:ColorModuleText(moduleName, L["N/A"]))
             SDT:ApplyModuleFont(moduleName, text)
             if barFrame then barFrame:Hide() end
             return
@@ -294,7 +285,7 @@ function mod.Create(slotFrame)
             barFrame:Hide()
         end
 
-        local textOutput = GetColoredText(textString)
+        local textOutput = SDT:ColorModuleText(moduleName, textString)
         if showingBar then
             text:SetText("")
             barText:SetText(textOutput)

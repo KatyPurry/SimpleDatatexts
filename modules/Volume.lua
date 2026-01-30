@@ -79,6 +79,11 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
 	SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Short Label"], "showShortLabel", false)
 
+	-- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
 	-- Font Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
@@ -138,7 +143,7 @@ function mod.Create(slotFrame)
 	    activeIndex = arg1
 	    activeStream = AudioStreams[arg1]
 
-	    slotFrame.text:SetText(SDT:ColorText(GetStreamString(activeStream)))
+	    slotFrame.text:SetText(SDT:ColorModuleText(moduleName, GetStreamString(activeStream)))
     end
 
     local function ToggleStream(_, arg1)
@@ -146,7 +151,7 @@ function mod.Create(slotFrame)
 
         SDT:SetCVar(Stream.Enabled, GetCVarBool(Stream.Enabled) and 0 or 1)
 
-	    slotFrame.text:SetText(SDT:ColorText(GetStreamString(activeStream)))
+	    slotFrame.text:SetText(SDT:ColorModuleText(moduleName, GetStreamString(activeStream)))
     end
 
 	twipe(menu)
@@ -170,7 +175,7 @@ function mod.Create(slotFrame)
     -- Update displayed text
     ----------------------------------------------------
 	local function UpdateDisplay()
-		slotFrame.text:SetText(SDT:ColorText(GetStreamString(activeStream)))
+		slotFrame.text:SetText(SDT:ColorModuleText(moduleName, GetStreamString(activeStream)))
 		SDT:ApplyModuleFont(moduleName, slotFrame.text)
 	end
 	f.Update = UpdateDisplay
@@ -213,7 +218,7 @@ function mod.Create(slotFrame)
 	    end
 
 	    SDT:SetCVar(activeStream.Volume, vol)
-	    slotFrame.text:SetText(SDT:ColorText(GetStreamString(activeStream)))
+	    slotFrame.text:SetText(SDT:ColorModuleText(moduleName, GetStreamString(activeStream)))
     end)
 
     ----------------------------------------------------
