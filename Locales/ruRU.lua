@@ -263,6 +263,21 @@ L["Coordinates:"] = "Координаты:"
 L["Mastery:"] = "Мастерство:"
 
 -- ----------------------------
+-- modules/MythicPlusKey.lua
+-- ----------------------------
+L["Mythic+ Keystone"] = "Ключ эпохального+"
+L["No Mythic+ Keystone"] = "Нет ключа эпохального+"
+L["Current Key:"] = "Текущий ключ:"
+L["Dungeon Teleport is on cooldown for "] = "Телепорт в подземелье восстанавливается "
+L[" more seconds."] = " секунд."
+L["You do not know the teleport spell for "] = "Вы не знаете заклинание телепортации для "
+L["Key: "] = "Ключ: "
+L["None"] = "Нет"
+L["No Key"] = "Нет ключа"
+L["Left Click: Teleport to Dungeon"] = "Левый клик: Телепорт в подземелье"
+L["Right Click: List Group in Finder"] = "Правый клик: Создать группу в поиске"
+
+-- ----------------------------
 -- modules/SpecSwitch.lua
 -- ----------------------------
 L["Active"] = "Активен"

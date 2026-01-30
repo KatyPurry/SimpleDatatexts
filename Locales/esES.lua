@@ -262,6 +262,21 @@ L["Coordinates:"] = "Coordenadas:"
 L["Mastery:"] = "Maestría:"
 
 -- ----------------------------
+-- modules/MythicPlusKey.lua
+-- ----------------------------
+L["Mythic+ Keystone"] = "Piedra angular mítica+"
+L["No Mythic+ Keystone"] = "Sin piedra angular mítica+"
+L["Current Key:"] = "Clave actual:"
+L["Dungeon Teleport is on cooldown for "] = "El teletransporte a la mazmorra está en recarga durante "
+L[" more seconds."] = " segundos más."
+L["You do not know the teleport spell for "] = "No conoces el hechizo de teletransporte para "
+L["Key: "] = "Clave: "
+L["None"] = "Ninguno"
+L["No Key"] = "Sin clave"
+L["Left Click: Teleport to Dungeon"] = "Clic izquierdo: Teletransportar a la mazmorra"
+L["Right Click: List Group in Finder"] = "Clic derecho: Listar grupo en el buscador"
+
+-- ----------------------------
 -- modules/SpecSwitch.lua
 -- ----------------------------
 L["Active"] = "Activo"

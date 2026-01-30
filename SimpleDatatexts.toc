@@ -65,6 +65,7 @@ modules/LDBObjects.lua
 modules/Mail.lua
 modules/MapName.lua
 modules/Mastery.lua
+modules/MythicPlusKey.lua
 modules/SpecSwitch.lua
 modules/Speed.lua
 modules/Strength.lua

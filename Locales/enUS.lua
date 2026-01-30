@@ -259,6 +259,21 @@ L["Coordinates:"] = "Coordinates:"
 L["Mastery:"] = "Mastery:"
 
 -- ----------------------------
+-- modules/MythicPlusKey.lua
+-- ----------------------------
+L["Mythic+ Keystone"] = "Mythic+ Keystone"
+L["No Mythic+ Keystone"] = "No Mythic+ Keystone"
+L["Current Key:"] = "Current Key:"
+L["Dungeon Teleport is on cooldown for "] = "Dungeon Teleport is on cooldown for "
+L[" more seconds."] = " more seconds."
+L["You do not know the teleport spell for "] = "You do not know the teleport spell for "
+L["Key: "] = "Key: "
+L["None"] = "None"
+L["No Key"] = "No Key"
+L["Left Click: Teleport to Dungeon"] = "Left Click: Teleport to Dungeon"
+L["Right Click: List Group in Finder"] = "Right Click: List Group in Finder"
+
+-- ----------------------------
 -- modules/SpecSwitch.lua
 -- ----------------------------
 L["Active"] = "Active"
