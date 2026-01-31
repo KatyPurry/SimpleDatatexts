@@ -149,6 +149,20 @@ L["AP"] = "AP"
 L["Bags"] = "Сумки"
 
 -- ----------------------------
+-- modules/CombatTime.lua
+-- ----------------------------
+L["Combat"] = "Бой"
+L["combat duration"] = "продолжительность боя"
+L["Current"] = "Текущий"
+L["Currently out of combat"] = "В данный момент вне боя"
+L["Display Duration"] = "Длительность отображения"
+L["Enter combat to start tracking"] = "Вступите в бой, чтобы начать отслеживание"
+L["Last"] = "Последний"
+L["Left-click"] = "Левый клик"
+L["Out of Combat"] = "Вне боя"
+L["to reset"] = "для сброса"
+
+-- ----------------------------
 -- modules/Crit.lua
 -- ----------------------------
 L["Crit"] = "Крит"

@@ -145,6 +145,20 @@ L["AP"] = "AP"
 L["Bags"] = "Bags"
 
 -- ----------------------------
+-- modules/CombatTime.lua
+-- ----------------------------
+L["Combat"] = "Combat"
+L["combat duration"] = "combat duration"
+L["Current"] = "Current"
+L["Currently out of combat"] = "Currently out of combat"
+L["Display Duration"] = "Display Duration"
+L["Enter combat to start tracking"] = "Enter combat to start tracking"
+L["Last"] = "Last"
+L["Left-click"] = "Left-click"
+L["Out of Combat"] = "Out of Combat"
+L["to reset"] = "to reset"
+
+-- ----------------------------
 -- modules/Crit.lua
 -- ----------------------------
 L["Crit"] = "Crit"
