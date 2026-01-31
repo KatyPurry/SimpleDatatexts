@@ -49,6 +49,7 @@ Ara_Broker_Guild_Friends.lua
 modules/Agility.lua
 modules/Armor.lua
 modules/AttackPower.lua
+modules/Avoidance.lua
 modules/Bags.lua
 modules/CombatTimer.lua
 modules/Coordinates.lua
