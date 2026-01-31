@@ -66,6 +66,7 @@ modules/Haste.lua
 modules/Hearthstone.lua
 modules/Intellect.lua
 modules/LDBObjects.lua
+modules/Leech.lua
 modules/Mail.lua
 modules/MapName.lua
 modules/Mastery.lua
