@@ -51,6 +51,7 @@ modules/Armor.lua
 modules/AttackPower.lua
 modules/Avoidance.lua
 modules/Bags.lua
+modules/Block.lua
 modules/CombatTimer.lua
 modules/Coordinates.lua
 modules/Crit.lua
