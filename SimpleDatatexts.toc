@@ -70,6 +70,7 @@ modules/Mastery.lua
 modules/MythicPlusKey.lua
 modules/SpecSwitch.lua
 modules/Speed.lua
+modules/SpellPower.lua
 modules/Strength.lua
 modules/System.lua
 modules/Time.lua
