@@ -123,9 +123,13 @@ function mod.Create(slotFrame)
 
         -- Haste
         local haste = GetHaste()
-        SDT:AddTooltipHeader(GameTooltip, 14, format('%s: %s%.2f%%|r', STAT_HASTE, '|cffFFFFFF', haste))
         local hasteStat = SDTC.playerClass == "HUNTER" and CR_HASTE_RANGED or CR_HASTE_MELEE
-        SDT:AddTooltipLine(GameTooltip, 12, format('%s'..STAT_HASTE_BASE_TOOLTIP, _G['STAT_HASTE_'..SDTC.playerClass..'_TOOLTIP'] or STAT_HASTE_TOOLTIP, GetCombatRating(hasteStat), GetCombatRatingBonus(hasteStat)), nil, nil, nil, nil, nil, nil, true)
+        local text = format('%s: %s%.2f%%|r', STAT_HASTE, '|cffFFFFFF', haste)
+        local tooltip = format('%s'..STAT_HASTE_BASE_TOOLTIP, _G['STAT_HASTE_'..SDTC.playerClass..'_TOOLTIP'] or STAT_HASTE_TOOLTIP, GetCombatRating(hasteStat), GetCombatRatingBonus(hasteStat))
+
+        SDT:AddTooltipHeader(GameTooltip, 14, text)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, tooltip, nil, nil, nil, nil, nil, nil, nil, true)
 
         -- Attack speed
         local mh, oh = UnitAttackSpeed("player")

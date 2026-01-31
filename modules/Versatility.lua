@@ -128,6 +128,7 @@ function mod.Create(slotFrame)
         local tooltip = format(CR_VERSATILITY_TOOLTIP, currentVers, versReduction, BreakUpLargeNumbers(versatility), currentVers, versReduction)
         
         SDT:AddTooltipHeader(GameTooltip, 14, text)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
         SDT:AddTooltipLine(GameTooltip, 12, tooltip, nil, nil, nil, nil, nil, nil, nil, true)
 
         GameTooltip:Show()
