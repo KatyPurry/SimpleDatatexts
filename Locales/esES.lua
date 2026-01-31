@@ -65,6 +65,8 @@ L["Toggle the minimap button on or off"] = "Activar/desactivar el botón del min
 L["Use 24Hr Clock"] = "Usar reloj de 24 horas"
 L["Use Class Color"] = "Usar color de clase"
 L["Use Custom Color"] = "Usar color personalizado"
+L["X Offset"] = "Desplazamiento X"
+L["Y Offset"] = "Desplazamiento Y"
 
 -- ----------------------------
 -- Config.lua - Panels

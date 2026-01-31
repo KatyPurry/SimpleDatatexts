@@ -412,7 +412,25 @@ function SDT:RebuildSlots(bar)
         slot.text:SetPoint("CENTER")
         slot.text:SetText("")
 
-        local assignedName = saved.slots[i]
+        -- Read slot data (support both old string format and new table format)
+        local slotData = saved.slots[i]
+        local assignedName, offsetX, offsetY
+        
+        if type(slotData) == "string" then
+            -- Legacy format (backwards compatibility)
+            assignedName = slotData
+            offsetX, offsetY = 0, 0
+        elseif type(slotData) == "table" then
+            -- New format with offsets
+            assignedName = slotData.module
+            offsetX = slotData.offsetX or 0
+            offsetY = slotData.offsetY or 0
+        else
+            -- No assignment
+            assignedName = nil
+            offsetX, offsetY = 0, 0
+        end
+
         if assignedName == "(spacer)" then
             slot.module = "(spacer)"
             slot.text:SetText("")
@@ -422,6 +440,12 @@ function SDT:RebuildSlots(bar)
             if slot.moduleFrame then slot.moduleFrame:Hide() end
             slot.module = assignedName
             slot.moduleFrame = mod.Create(slot)
+
+            -- Apply offset to the text element
+            if slot.text then
+                slot.text:ClearAllPoints()
+                slot.text:SetPoint("CENTER", slot, "CENTER", offsetX, offsetY)
+            end
         else
             slot.module = nil
             if slot.moduleFrame then slot.moduleFrame:Hide() end

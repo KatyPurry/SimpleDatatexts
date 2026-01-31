@@ -590,18 +590,115 @@ function SDT:GetSlotArgs()
                 if not self.selectedBar or not self.db.profile.bars[self.selectedBar] then
                     return ""
                 end
-                return self.db.profile.bars[self.selectedBar].slots[i] or ""
+                local slotData = self.db.profile.bars[self.selectedBar].slots[i]
+                if type(slotData) == "string" then
+                    return slotData
+                elseif type(slotData) == "table" then
+                    return slotData.module
+                end
+                return ""
             end,
             set = function(_, val)
                 if val == "" then
                     self.db.profile.bars[self.selectedBar].slots[i] = nil
                 else
-                    self.db.profile.bars[self.selectedBar].slots[i] = val
+                    -- Convert to new table format
+                    local oldData = self.db.profile.bars[self.selectedBar].slots[i]
+                    local offsetX, offsetY = 0, 0
+                    if type(oldData) == "table" then
+                        offsetX = oldData.offsetX or 0
+                        offsetY = oldData.offsetY or 0
+                    end
+                    
+                    self.db.profile.bars[self.selectedBar].slots[i] = {
+                        module = val,
+                        offsetX = offsetX,
+                        offsetY = offsetY,
+                    }
                 end
                 self:RebuildSlots(self.bars[self.selectedBar])
             end,
-            order = i,
+            order = i * 10,
         }
+
+        -- Offset X
+        args["slot" .. i .. "_offsetX"] = {
+            type = "range",
+            name = L["X Offset"],
+            min = -100,
+            max = 100,
+            step = 1,
+            disabled = function()
+                local slotData = self.db.profile.bars[self.selectedBar].slots[i]
+                return not slotData or (type(slotData) == "string" and slotData == "")
+            end,
+            get = function()
+                local slotData = self.db.profile.bars[self.selectedBar].slots[i]
+                if type(slotData) == "table" then
+                    return slotData.offsetX or 0
+                end
+                return 0
+            end,
+            set = function(_, val)
+                local slotData = self.db.profile.bars[self.selectedBar].slots[i]
+                if type(slotData) == "string" then
+                    -- Convert to table format
+                    self.db.profile.bars[self.selectedBar].slots[i] = {
+                        module = slotData,
+                        offsetX = val,
+                        offsetY = 0,
+                    }
+                elseif type(slotData) == "table" then
+                    slotData.offsetX = val
+                end
+                self:RebuildSlots(self.bars[self.selectedBar])
+            end,
+            order = i * 10 + 1,
+        }
+
+        -- Offset Y
+        args["slot" .. i .. "_offsetY"] = {
+            type = "range",
+            name = L["Y Offset"],
+            min = -50,
+            max = 50,
+            step = 1,
+            disabled = function()
+                local slotData = self.db.profile.bars[self.selectedBar].slots[i]
+                return not slotData or (type(slotData) == "string" and slotData == "")
+            end,
+            get = function()
+                local slotData = self.db.profile.bars[self.selectedBar].slots[i]
+                if type(slotData) == "table" then
+                    return slotData.offsetY or 0
+                end
+                return 0
+            end,
+            set = function(_, val)
+                local slotData = self.db.profile.bars[self.selectedBar].slots[i]
+                if type(slotData) == "string" then
+                    -- Convert to table format
+                    self.db.profile.bars[self.selectedBar].slots[i] = {
+                        module = slotData,
+                        offsetX = 0,
+                        offsetY = val,
+                    }
+                elseif type(slotData) == "table" then
+                    slotData.offsetY = val
+                end
+                self:RebuildSlots(self.bars[self.selectedBar])
+            end,
+            order = i * 10 + 2,
+        }
+
+        -- Separator
+        if i < numSlots then
+            args["slot" .. i .. "_spacer"] = {
+                type = "header",
+                name = "",
+                order = i * 10 + 3,
+            }
+        end
     end
     
     return args

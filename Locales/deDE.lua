@@ -65,6 +65,8 @@ L["Toggle the minimap button on or off"] = "Minikartensymbol ein-/ausschalten"
 L["Use 24Hr Clock"] = "24-Stunden-Uhr verwenden"
 L["Use Class Color"] = "Klassenfarbe verwenden"
 L["Use Custom Color"] = "Benutzerdefinierte Farbe verwenden"
+L["X Offset"] = "X-Versatz"
+L["Y Offset"] = "Y-Versatz"
 
 -- ----------------------------
 -- Config.lua - Panels

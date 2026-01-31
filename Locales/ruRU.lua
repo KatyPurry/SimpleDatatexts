@@ -65,6 +65,8 @@ L["Toggle the minimap button on or off"] = "Включить/выключить 
 L["Use 24Hr Clock"] = "Использовать 24-часовой формат"
 L["Use Class Color"] = "Использовать цвет класса"
 L["Use Custom Color"] = "Использовать пользовательский цвет"
+L["X Offset"] = "Смещение по X"
+L["Y Offset"] = "Смещение по Y"
 
 -- ----------------------------
 -- Config.lua - Panels
