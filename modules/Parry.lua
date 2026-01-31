@@ -1,0 +1,147 @@
+-- modules/Parry.lua
+-- Parry datatext adapted from ElvUI for Simple DataTexts (SDT)
+local SDT = SimpleDatatexts
+local L = SDT.L
+
+local mod = {}
+
+----------------------------------------------------
+-- Lua Locals
+----------------------------------------------------
+local format = string.format
+
+----------------------------------------------------
+-- WoW API Locals
+----------------------------------------------------
+local CreateFrame = CreateFrame
+local GameTooltip = GameTooltip
+local GetParryChance = GetParryChance
+
+----------------------------------------------------
+-- Constants Locals
+----------------------------------------------------
+local CR_PARRY = CR_PARRY or 4
+local CR_PARRY_TOOLTIP = CR_PARRY_TOOLTIP
+local STAT_PARRY = STAT_PARRY
+
+----------------------------------------------------
+-- File Locals
+----------------------------------------------------
+local moduleName = "Parry"
+
+----------------------------------------------------
+-- Module Config Settings
+----------------------------------------------------
+local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Label"], "showLabel", true)
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Hide Decimals"], "hideDecimals", false)
+
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
+    -- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
+end
+
+SetupModuleConfig()
+
+----------------------------------------------------
+-- Module Creation
+----------------------------------------------------
+function mod.Create(slotFrame)
+    local f = CreateFrame("Frame", nil, slotFrame)
+    f:SetAllPoints(slotFrame)
+    f:EnableMouse(false)
+
+    local text = slotFrame.text
+    if not text then
+        text = slotFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        text:SetPoint("CENTER")
+        slotFrame.text = text
+    end
+
+    local parryChance = 0
+    local parryRating = 0
+    local parryBonus = 0
+
+    ----------------------------------------------------
+    -- Update logic
+    ----------------------------------------------------
+    local function UpdateParry()
+        parryChance = GetParryChance()
+        parryRating = GetCombatRating(CR_PARRY)
+        parryBonus = GetCombatRatingBonus(CR_PARRY)
+        
+        local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
+        local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
+        local textString = (showLabel and STAT_PARRY..": " or "") .. SDT:FormatPercent(parryChance, hideDecimals)
+        text:SetText(SDT:ColorModuleText(moduleName, textString))
+        SDT:ApplyModuleFont(moduleName, text)
+    end
+
+    f.Update = UpdateParry
+
+    ----------------------------------------------------
+    -- Event Handler
+    ----------------------------------------------------
+    local function OnEvent(self, event, ...)
+        if event == "PLAYER_ENTERING_WORLD"
+        or event == "UNIT_STATS"
+        or event == "PLAYER_EQUIPMENT_CHANGED"
+        or event == "UNIT_AURA" then
+            UpdateParry()
+        end
+    end
+
+    f:SetScript("OnEvent", OnEvent)
+    f:RegisterEvent("PLAYER_ENTERING_WORLD")
+    f:RegisterEvent("UNIT_STATS")
+    f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+    f:RegisterEvent("UNIT_AURA")
+
+    ----------------------------------------------------
+    -- Tooltip
+    ----------------------------------------------------
+    slotFrame:EnableMouse(true)
+    slotFrame:SetScript("OnEnter", function(self)
+        local anchor = SDT:FindBestAnchorPoint(self)
+        GameTooltip:SetOwner(self, anchor)
+        GameTooltip:ClearLines()
+
+        local text = format('%s: |cffFFFFFF%.2f%%|r', STAT_PARRY, parryChance)
+        local tooltip = format(CR_PARRY_TOOLTIP, parryRating, parryBonus)
+
+        SDT:AddTooltipHeader(GameTooltip, 14, text)
+        SDT:AddTooltipLine(GameTooltip, 12, " ")
+        SDT:AddTooltipLine(GameTooltip, 12, tooltip, nil, nil, nil, nil, nil, nil, nil, true)
+
+        GameTooltip:Show()
+    end)
+
+    slotFrame:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
+    UpdateParry()
+    return f
+end
+
+----------------------------------------------------
+-- Register with SDT
+----------------------------------------------------
+SDT:RegisterDataText(moduleName, mod)
+
+return mod
