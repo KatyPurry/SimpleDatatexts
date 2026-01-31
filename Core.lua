@@ -491,26 +491,191 @@ end
 -- Slot Selection Dropdown
 ----------------------------------------------------
 function SDT:ShowSlotDropdown(slot, bar)
-    -- Create the context menu at the cursor
-    MenuUtil.CreateContextMenu(slot, function(owner, root)
-        -- Empty option
-        root:CreateButton(L["(empty)"], function()
+    local maxVisibleItems = 20 -- Maximum items to show before scrolling
+    local totalItems = 2 + #self.cache.moduleNames -- (empty) + (spacer) + modules
+    
+    if totalItems <= maxVisibleItems then
+        -- Use normal context menu for small lists
+        MenuUtil.CreateContextMenu(slot, function(owner, root)
+            -- Empty option
+            root:CreateButton(L["(empty)"], function()
+                self.db.profile.bars[bar:GetName()].slots[slot.index] = nil
+                self:RebuildSlots(bar)
+            end)
+
+            -- Spacer option
+            root:CreateButton(L["(spacer)"], function()
+                self.db.profile.bars[bar:GetName()].slots[slot.index] = "(spacer)"
+                self:RebuildSlots(bar)
+            end)
+
+            -- Module options
+            for _, moduleName in ipairs(self.cache.moduleNames) do
+                root:CreateButton(moduleName, function()
+                    self.db.profile.bars[bar:GetName()].slots[slot.index] = moduleName
+                    self:RebuildSlots(bar)
+                end)
+            end
+        end)
+    else
+        -- Close any existing custom dropdown
+        if self.customDropdown then
+            self.customDropdown:Hide()
+            self.customDropdown = nil
+        end
+        
+        -- Create custom scrollable dropdown
+        local dropdown = CreateFrame("Frame", "SDT_CustomSlotDropdown", UIParent, "BackdropTemplate")
+        self.customDropdown = dropdown
+        
+        local itemHeight = 18
+        local visibleHeight = maxVisibleItems * itemHeight
+        local dropdownWidth = 200
+        local backdropInsets = 4 -- top (2) + bottom (2) insets from backdrop
+        
+        dropdown:SetSize(dropdownWidth, visibleHeight + backdropInsets)
+        dropdown:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = "Interface\\Buttons\\WHITE8X8",
+            tile = false,
+            edgeSize = 1,
+            insets = { left = 1, right = 1, top = 1, bottom = 1 }
+        })
+        dropdown:SetBackdropColor(0.1, 0.1, 0.1, 0.95)
+        dropdown:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        dropdown:SetFrameStrata("FULLSCREEN_DIALOG")
+        dropdown:SetClampedToScreen(true)
+        
+        -- Position at cursor
+        local x, y = GetCursorPosition()
+        local scale = UIParent:GetEffectiveScale()
+        dropdown:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x / scale, y / scale)
+        
+        -- Close on escape
+        dropdown:SetScript("OnKeyDown", function(self, key)
+            if key == "ESCAPE" then
+                self:Hide()
+            end
+        end)
+        dropdown:SetPropagateKeyboardInput(false)
+        
+        -- Create scroll frame
+        local scrollFrame = CreateFrame("ScrollFrame", nil, dropdown)
+        scrollFrame:SetPoint("TOPLEFT", 2, -2)
+        scrollFrame:SetPoint("BOTTOMRIGHT", -20, 2)
+        
+        -- Create scroll child (content container)
+        local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+        scrollChild:SetSize(dropdownWidth - 22, totalItems * itemHeight)
+        scrollFrame:SetScrollChild(scrollChild)
+        
+        -- Create scrollbar
+        local scrollbar = CreateFrame("Slider", nil, dropdown, "UIPanelScrollBarTemplate")
+        scrollbar:SetPoint("TOPRIGHT", dropdown, "TOPRIGHT", -3, -18)
+        scrollbar:SetPoint("BOTTOMRIGHT", dropdown, "BOTTOMRIGHT", -3, 18)
+        scrollbar:SetMinMaxValues(0, math.max(0, (totalItems * itemHeight) - visibleHeight))
+        scrollbar:SetValueStep(itemHeight)
+        scrollbar:SetObeyStepOnDrag(true)
+        scrollbar:SetWidth(18)
+        
+        scrollbar:SetScript("OnValueChanged", function(self, value)
+            scrollFrame:SetVerticalScroll(value)
+        end)
+        
+        -- Mouse wheel scrolling
+        scrollFrame:EnableMouseWheel(true)
+        scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+            local current = scrollbar:GetValue()
+            local minVal, maxVal = scrollbar:GetMinMaxValues()
+            local newValue = current - (delta * itemHeight * 3) -- Scroll 3 items at a time
+            newValue = math.max(minVal, math.min(maxVal, newValue))
+            scrollbar:SetValue(newValue)
+        end)
+        
+        -- Create buttons
+        local buttons = {}
+        local itemIndex = 0
+        
+        local function CreateButton(text, onClick)
+            local btn = CreateFrame("Button", nil, scrollChild)
+            btn:SetSize(dropdownWidth - 22, itemHeight)
+            btn:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, -(itemIndex * itemHeight))
+            
+            btn:SetNormalFontObject("GameFontHighlightSmall")
+            btn:SetHighlightFontObject("GameFontHighlightSmall")
+            
+            local btnText = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            btnText:SetPoint("LEFT", btn, "LEFT", 5, 0)
+            btnText:SetText(text)
+            btn:SetFontString(btnText)
+            
+            -- Highlight texture
+            local highlight = btn:CreateTexture(nil, "BACKGROUND")
+            highlight:SetAllPoints(btn)
+            highlight:SetColorTexture(0.3, 0.3, 0.8, 0.5)
+            btn:SetHighlightTexture(highlight)
+            
+            btn:SetScript("OnClick", function()
+                onClick()
+                dropdown:Hide()
+            end)
+            
+            itemIndex = itemIndex + 1
+            return btn
+        end
+        
+        -- Add (empty) option
+        CreateButton(L["(empty)"], function()
             self.db.profile.bars[bar:GetName()].slots[slot.index] = nil
             self:RebuildSlots(bar)
         end)
-
-        -- Spacer option
-        root:CreateButton(L["(spacer)"], function()
+        
+        -- Add (spacer) option
+        CreateButton(L["(spacer)"], function()
             self.db.profile.bars[bar:GetName()].slots[slot.index] = "(spacer)"
             self:RebuildSlots(bar)
         end)
-
-        -- Module options
+        
+        -- Add module options
         for _, moduleName in ipairs(self.cache.moduleNames) do
-            root:CreateButton(moduleName, function()
+            CreateButton(moduleName, function()
                 self.db.profile.bars[bar:GetName()].slots[slot.index] = moduleName
                 self:RebuildSlots(bar)
             end)
         end
-    end)
+        
+        -- Close on click outside
+        dropdown:SetScript("OnHide", function()
+            self.customDropdown = nil
+        end)
+        
+        -- Close on right click anywhere
+        dropdown:SetScript("OnMouseDown", function(self, button)
+            if button == "RightButton" then
+                self:Hide()
+            end
+        end)
+        
+        -- Create invisible close button that covers entire screen
+        local closeButton = CreateFrame("Button", nil, UIParent)
+        closeButton:SetFrameStrata("FULLSCREEN")
+        closeButton:SetAllPoints(UIParent)
+        closeButton:SetScript("OnClick", function()
+            dropdown:Hide()
+            closeButton:Hide()
+        end)
+        closeButton:Show()
+        
+        dropdown:SetScript("OnHide", function()
+            closeButton:Hide()
+            self.customDropdown = nil
+        end)
+        
+        -- Show the dropdown after close button so it's on top
+        closeButton:SetFrameLevel(dropdown:GetFrameLevel() - 1)
+        dropdown:Show()
+        
+        -- Set initial scroll position
+        scrollbar:SetValue(0)
+    end
 end
