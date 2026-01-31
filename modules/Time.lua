@@ -55,6 +55,26 @@ local lockedInstances = { raids = {}, dungeons = {} }
 local collectedImages = false
 local instanceIconByName = {}
 local moduleName = "Time"
+local difficultyTable = {
+    [1] = "(N)",
+    [2] = "(H)",
+    [8] = "(M)",
+    [14] = "(N)",
+    [15] = "(H)",
+    [16] = "(M)",
+    [17] = "(LFR)",
+    [23] = "(M)",
+    [24] = "(TW)",
+    [33] = "(TW)",
+    [38] = "(N)",
+    [39] = "(H)",
+    [40] = "(M)",
+    [147] = "(N)",
+    [149] = "(H)",
+    [150] = "(N)",
+    [151] = "(LFR)",
+    [230] = "(H)",
+}
 
 ----------------------------------------------------
 -- Module Config
@@ -212,14 +232,17 @@ function mod.Create(slotFrame)
         wipe(lockedInstances.raids)
         wipe(lockedInstances.dungeons)
 
-        for i = 1, GetNumSavedInstances() do
-            local info = { GetSavedInstanceInfo(i) }
-            local name, _, _, difficulty, locked, extended, _, isRaid = unpack(info)
-            if name and (locked or extended) then
-                local buttonImg = instanceIconByName[name] and format('|T%s:16:16|t ', instanceIconByName[name]) or ''
-                tinsert(lockedInstances[isRaid and 'raids' or 'dungeons'], { name, "", buttonImg, info })
+        C_Timer.After(0.1, function()
+            for i = 1, GetNumSavedInstances() do
+                local info = { GetSavedInstanceInfo(i) }
+                local name, _, _, difficulty, locked, extended, _, isRaid = unpack(info)
+                local diffTag = difficultyTable[difficulty] or ""
+                if name and (locked or extended) then
+                    local buttonImg = instanceIconByName[name] and format('|T%s:16:16|t ', instanceIconByName[name]) or ''
+                    tinsert(lockedInstances[isRaid and 'raids' or 'dungeons'], { name, diffTag, buttonImg, info })
+                end
             end
-        end
+        end)
 
         if not collectedImages then
             CollectImages()
