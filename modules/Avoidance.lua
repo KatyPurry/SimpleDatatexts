@@ -85,7 +85,7 @@ function mod.Create(slotFrame)
         
         local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
         local hideDecimals = SDT:GetModuleSetting(moduleName, "hideDecimals", false)
-        local textString = (showLabel and STAT_AVOIDANCE.." " or "") .. SDT:FormatPercent(avoidancePercent, hideDecimals)
+        local textString = (showLabel and STAT_AVOIDANCE..": " or "") .. SDT:FormatPercent(avoidancePercent, hideDecimals)
         text:SetText(SDT:ColorModuleText(moduleName, textString))
         SDT:ApplyModuleFont(moduleName, text)
     end

@@ -99,7 +99,7 @@ function mod.Create(slotFrame)
         spellPower = maxSpellPower
         
         local showLabel = SDT:GetModuleSetting(moduleName, "showLabel", true)
-        local textString = (showLabel and ITEM_MOD_SPELL_POWER_SHORT.." " or "") .. spellPower
+        local textString = (showLabel and ITEM_MOD_SPELL_POWER_SHORT..": " or "") .. spellPower
         text:SetText(SDT:ColorModuleText(moduleName, textString))
         SDT:ApplyModuleFont(moduleName, text)
     end
