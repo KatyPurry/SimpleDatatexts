@@ -357,6 +357,8 @@ local function UpdateSecureAttributes(slotFrame)
     end
     
     local _, dungeonName, mapID = GetKeystoneInfo()
+    if not mapID then return end
+    
     local teleportKnown = false
     for _, spellID in ipairs(dungeonTeleportSpells[mapID]) do
         if C_SpellBook_IsSpellKnown(spellID) then
