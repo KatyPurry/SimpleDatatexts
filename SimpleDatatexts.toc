@@ -75,6 +75,7 @@ modules/Parry.lua
 modules/SpecSwitch.lua
 modules/Speed.lua
 modules/SpellPower.lua
+modules/Stagger.lua
 modules/Strength.lua
 modules/System.lua
 modules/Time.lua
