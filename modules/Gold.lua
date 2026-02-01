@@ -80,6 +80,29 @@ SetupModuleConfig()
 ----------------------------------------------------
 -- Helpers
 ----------------------------------------------------
+local function FormatLargeNumber(n)
+  local locale = GetLocale()
+  local sep
+
+  if locale == "frFR" then
+    sep = " "
+  elseif locale == "deDE" then
+    sep = "."
+  elseif locale == "enUS" or locale == "enGB" then
+    sep = ","
+  else
+    return FormatLargeNumber(n)
+  end
+
+  local s = tostring(math.floor(n))
+  while true do
+    local k
+    s, k = s:gsub("^(-?%d+)(%d%d%d)", "%1"..sep.."%2")
+    if k == 0 then break end
+  end
+  return s
+end
+
 local function SortFunction(a,b) return (a.amount or 0) > (b.amount or 0) end
 
 local function UpdateMarketPrice()
@@ -113,7 +136,7 @@ local function DisplayCurrencyInfo(tooltip)
     while info and info.name do
         if index == 1 then GameTooltip:AddLine(" ") end
         if (info.name ~= "Valorstones" or toc < 120001) and info.quantity then
-            GameTooltip:AddDoubleLine(format(iconStringName, info.iconFileID, info.name), BreakUpLargeNumbers(info.quantity), 1,1,1, 1,1,1)
+            GameTooltip:AddDoubleLine(format(iconStringName, info.iconFileID, info.name), FormatLargeNumber(info.quantity), 1,1,1, 1,1,1)
         end
         index = index + 1
         info, name = C_CurrencyInfo_GetBackpackCurrencyInfo(index)
@@ -124,7 +147,7 @@ local function FormatMoney(copper, customColor)
     local showCopper = SDT:GetModuleSetting(moduleName, "showCopper", true)
     local showSilver = SDT:GetModuleSetting(moduleName, "showSilver", true)
     local useCoinIcons = SDT:GetModuleSetting(moduleName, "useCoinIcons", true)
-    local g = BreakUpLargeNumbers(floor(copper / 10000))
+    local g = FormatLargeNumber(floor(copper / 10000))
     local s = floor((copper % 10000) / 100)
     local c = copper % 100
     if customColor then
@@ -250,7 +273,7 @@ local function ShowTooltip(self)
             toonName = format('|TInterface\\FriendsFrame\\PlusManz-%s:14|t ', g.faction) .. toonName
         end
         SDT:AddTooltipLine(tooltip, 12, (g.name == _G.UnitName("player") and toonName..' |TInterface\\COMMON\\Indicator-Green:14|t' or toonName),
-            g.amountText, g.r, g.g, g.b, 1,1,1)
+            FormatMoney(g.amount), g.r, g.g, g.b, 1,1,1)
     end
 
     SDT:AddTooltipLine(tooltip, 12, " ")
