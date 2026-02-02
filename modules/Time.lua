@@ -250,7 +250,6 @@ function mod.Create(slotFrame)
     end
 
     f:SetScript("OnEvent", OnEvent)
-    f:RegisterEvent("PLAYER_ENTERING_WORLD")
     f:RegisterEvent("UPDATE_INSTANCE_INFO")
     f:RegisterEvent("BOSS_KILL")
 
