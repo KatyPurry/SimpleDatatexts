@@ -9,6 +9,7 @@ local defaults = {
     profile = {
         -- Global settings
         locked = false,
+        debugMode = false,
         useClassColor = false,
         useCustomColor = false,
         customColorHex = "#ffffff",
