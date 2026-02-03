@@ -1,0 +1,37 @@
+name: Update Libraries
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'SimpleDatatexts.toc'
+
+permissions:
+  contents: write
+
+jobs:
+  update-libs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update Libraries
+        uses: BigWigsMods/packager@master
+        with:
+          args: -d -z
+
+      - name: Commit Updated Libraries
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Libs/
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(libs): Update libraries"
+            git push
+          else
+            echo "No library updates needed"
+          fi
