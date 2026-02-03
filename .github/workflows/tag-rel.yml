@@ -17,22 +17,36 @@ jobs:
     steps:
       # Do the release checkout
       - name: Clone Project
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Get Tag
         id: vars
         run: |
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "oldtag=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))" >> $GITHUB_ENV
+
       # Make a zip file for GitHub
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
           filename: SimpleDatatexts-${{ env.tag }}.zip
           exclusions: '*.git* *.pkgmeta *.svn*'
+
       # Generate Changelog
       - name: Generate Changelog
         run: |
           git log ${{ env.oldtag }}...${{ env.tag }} --pretty=format:"%h %s" > CHANGELOG.md
+
+      # Commit Changelog for CurseForge
+      - name: Commit Changelog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore(CHANGELOG): Update changelog for ${{ env.tag }}"
+          git push
+
       # Create a release on GitHub
       - name: Create Release
         id: create_release
@@ -43,6 +57,7 @@ jobs:
           bodyFile: CHANGELOG.md
           draft: false
           prerelease: false
+
       # Upload the zip to the GitHub release
       - name: Upload Zip
         id: upload-zip
@@ -54,6 +69,7 @@ jobs:
           asset_path: ./SimpleDatatexts-${{ env.tag }}.zip
           asset_name: SimpleDatatexts-${{ env.tag }}.zip
           asset_content_type: application/zip
+
       # Use the BigWigs packager for Wago output
       - name: Package and Release to Wago
         uses: BigWigsMods/packager@master
