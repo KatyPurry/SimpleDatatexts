@@ -17,11 +17,14 @@ L["Font Size"] = "Tamanho da Fonte"
 L["Font Outline"] = "Contorno da Fonte"
 L["GOLD"] = "OURO"
 L["Override Global Font"] = "Substituir fonte global"
+L["Override Text Color"] = "Substituir cor do texto"
 L["Settings"] = "Configurações"
 
 -- ----------------------------
 -- Core.lua
 -- ----------------------------
+L["Debug Mode Disabled"] = "Modo de depuração desativado"
+L["Debug Mode Enabled"] = "Modo de depuração ativado"
 L["Left Click to open settings"] = "Clique esquerdo para abrir as configurações"
 L["Lock/Unlock"] = "Bloquear/Desbloquear"
 L["Minimap Icon Disabled"] = "Ícone do minimapa desativado"
@@ -55,6 +58,7 @@ L["Profile imported successfully!"] = "Perfil importado com sucesso!"
 -- ----------------------------
 L["Colors"] = "Cores"
 L["Custom Color"] = "Cor Personalizada"
+L["Enable Per-Spec Profiles"] = "Ativar perfis por especialização"
 L["Global"] = "Global"
 L["Global Settings"] = "Configurações Globais"
 L["Hide Module Title in Tooltip"] = "Ocultar título do módulo no tooltip"
@@ -179,6 +183,7 @@ L["Tracked Currency Qty"] = "Qtd. de Moeda Rastreada"
 -- ----------------------------
 -- modules/Durability.lua
 -- ----------------------------
+L["Dur:"] = "Dur:"
 L["Durability:"] = "Durabilidade:"
 
 -------------------------------
@@ -337,6 +342,7 @@ L["Total Memory:"] = "Memória total:"
 L["(Shift Click) Collect Garbage"] = "(Shift + Clique) Limpar memória"
 L["FPS"] = "FPS"
 L["MS"] = "MS"
+L["Top Addons by Memory:"] = "Top de addons por memória:"
 L["Top Addons in Tooltip"] = "Melhores addons no tooltip"
 
 -- ----------------------------

@@ -17,11 +17,14 @@ L["Font Size"] = "Taille de Police"
 L["Font Outline"] = "Contour de Police"
 L["GOLD"] = "OR"
 L["Override Global Font"] = "Remplacer la police globale"
+L["Override Text Color"] = "Remplacer la couleur du texte"
 L["Settings"] = "Paramètres"
 
 -- ----------------------------
 -- Core.lua
 -- ----------------------------
+L["Debug Mode Disabled"] = "Mode débogage désactivé"
+L["Debug Mode Enabled"] = "Mode débogage activé"
 L["Left Click to open settings"] = "Clic gauche pour ouvrir les paramètres"
 L["Lock/Unlock"] = "Verrouiller/Déverrouiller"
 L["Minimap Icon Disabled"] = "Icône de la mini-carte désactivée"
@@ -55,6 +58,7 @@ L["Profile imported successfully!"] = "Profil importé avec succès !"
 -- ----------------------------
 L["Colors"] = "Couleurs"
 L["Custom Color"] = "Couleur Personnalisée"
+L["Enable Per-Spec Profiles"] = "Activer les profils par spécialisation"
 L["Global"] = "Global"
 L["Global Settings"] = "Paramètres Globaux"
 L["Hide Module Title in Tooltip"] = "Masquer le titre du module dans l'infobulle"
@@ -179,6 +183,7 @@ L["Tracked Currency Qty"] = "Qté de Devise Suivie"
 -- ----------------------------
 -- modules/Durability.lua
 -- ----------------------------
+L["Dur:"] = "Durée:"
 L["Durability:"] = "Durabilité :"
 
 -------------------------------
@@ -337,6 +342,7 @@ L["Total Memory:"] = "Mémoire totale :"
 L["(Shift Click) Collect Garbage"] = "(Maj + clic) Collecter les déchets"
 L["FPS"] = "FPS"
 L["MS"] = "MS"
+L["Top Addons by Memory:"] = "Top des addons par mémoire:"
 L["Top Addons in Tooltip"] = "Meilleurs addons dans l'infobulle"
 
 -- ----------------------------
