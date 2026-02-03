@@ -25,8 +25,16 @@ jobs:
         with:
           args: -d -z
           
-      - name: Show release contents
-        run: ls -R .release
+      - name: Copy packaged libraries into repo
+        run: |
+          if [ -d ".release/SimpleDatatexts/libs" ]; then
+            rm -rf libs
+            mkdir -p libs
+            cp -R .release/SimpleDatatexts/libs/* libs/
+            echo "Libraries copied into repo libs/ directory"
+          else
+            echo "No packaged libs found"
+          fi
 
       - name: Commit Updated Libraries
         run: |
