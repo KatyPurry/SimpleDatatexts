@@ -24,6 +24,9 @@ jobs:
         uses: BigWigsMods/packager@master
         with:
           args: -d -z
+          
+      - name: Show release contents
+        run: ls -R .release
 
       - name: Commit Updated Libraries
         run: |
