@@ -7,17 +7,14 @@
 
 # Libs
 libs/LibStub/LibStub.lua
-libs/CallbackHandler-1.0/CallbackHandler-1.0.lua
-libs/AceAddon-3.0/AceAddon-3.0.lua
-libs/AceEvent-3.0/AceEvent-3.0.lua
-libs/AceDB-3.0/AceDB-3.0.lua
-libs/AceDBOptions-3.0/AceDBOptions-3.0.lua
-libs/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
-libs/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
+libs/CallbackHandler-1.0/CallbackHandler-1.0.xml
+libs/AceAddon-3.0/AceAddon-3.0.xml
+libs/AceEvent-3.0/AceEvent-3.0.xml
+libs/AceDB-3.0/AceDB-3.0.xml
+libs/AceDBOptions-3.0/AceDBOptions-3.0.xml
 libs/AceGUI-3.0/AceGUI-3.0.xml
-libs/AceConfig-3.0/AceConfig-3.0.lua
-libs/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
-libs/AceSerializer-3.0/AceSerializer-3.0.lua
+libs/AceConfig-3.0/AceConfig-3.0.xml
+libs/AceSerializer-3.0/AceSerializer-3.0.xml
 libs/LibDeflate/LibDeflate.lua
 libs/LibSharedMedia-3.0/LibSharedMedia-3.0.lua
 libs/LibDataBroker-1.1/LibDataBroker-1.1.lua
