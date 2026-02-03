@@ -1,7 +1,7 @@
 local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
-if GetLocale() ~= "frFR" then
+if SDT.cache.locale ~= "frFR" then
     return
 end
 
@@ -15,6 +15,7 @@ L["Display Font:"] = "Police :"
 L["Font Settings"] = "Paramètres de Police"
 L["Font Size"] = "Taille de Police"
 L["Font Outline"] = "Contour de Police"
+L["GOLD"] = "OR"
 L["Override Global Font"] = "Remplacer la police globale"
 L["Settings"] = "Paramètres"
 
@@ -173,8 +174,7 @@ L["Crit"] = "Crit"
 -- modules/Currency.lua
 -- ----------------------------
 L["CURRENCIES"] = "MONNAIES"
--- Used in: modules/Currency.lua, modules/Gold.lua
-L["GOLD"] = "OR"
+L["Tracked Currency Qty"] = "Qté de Devise Suivie"
 
 -- ----------------------------
 -- modules/Durability.lua

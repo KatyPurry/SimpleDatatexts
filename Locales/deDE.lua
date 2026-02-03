@@ -1,7 +1,7 @@
 local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
-if GetLocale() ~= "deDE" then
+if SDT.cache.locale ~= "deDE" then
     return
 end
 
@@ -15,6 +15,7 @@ L["Display Font:"] = "Schriftart:"
 L["Font Settings"] = "Schrifteinstellungen"
 L["Font Size"] = "Schriftgröße"
 L["Font Outline"] = "Schriftkontur"
+L["GOLD"] = "GOLD"
 L["Override Global Font"] = "Globale Schriftart überschreiben"
 L["Settings"] = "Einstellungen"
 
@@ -173,7 +174,7 @@ L["Crit"] = "Krit"
 -- modules/Currency.lua
 -- ----------------------------
 L["CURRENCIES"] = "WÄHRUNGEN"
-L["GOLD"] = "GOLD"
+L["Tracked Currency Qty"] = "Verfolgte Währung Menge"
 
 -- ----------------------------
 -- modules/Durability.lua

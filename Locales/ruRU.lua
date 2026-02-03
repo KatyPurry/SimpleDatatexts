@@ -1,7 +1,7 @@
 local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
-if GetLocale() ~= "ruRU" then
+if SDT.cache.locale ~= "ruRU" then
     return
 end
 
@@ -15,6 +15,7 @@ L["Display Font:"] = "Шрифт:"
 L["Font Settings"] = "Настройки шрифта"
 L["Font Size"] = "Размер шрифта"
 L["Font Outline"] = "Контур шрифта"
+L["GOLD"] = "ЗОЛОТО"
 L["Override Global Font"] = "Переопределить глобальный шрифт"
 L["Settings"] = "Настройки"
 
@@ -173,8 +174,7 @@ L["Crit"] = "Крит"
 -- modules/Currency.lua
 -- ----------------------------
 L["CURRENCIES"] = "ВАЛЮТЫ"
--- Used in: modules/Currency.lua, modules/Gold.lua
-L["GOLD"] = "ЗОЛОТО"
+L["Tracked Currency Qty"] = "Отслеживаемая Валюта Кол-во"
 
 -- ----------------------------
 -- modules/Durability.lua

@@ -11,6 +11,7 @@ L["Display Font:"] = "Display Font:"
 L["Font Settings"] = "Font Settings"
 L["Font Size"] = "Font Size"
 L["Font Outline"] = "Font Outline"
+L["GOLD"] = "GOLD"
 L["Override Global Font"] = "Override Global Font"
 L["Settings"] = "Settings"
 
@@ -169,8 +170,7 @@ L["Crit"] = "Crit"
 -- modules/Currency.lua
 -- ----------------------------
 L["CURRENCIES"] = "CURRENCIES"
--- Used in: modules/Currency.lua, modules/Gold.lua
-L["GOLD"] = "GOLD"
+L["Tracked Currency Qty"] = "Tracked Currency Qty"
 
 -- ----------------------------
 -- modules/Durability.lua

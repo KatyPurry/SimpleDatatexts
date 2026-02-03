@@ -1,7 +1,7 @@
 local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
-if GetLocale() ~= "esES" then
+if SDT.cache.locale ~= "esES" then
     return
 end
 
@@ -15,6 +15,7 @@ L["Display Font:"] = "Fuente:"
 L["Font Settings"] = "Configuración de Fuente"
 L["Font Size"] = "Tamaño de Fuente"
 L["Font Outline"] = "Contorno de Fuente"
+L["GOLD"] = "ORO"
 L["Override Global Font"] = "Anular fuente global"
 L["Settings"] = "Opciones"
 
@@ -173,7 +174,7 @@ L["Crit"] = "Crítico"
 -- modules/Currency.lua
 -- ----------------------------
 L["CURRENCIES"] = "MONEDAS"
-L["GOLD"] = "ORO"
+L["Tracked Currency Qty"] = "Cantidad de Moneda Rastreada"
 
 -- ----------------------------
 -- modules/Durability.lua
