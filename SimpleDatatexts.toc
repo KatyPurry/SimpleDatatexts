@@ -12,11 +12,11 @@ libs/AceAddon-3.0/AceAddon-3.0.lua
 libs/AceEvent-3.0/AceEvent-3.0.lua
 libs/AceDB-3.0/AceDB-3.0.lua
 libs/AceDBOptions-3.0/AceDBOptions-3.0.lua
-libs/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
-libs/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
+libs/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
+libs/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
 libs/AceGUI-3.0/AceGUI-3.0.xml
 libs/AceConfig-3.0/AceConfig-3.0.lua
-libs/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
+libs/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
 libs/AceSerializer-3.0/AceSerializer-3.0.lua
 libs/LibDeflate/LibDeflate.lua
 libs/LibSharedMedia-3.0/LibSharedMedia-3.0.lua
