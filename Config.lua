@@ -703,8 +703,8 @@ function SDT:GetSlotArgs()
         args["slot" .. i .. "_offsetX"] = {
             type = "range",
             name = L["X Offset"],
-            min = -100,
-            max = 100,
+            min = -200,
+            max = 200,
             step = 1,
             disabled = function()
                 local slotData = self.db.profile.bars[self.selectedBar].slots[i]
@@ -738,8 +738,8 @@ function SDT:GetSlotArgs()
         args["slot" .. i .. "_offsetY"] = {
             type = "range",
             name = L["Y Offset"],
-            min = -50,
-            max = 50,
+            min = -100,
+            max = 100,
             step = 1,
             disabled = function()
                 local slotData = self.db.profile.bars[self.selectedBar].slots[i]
