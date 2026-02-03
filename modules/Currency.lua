@@ -15,7 +15,6 @@ local format = string.format
 -- WoW API locals
 ----------------------------------------------------
 local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
-local BreakUpLargeNumbers = BreakUpLargeNumbers
 local GetMoney            = GetMoney
 local UnitName            = UnitName
 
@@ -36,7 +35,7 @@ local moduleName = "Currency"
 -- Helpers
 ----------------------------------------------------
 local function FormatMoney(copper, classColor)
-    local g = BreakUpLargeNumbers(floor(copper / 10000))
+    local g = SDT:FormatLargeNumbers(floor(copper / 10000))
     local s = floor((copper % 10000) / 100)
     local c = copper % 100
 
@@ -61,6 +60,8 @@ local goldText = "0"
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting(moduleName, "range", L["Tracked Currency Qty"], "trackedQty", 3, 1, 8, 1)
+
     -- Text Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
@@ -89,14 +90,16 @@ SetupModuleConfig()
 local function UpdateDisplay(self)
     local display = ""
 
-    -- Backpack currencies (1–3 slots)
-    for i = 1, 3 do
+    -- Backpack currencies
+    local trackedQty = SDT:GetModuleSetting(moduleName, "trackedQty", 3)
+    for i = 1, trackedQty do
         local info = C_CurrencyInfo_GetBackpackCurrencyInfo(i)
         if info and info.quantity and info.iconFileID then
+            local formattedQty = SDT:FormatLargeNumbers(info.quantity)
             local icon = format(ICON_FMT, info.iconFileID)
             display = display == ""
-                and format("%s %s", icon, info.quantity)
-                or format("%s %s %s", display, icon, info.quantity)
+                and format("%s %s", icon, formattedQty)
+                or format("%s %s %s", display, icon, formattedQty)
         end
     end
 
@@ -132,12 +135,13 @@ local function ShowTooltip(self)
         SDT:AddTooltipLine(tooltip, 12, " ")
     end
 
-    for i = 1, 3 do
+    local trackedQty = SDT:GetModuleSetting(moduleName, "trackedQty", 3)
+    for i = 1, trackedQty do
         local info = C_CurrencyInfo_GetBackpackCurrencyInfo(i)
         if info and info.quantity and info.iconFileID then
             SDT:AddTooltipLine(tooltip, 12, 
                 format("%s %s", format(ICON_FMT, info.iconFileID), info.name or "?"),
-                BreakUpLargeNumbers(info.quantity),
+                SDT:FormatLargeNumbers(info.quantity),
                 1,1,1, 1,1,1
             )
         end
