@@ -65,7 +65,7 @@ function SDT:RegisterConfig()
             general = self:GetGeneralOptions(),
             panels = self:GetPanelOptions(),
             modules = self:GetModuleOptions(),
-            profiles = AceDBOptions:GetOptionsTable(self.db),
+            profiles = self:GetProfileOptions(),
             importexport = self:GetImportExportOptions(),
         }
     }
@@ -96,7 +96,7 @@ function SDT:RebuildConfig()
             general = self:GetGeneralOptions(),
             panels = self:GetPanelOptions(),
             modules = self:GetModuleOptions(),
-            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db),
+            profiles = self:GetProfileOptions(),
             importexport = self:GetImportExportOptions(),
         }
     }
@@ -114,6 +114,84 @@ function SDT:OpenConfig()
     if frame and frame.frame then
         frame.frame:SetClampedToScreen(true)
     end
+end
+
+----------------------------------------------------
+-- Profile Options (extends AceDBOptions with per-spec profiles)
+----------------------------------------------------
+function SDT:GetProfileOptions()
+    local tbl = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+
+    -- Order 42 puts it right after "Existing Profiles" (40).
+    local specArgs = {
+        specDesc = {
+            type = "description",
+            name = L["When enabled, the addon will automatically switch to a different profile each time you change specialization. Pick which profile each spec should use below."],
+            order = 41,
+        },
+        useSpecProfiles = {
+            type = "toggle",
+            name = function()
+                return NORMAL_FONT_COLOR_CODE .. L["Enable Per-Spec Profiles"] .. FONT_COLOR_CODE_CLOSE
+            end,
+            width = "full",
+            get = function() return self.db.char.useSpecProfiles end,
+            set = function(_, val)
+                self.db.char.useSpecProfiles = val
+                if val then
+                    self:SwitchToSpecProfile()
+                end
+            end,
+            order = 42,
+        },
+    }
+
+    -- Per-spec dropdowns at 43, 44, 45 … : directly below the toggle,
+    -- still above copydesc (50).
+    local numSpecs = GetNumSpecializations()
+    for i = 1, numSpecs do
+        local _, specName = GetSpecializationInfo(i)
+        if specName then
+            specArgs["spec_" .. i] = {
+                type = "select",
+                name = specName,
+                values = function()
+                    local profiles = {}
+                    for _, name in pairs(self.db:GetProfiles()) do
+                        profiles[name] = name
+                    end
+                    -- Same well-known defaults the built-in "Existing Profiles"
+                    -- dropdown includes (via arg="common" / defaultProfiles).
+                    profiles["Default"] = "Default"
+                    profiles[self.db.keys.char] = self.db.keys.char
+                    profiles[self.db.keys.realm] = self.db.keys.realm
+                    profiles[self.db.keys.class] = UnitClass("player")
+                    return profiles
+                end,
+                get = function()
+                    return self.db.char.chosenProfile[specName]
+                end,
+                set = function(_, val)
+                    self.db.char.chosenProfile[specName] = val
+                    if self.db.char.useSpecProfiles then
+                        local activeIndex = GetSpecialization()
+                        if activeIndex == i then
+                            self.db:SetProfile(val)
+                        end
+                    end
+                end,
+                disabled = function()
+                    return not self.db.char.useSpecProfiles
+                end,
+                order = 43 + i,
+            }
+        end
+    end
+
+    tbl.plugins = tbl.plugins or {}
+    tbl.plugins["specprofiles"] = specArgs
+
+    return tbl
 end
 
 ----------------------------------------------------

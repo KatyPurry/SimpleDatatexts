@@ -134,6 +134,29 @@ function SDT:InitializeSpecProfiles()
 end
 
 ----------------------------------------------------
+-- Switch to the Active Spec's Profile
+----------------------------------------------------
+function SDT:SwitchToSpecProfile()
+    if not self.db.char.useSpecProfiles then return end
+
+    local specIndex = GetSpecialization()
+    if not specIndex then return end
+
+    local _, specName = GetSpecializationInfo(specIndex)
+    if not specName then return end
+
+    -- Ensure a profile name exists for this spec
+    if not self.db.char.chosenProfile[specName] then
+        self.db.char.chosenProfile[specName] = self.cache.charKey .. "-" .. specName:lower()
+    end
+
+    local targetProfile = self.db.char.chosenProfile[specName]
+    if self.db:GetCurrentProfile() ~= targetProfile then
+        self.db:SetProfile(targetProfile)
+    end
+end
+
+----------------------------------------------------
 -- Migrate Old Data
 ----------------------------------------------------
 function SDT:MigrateOldData()

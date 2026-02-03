@@ -134,6 +134,10 @@ function SDT:OnEnable()
             self:CreateDataBar(id, barData.numSlots)
         end
     end
+
+    -- Per-spec profile switching
+    self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "SwitchToSpecProfile")
+    self:SwitchToSpecProfile()
 end
 
 ----------------------------------------------------
