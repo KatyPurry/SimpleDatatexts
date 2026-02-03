@@ -29,6 +29,10 @@ jobs:
         with:
           filename: SimpleDatatexts-${{ env.tag }}.zip
           exclusions: '*.git* *.pkgmeta *.svn*'
+      # Generate Changelog
+      - name: Generate Changelog
+        run: |
+          git log ${{ env.oldtag }}...${{ env.tag }} --pretty=format:"%h %s" > CHANGELOG.md
       # Create a release on GitHub
       - name: Create Release
         id: create_release
@@ -36,8 +40,7 @@ jobs:
         with:
           tag: ${{ env.tag }}
           name: SimpleDatatexts
-          body: |
-            Changes: https://github.com/Cilraaz/SimpleDatatexts/compare/${{ env.oldtag }}...${{ env.tag }}
+          bodyFile: CHANGELOG.md
           draft: false
           prerelease: false
       # Upload the zip to the GitHub release
@@ -57,4 +60,4 @@ jobs:
         env:
             WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
         with:
-            args: -g retail -a 96E7BYGg -n "${{ env.tag }}"
+            args: -g retail -a 96E7BYGg -n "${{ env.tag }}" -c CHANGELOG.md
