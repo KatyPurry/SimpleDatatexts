@@ -1,6 +1,55 @@
 -- Core.lua - Main addon initialization
 local addonName, SDT = ...
 
+----------------------------------------------------
+-- Debug Stuffs
+----------------------------------------------------
+SDT.profileData = {}
+
+function SDT:ProfileFunction(name, func)
+    local startTime = debugprofilestop()
+    local startMemory = collectgarbage("count")
+    
+    func()
+    
+    local endTime = debugprofilestop()
+    local endMemory = collectgarbage("count")
+    
+    -- Store instead of print immediately
+    SDT.profileData[#SDT.profileData + 1] = {
+        name = name,
+        time = endTime - startTime,
+        memory = endMemory - startMemory
+    }
+end
+
+function SDT:ShowProfileData()
+    if #SDT.profileData == 0 then return end
+    
+    print("|cff00ff00[SDT Profile Results]|r")
+    
+    -- Sort by time (descending)
+    table.sort(SDT.profileData, function(a, b) return a.time > b.time end)
+    
+    local totalTime = 0
+    local totalMemory = 0
+    
+    for _, data in ipairs(SDT.profileData) do
+        totalTime = totalTime + data.time
+        totalMemory = totalMemory + data.memory
+        
+        print(format("  %s: |cffff8800%.3f ms|r | |cff8888ff%.2f KB|r", 
+            data.name, 
+            data.time, 
+            data.memory))
+    end
+    
+    print(format("|cff00ff00Total: %.3f ms | %.2f KB|r", totalTime, totalMemory))
+    
+    -- Clear the data
+    wipe(SDT.profileData)
+end
+
 -- Create the addon object using Ace3
 LibStub("AceAddon-3.0"):NewAddon(SDT, addonName, "AceEvent-3.0")
 _G.SimpleDatatexts = SDT
@@ -15,7 +64,7 @@ if not getmetatable(L) then
     setmetatable(L, {
         __index = function(_, key)
             if SDT.db and SDT.db.profile.debugMode then
-                SDT:Print("DEBUG - Missing translation: " .. key)
+                SDT:Print("DEBUG - Missing translation: '" .. key .. "'")
             end
             return key
         end
@@ -99,46 +148,70 @@ end
 -- Addon Initialization
 ----------------------------------------------------
 function SDT:OnInitialize()
-    -- Build cache first
-    self:BuildCache()
+    -- DEBUG
+    if SDT.db and SDT.db.profile and SDT.db.profile.debugMode then
+        SDT:ProfileFunction("BuildCache", function() self:BuildCache() end)
+        SDT:ProfileFunction("InitializeDatabase", function() self:InitializeDatabase() end)
+        SDT:ProfileFunction("RegisterSlashCommands", function() self:RegisterSlashCommands() end)
+        SDT:ProfileFunction("Minimap Icon", function() 
+            SDT.Icon:Register("SimpleDatatexts", obj, self.db.profile.minimap)
+        end)
+    else
+        -- Build cache first
+        self:BuildCache()
 
-    -- Initialize database (handled in Database.lua)
-    self:InitializeDatabase()
+        -- Initialize database (handled in Database.lua)
+        self:InitializeDatabase()
 
-    -- Register slash commands
-    self:RegisterSlashCommands()
+        -- Register slash commands
+        self:RegisterSlashCommands()
 
-    -- Create minimap button
-    SDT.Icon:Register("SimpleDatatexts", obj, self.db.profile.minimap)
+        -- Create minimap button
+        SDT.Icon:Register("SimpleDatatexts", obj, self.db.profile.minimap)
+    end
 end
 
 function SDT:OnEnable()
-    -- Cache screen size
-    self:ScreenCache()
+    -- DEBUG
+    if SDT.db and SDT.db.profile and SDT.db.profile.debugMode then
+        SDT:ProfileFunction("ScreenCache", function() self:ScreenCache() end)
+        SDT:ProfileFunction("RegisterFonts", function() self:RegisterFonts() end)
+        SDT:ProfileFunction("CreateModuleList", function() self:CreateModuleList() end)
 
-    -- Register fonts
-    self:RegisterFonts()
+        SDT:ProfileFunction("CreateBars", function()
+            for barName, barData in pairs(self.db.profile.bars) do
+                local id = tonumber(barName:match("SDT_Bar(%d+)"))
+                if id and id > 0 then
+                    self:CreateDataBar(id, barData.numSlots)
+                end
+            end
+        end)
+    else
+        -- Cache screen size
+        self:ScreenCache()
 
-    -- Create module list
-    self:CreateModuleList()
+        -- Register fonts
+        self:RegisterFonts()
 
-    -- Create addon list
-    self:CreateAddonList()
+        -- Create module list
+        self:CreateModuleList()
 
-    -- Register config (handled in Config.lua)
-    self:RegisterConfig()
-
-    -- Create bars from current profile
-    for barName, barData in pairs(self.db.profile.bars) do
-        local id = tonumber(barName:match("SDT_Bar(%d+)"))
-        if id and id > 0 then
-            self:CreateDataBar(id, barData.numSlots)
+        -- Create bars from current profile
+        for barName, barData in pairs(self.db.profile.bars) do
+            local id = tonumber(barName:match("SDT_Bar(%d+)"))
+            if id and id > 0 then
+                self:CreateDataBar(id, barData.numSlots)
+            end
         end
     end
 
     -- Per-spec profile switching
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "SwitchToSpecProfile")
     self:SwitchToSpecProfile()
+
+    if SDT.db.profile.debugMode then
+        C_Timer.After(1, function() self:ShowProfileData() end)
+    end
 end
 
 ----------------------------------------------------
@@ -226,6 +299,13 @@ function SDT:HandleSlashCommand(msg)
         end
     elseif command == "version" then
         self:Print(format("%s %s: |cff8888ff%s|r", L["Simple Datatexts"], L["Version"], self.cache.version))
+    elseif command == "debug" then
+        self.db.profile.debugMode = not self.db.profile.debugMode
+        if self.db.profile.debugMode then
+            self:Print(L["Debug Mode Enabled"])
+        else
+            self:Print(L["Debug Mode Disabled"])
+        end
     else
         self:Print(L["Usage"] .. ":")
         self:Print("/sdt config - " .. L["Settings"])
@@ -362,42 +442,10 @@ end
 function SDT:RebuildSlots(bar)
     if not bar then return end
 
-    -- Hide and clear existing slot frames
-    if bar.slots then
-        for _, s in ipairs(bar.slots) do
-            if s.moduleFrame then
-                -- Unregister events
-                s.moduleFrame:UnregisterAllEvents()
-
-                -- Clear scripts
-                s.moduleFrame:SetScript("OnUpdate", nil)
-                s.moduleFrame:SetScript("OnEvent", nil)
-                s.moduleFrame:SetScript("OnEnter", nil)
-                s.moduleFrame:SetScript("OnLeave", nil)
-                s.moduleFrame:SetScript("OnShow", nil)
-                s.moduleFrame:SetScript("OnHide", nil)
-
-                -- Unregister update ticker
-                if SDT.UpdateTicker then
-                    SDT.UpdateTicker:UnregisterPrefix(s.module .. "_")
-                end
-
-                -- Hide and clear visuals
-                s.moduleFrame:Hide()
-                s.moduleFrame:ClearAllPoints()
-                s.moduleFrame:SetParent(nil)
-                s.moduleFrame = nil
-            end
-            s:SetParent(nil)
-            s:Hide()
-        end
-    end
-    bar.slots = {}
-
     local barName = bar:GetName()
     local saved = self.db.profile.bars[barName]
     if not saved then return end
-    
+
     local numSlots = saved.numSlots or 3
     local totalW = saved.width or 300
     local totalH = saved.height or 22
@@ -406,78 +454,116 @@ function SDT:RebuildSlots(bar)
     
     bar:SetSize(totalW, totalH)
 
+    bar.slots = bar.slots or {}
+
+    -- Hide/cleanup extra slots if we have more than needed
+    for i = numSlots + 1, #bar.slots do
+        local slot = bar.slots[i]
+        if slot then
+            if slot.moduleFrame then
+                slot.moduleFrame:UnregisterAllEvents()
+                slot.moduleFrame:SetScript("OnUpdate", nil)
+                slot.moduleFrame:SetScript("OnEvent", nil)
+                slot.moduleFrame:Hide()
+                
+                if SDT.UpdateTicker then
+                    SDT.UpdateTicker:UnregisterPrefix(slot.module .. "_")
+                end
+            end
+            slot:Hide()
+        end
+    end
+
     for i = 1, numSlots do
-        local slotName = barName .. "_Slot" .. i
-        local slot = CreateFrame("Button", slotName, bar)
-        slot:SetSize(slotW, slotH)
+        local slot = bar.slots[i]
+        
+        -- Reuse existing slot frame if possible
+        if not slot then
+            local slotName = barName .. "_Slot" .. i
+            slot = CreateFrame("Button", slotName, bar)
+            slot.text = slot:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+            slot.text:SetPoint("CENTER")
+            
+            -- Set up mouse events once
+            slot:EnableMouse(true)
+            slot:RegisterForClicks("AnyUp")
+            slot:RegisterForDrag("LeftButton")
+            
+            bar.slots[i] = slot
+        end
+        
+        -- Update slot properties
         slot.index = i
+        slot:SetSize(slotW, slotH)
+        slot:ClearAllPoints()
         slot:SetPoint("LEFT", bar, "LEFT", (i - 1) * slotW, 0)
-
-        slot.text = slot.text or slot:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        slot.text:SetPoint("CENTER")
-        slot.text:SetText("")
-
-        -- Read slot data (support both old string format and new table format)
+        slot:Show()
+        
+        -- Read slot data
         local slotData = saved.slots[i]
         local assignedName, offsetX, offsetY
         
         if type(slotData) == "string" then
-            -- Legacy format (backwards compatibility)
             assignedName = slotData
             offsetX, offsetY = 0, 0
         elseif type(slotData) == "table" then
-            -- New format with offsets
             assignedName = slotData.module
             offsetX = slotData.offsetX or 0
             offsetY = slotData.offsetY or 0
         else
-            -- No assignment
             assignedName = nil
             offsetX, offsetY = 0, 0
         end
-
-        if assignedName == "(spacer)" then
-            slot.module = "(spacer)"
-            slot.text:SetText("")
-            if slot.moduleFrame then slot.moduleFrame:Hide() end
-        elseif assignedName and self.modules[assignedName] then
-            local mod = self.modules[assignedName]
-            if slot.moduleFrame then slot.moduleFrame:Hide() end
-            slot.module = assignedName
-            slot.moduleFrame = mod.Create(slot)
-
-            -- Apply offset to the text element
-            if slot.text then
-                slot.text:ClearAllPoints()
-                slot.text:SetPoint("CENTER", slot, "CENTER", offsetX, offsetY)
+        
+        -- Only recreate module frame if the module changed
+        if slot.module ~= assignedName then
+            if slot.moduleFrame then
+                slot.moduleFrame:UnregisterAllEvents()
+                slot.moduleFrame:SetScript("OnUpdate", nil)
+                slot.moduleFrame:SetScript("OnEvent", nil)
+                slot.moduleFrame:Hide()
+                
+                if SDT.UpdateTicker then
+                    SDT.UpdateTicker:UnregisterPrefix(slot.module .. "_")
+                end
+                slot.moduleFrame = nil
             end
-        else
-            slot.module = nil
-            if slot.moduleFrame then slot.moduleFrame:Hide() end
-            slot.text:SetText(assignedName or L["(empty)"])
+            
+            if assignedName == "(spacer)" then
+                slot.module = "(spacer)"
+                slot.text:SetText("")
+            elseif assignedName and self.modules[assignedName] then
+                slot.module = assignedName
+                slot.moduleFrame = self.modules[assignedName].Create(slot)
+            else
+                slot.module = nil
+                slot.text:SetText(assignedName or L["(empty)"])
+            end
         end
-
-        slot:EnableMouse(true)
-        slot:RegisterForClicks("AnyUp")
+        
+        -- Apply offset
+        if slot.text then
+            slot.text:ClearAllPoints()
+            slot.text:SetPoint("CENTER", slot, "CENTER", offsetX, offsetY)
+        end
+        
+        -- Set up event handlers (these need to capture current values)
         slot:SetScript("OnMouseUp", function(self, btn)
             if btn == "RightButton" and IsControlKeyDown() then
                 SDT:ShowSlotDropdown(self, bar)
             end
         end)
-
-        -- Forward drag events to parent bar
-        slot:RegisterForDrag("LeftButton")
+        
         slot:SetScript("OnDragStart", function(self)
             if not SDT.db.profile.locked then
                 bar:StartMoving()
             end
         end)
+        
         slot:SetScript("OnDragStop", function(self)
             bar:StopMovingOrSizing()
             SaveBarPosition(bar)
         end)
-
-        bar.slots[i] = slot
     end
 
     self:ApplyFont()
