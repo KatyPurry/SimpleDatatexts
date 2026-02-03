@@ -59,7 +59,7 @@ function SDT:RegisterConfig()
     -- Main options table
     local options = {
         type = "group",
-        name = format("%s - %s: |cff8888ff%s|r", L["Simple DataTexts"], L["Version"], SDT.cache.version),
+        name = format("%s - %s: |cff8888ff%s|r", L["Simple Datatexts"], L["Version"], SDT.cache.version),
         childGroups = "tab",
         args = {
             general = self:GetGeneralOptions(),
@@ -106,6 +106,13 @@ function SDT:RebuildConfig()
 end
 
 function SDT:OpenConfig()
+    if not self.configRegistered then
+        SDT:ProfileFunction("RegisterConfig (Lazy)", function()
+            self:RegisterConfig()
+        end)
+        self.configRegistered = true
+        SDT:ShowProfileData()
+    end
     local AceConfigDialog = LibStub("AceConfigDialog-3.0")
     AceConfigDialog:Open("SimpleDatatexts")
 
