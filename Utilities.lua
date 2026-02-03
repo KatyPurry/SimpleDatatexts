@@ -15,6 +15,7 @@ local wipe = table.wipe
 ----------------------------------------------------
 -- WoW API Locals
 ----------------------------------------------------
+local BreakUpLargeNumbers = BreakUpLargeNumbers
 local GetCVar = GetCVar
 local SetCVar = SetCVar
 local UIParent = UIParent
@@ -203,6 +204,29 @@ end
 ----------------------------------------------------
 -- Format Helpers
 ----------------------------------------------------
+function SDT:FormatLargeNumbers(n)
+    local locale = self.cache.locale
+    local sep
+
+    if locale == "frFR" then
+        sep = " "
+    elseif locale == "deDE" then
+        sep = "."
+    elseif locale == "enUS" or locale == "enGB" then
+        sep = ","
+    else
+        return BreakUpLargeNumbers(n)
+    end
+
+    local s = tostring(math.floor(n))
+    while true do
+        local k
+        s, k = s:gsub("^(-?%d+)(%d%d%d)", "%1"..sep.."%2")
+        if k == 0 then break end
+    end
+    return s
+end
+
 function SDT:FormatPercent(v, hideDecimals, roundDown)
     if hideDecimals then
         if roundDown then
