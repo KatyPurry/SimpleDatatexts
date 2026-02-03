@@ -116,7 +116,7 @@ local function GetCachedAddonData()
     local totalMEM, totalCPU = 0, 0
     local infoDisplay = {}
     
-    for i, data in ipairs(SDT.cache.addonList) do
+    for i, data in ipairs(SDT:GetAddonList()) do
         if IsAddOnLoaded(data.index) then
             local mem = GetAddOnMemoryUsage(data.index)
             totalMEM = totalMEM + mem
