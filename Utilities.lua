@@ -241,6 +241,16 @@ function SDT:FormatPercent(v, hideDecimals, roundDown)
 end
 
 ----------------------------------------------------
+-- Generate Addon List
+----------------------------------------------------
+function SDT:GetAddonList()
+    if not self.cache.addonList or #self.cache.addonList == 0 then
+        self:CreateAddonList()
+    end
+    return self.cache.addonList
+end
+
+----------------------------------------------------
 -- Menu List Handler (for right-click menus)
 ----------------------------------------------------
 function SDT:HandleMenuList(root, menuList, submenu, depth)
