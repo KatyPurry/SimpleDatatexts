@@ -31,6 +31,25 @@ jobs:
             rm -rf libs
             mkdir -p libs
             cp -R .release/SimpleDatatexts/libs/* libs/
+            
+            rm -rf libs/LibDBIcon-1.0/CallbackHandler-1.0
+            rm -rf libs/LibDBIcon-1.0/LibDataBroker-1.1
+            rm -rf libs/LibDBIcon-1.0/LibDBIcon-1.0
+            rm -rf libs/LibDBIcon-1.0/LibStub
+            rm -f libs/LibDBIcon-1.0/embeds.xml
+            rm -f libs/LibDBIcon-1.0/LibDBIcon-1.0.toc
+            
+            rm -rf libs/LibDeflate/docs
+            rm -rf libs/LibDeflate/examples
+            rm -f libs/LibDeflate/*.md
+            rm -f libs/LibDeflate/lib.xml
+            rm -f libs/LibDeflate/LICENSE.txt
+            rm -f libs/LibDeflate/LibDeflate.toc
+            
+            rm -f libs/LibSharedMedia-3.0/lib.xml
+            
+            rm -rf libs/LibStub/tests
+            rm -f libs/LibStub/LibStub.toc
             echo "Libraries copied into repo libs/ directory"
           else
             echo "No packaged libs found"
@@ -48,7 +67,7 @@ jobs:
             git status
             
             if ! git diff --staged --quiet; then
-              git commit -m "chore: Update libraries"
+              git commit -m "chore(libs): Update libraries"
               git push
             else
               echo "No library updates needed"
