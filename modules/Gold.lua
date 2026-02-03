@@ -20,7 +20,6 @@ local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo and C_CurrencyInfo
 local C_Timer_NewTicker                      = C_Timer and C_Timer.NewTicker
 local C_WowTokenPublic_GetCurrentMarketPrice = C_WowTokenPublic.GetCurrentMarketPrice
 local C_WowTokenPublic_UpdateMarketPrice     = C_WowTokenPublic.UpdateMarketPrice
-local BreakUpLargeNumbers                    = BreakUpLargeNumbers
 local GetBuildInfo                           = GetBuildInfo
 local GetMoney                               = GetMoney
 local GetRealmName                           = GetRealmName
@@ -113,7 +112,7 @@ local function DisplayCurrencyInfo(tooltip)
     while info and info.name do
         if index == 1 then GameTooltip:AddLine(" ") end
         if (info.name ~= "Valorstones" or toc < 120001) and info.quantity then
-            GameTooltip:AddDoubleLine(format(iconStringName, info.iconFileID, info.name), BreakUpLargeNumbers(info.quantity), 1,1,1, 1,1,1)
+            GameTooltip:AddDoubleLine(format(iconStringName, info.iconFileID, info.name), SDT:FormatLargeNumbers(info.quantity), 1,1,1, 1,1,1)
         end
         index = index + 1
         info, name = C_CurrencyInfo_GetBackpackCurrencyInfo(index)
@@ -124,7 +123,7 @@ local function FormatMoney(copper, customColor)
     local showCopper = SDT:GetModuleSetting(moduleName, "showCopper", true)
     local showSilver = SDT:GetModuleSetting(moduleName, "showSilver", true)
     local useCoinIcons = SDT:GetModuleSetting(moduleName, "useCoinIcons", true)
-    local g = BreakUpLargeNumbers(floor(copper / 10000))
+    local g = SDT:FormatLargeNumbers(floor(copper / 10000))
     local s = floor((copper % 10000) / 100)
     local c = copper % 100
     if customColor then

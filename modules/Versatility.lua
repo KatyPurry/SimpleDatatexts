@@ -13,7 +13,6 @@ local format = string.format
 ----------------------------------------------------
 -- WoW API Locals
 ----------------------------------------------------
-local BreakUpLargeNumbers  = BreakUpLargeNumbers
 local CreateFrame          = CreateFrame
 local GameTooltip          = GameTooltip
 local GetCombatRating      = GetCombatRating
@@ -125,7 +124,7 @@ function mod.Create(slotFrame)
 
         local versatility = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE)
         local text = HIGHLIGHT_FONT_COLOR_CODE..format(VERSATILITY_TOOLTIP_FORMAT, '|cffFFD000'..STAT_VERSATILITY..'|r', currentVers, versReduction)..FONT_COLOR_CODE_CLOSE
-        local tooltip = format(CR_VERSATILITY_TOOLTIP, currentVers, versReduction, BreakUpLargeNumbers(versatility), currentVers, versReduction)
+        local tooltip = format(CR_VERSATILITY_TOOLTIP, currentVers, versReduction, SDT:FormatLargeNumbers(versatility), currentVers, versReduction)
         
         SDT:AddTooltipHeader(GameTooltip, 14, text)
         SDT:AddTooltipLine(GameTooltip, 12, " ")
