@@ -56,6 +56,7 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Bar Use Class Color"], "expBarUseClassColor", true)
     SDT:AddModuleConfigSetting(moduleName, "color", L["Bar Custom Color"], "expBarColor", "#4080FF")
     SDT:AddModuleConfigSetting(moduleName, "range", L["Bar Height (%)"], "expBarHeightPercent", 100, 10, 100, 5)
+    SDT:AddModuleConfigSetting(moduleName, "statusbar", L["Bar Texture"], "expBarTexture", "Blizzard")
 
     -- Text Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
@@ -169,7 +170,6 @@ function mod.Create(slotFrame)
         
         -- Position fill - anchor to left center
         barFill:SetHeight(barHeight)
-        barFill:SetWidth(1)  -- Will be set by UpdateExperience
         barFill:SetPoint("LEFT", barFrame, "LEFT", 0, 0)
     end
 
@@ -270,14 +270,20 @@ function mod.Create(slotFrame)
             UpdateBarHeight()
             UpdateBarDividers()
 
-            -- Update bar fill width
-            local slotWidth = slotFrame:GetWidth()
-            local fillWidth = (slotWidth) * (currentXP / maxXP)
-            barFill:SetWidth(fillWidth)
+            -- Apply statusbar texture
+            local textureName = SDT:GetModuleSetting(moduleName, "expBarTexture", "Blizzard")
+            local texturePath = LSM:Fetch("statusbar", textureName)
+            barFill:SetTexture(texturePath)
 
-            -- Apply color
+            -- Crop to XP percentage
+            local slotWidth = slotFrame:GetWidth()
+            local fillPercent = currentXP / maxXP
+            barFill:SetWidth(slotWidth * fillPercent)
+            barFill:SetTexCoord(0, fillPercent, 0, 1)
+
+            -- Apply selected color
             local r, g, b, a = GetBarColor()
-            barFill:SetColorTexture(r, g, b, 0.8)
+            barFill:SetVertexColor(r, g, b, 0.8)
             
             -- Update font size from settings
             SDT:ApplyModuleFont(moduleName, barText)

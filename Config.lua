@@ -953,6 +953,19 @@ function SDT:ConvertSettingToArg(moduleName, setting, order)
             name = setting.label,
             order = order,
         }
+    elseif setting.settingType == "statusbar" then
+        return {
+            type = "select",
+            name = setting.label,
+            dialogControl = "LSM30_Statusbar",
+            values = function() return SDT.LSM:HashTable("statusbar") end,
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModules()
+            end,
+            order = order,
+        }
     end
 
     -- Fallback
