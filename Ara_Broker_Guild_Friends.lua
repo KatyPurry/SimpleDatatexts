@@ -1,3 +1,17 @@
+--[[
+	ATTRIBUTION:
+    This module is based on Ara Broker Guild Friends
+    Original Author: Aranarth (wowinterface.com, last active 2017)
+    Updated by: MysticalOS (2024)
+    Further Modified by: Cilraaz for Simple Datatexts
+    
+    The original addon had no explicit license. This incorporation
+    follows WoW addon community norms for abandoned addons.
+    If the original author objects, this module will be removed immediately.
+    
+    This modified version is licensed under GPL v3 as part of Simple Datatexts.
+]]
+
 -- TODO  translate zones.
 -- TODO? don't recreate guild/friend entries, replace values in the table if char is present, remove disconnected, add connected.
 -- TODO  make real friend with broadcast a double sized button unless the broadcast has a link (in this case, click broadcast to copy link).
