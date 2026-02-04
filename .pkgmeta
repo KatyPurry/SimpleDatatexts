@@ -49,6 +49,7 @@ externals:
     tag: latest
     
 ignore:
+  - libs/LibAceConfig-3.0/AceConfigDropdown-3.0
   - libs/LibDBIcon-1.0/CallbackHandler-1.0
   - libs/LibDBIcon-1.0/LibDataBroker-1.1
   - libs/LibDBIcon-1.0/LibDBIcon-1.0
@@ -57,10 +58,15 @@ ignore:
   - libs/LibDBIcon-1.0/LibDBIcon-1.0.toc
   - libs/LibDeflate/tests
   - libs/LibDeflate/examples
-  - libs/LibStub/*.md
+  - libs/LibDataBroker-1.1/README.textile
+  - libs/LibDeflate/docs
+  - libs/LibDeflate/changelog.md
   - libs/LibDeflate/lib.xml
+  - libs/LibDeflate/libdeflate-1.0.2-1.rockspec
   - libs/LibDeflate/LICENSE.txt
   - libs/LibDeflate/LibDeflate.toc
+  - libs/LibDeflate/README.md
   - libs/LibSharedMedia-3.0/lib.xml
   - libs/LibStub/tests
+  - libs/LibStub/*.md
   - libs/LibStub/LibStub.toc
