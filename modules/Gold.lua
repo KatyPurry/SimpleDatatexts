@@ -53,6 +53,7 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Silver"], "showSilver", true)
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Show Copper"], "showCopper", true)
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Use Coin Icons"], "useCoinIcons", true)
+    SDT:AddModuleConfigSetting(moduleName, "range", L["Characters to Show"], "characterQty", 20, 1, 100, 1)
 
     -- Text Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
@@ -241,9 +242,10 @@ local function ShowTooltip(self)
     SDT:AddTooltipLine(tooltip, 12, " ")
     SDT:AddTooltipLine(tooltip, 12, L["Character:"])
     sort(myGold, SortFunction)
-    local total, limit = #myGold, nil
-    local useLimit = limit and limit > 0
-    for _, g in ipairs(myGold) do
+    local total = #myGold
+    local maxChars = SDT:GetModuleSetting(moduleName, "characterQty", 20)
+    for i = 1, math.min(maxChars, total) do
+        local g = myGold[i]
         local toonName = g.name .. (g.realm and g.realm ~= _G.GetRealmName() and ' - '..g.realm or '')
         if g.faction and g.faction ~= 'Neutral' and g.faction ~= '' then
             toonName = format('|TInterface\\FriendsFrame\\PlusManz-%s:14|t ', g.faction) .. toonName
