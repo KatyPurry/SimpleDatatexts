@@ -54,27 +54,7 @@ jobs:
             rm -rf libs/LibStub/tests
             rm -f libs/LibStub/LibStub.toc
             echo "Libraries copied into repo libs/ directory"
+            ls -la libs
           else
             echo "No packaged libs found"
-          fi
-
-      - name: Commit Updated Libraries
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          if [ -d "libs" ]; then
-            git add libs/
-            
-            echo "=== GIT STATUS AFTER ADD ==="
-            git status
-            
-            if ! git diff --staged --quiet; then
-              git commit -m "chore(libs): Update libraries"
-              git push
-            else
-              echo "No library updates needed"
-            fi
-          else
-            echo "No libs directory created - check .pkgmeta configuration"
           fi
