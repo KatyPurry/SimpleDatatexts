@@ -19,11 +19,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - name: Use dev pkgmeta for library updates
+        run: |
+          # Swap to the dev version that doesn't ignore libs
+          cp .pkgmeta .pkgmeta.original
+          cp .pkgmeta-dev .pkgmeta
 
       - name: Update Libraries
         uses: BigWigsMods/packager@master
         with:
           args: -d -z
+          
+      - name: Restore original pkgmeta
+        run: |
+          mv .pkgmeta.original .pkgmeta
           
       - name: Copy packaged libraries into repo
         run: |
