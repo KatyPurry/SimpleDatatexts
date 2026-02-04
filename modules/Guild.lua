@@ -31,6 +31,8 @@ local ara = LDB:GetDataObjectByName("|cFFFFB366Ara|r Guild")
 -- Module Config Settings
 ----------------------------------------------------
 local function SetupModuleConfig()
+    SDT:AddModuleConfigSetting(moduleName, "range", L["Max Guild Name Length"], "maxGuildNameLength", 12, 1, 50, 1)
+
     -- Text Settings
     SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
     SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
@@ -84,9 +86,9 @@ function mod.Create(slotFrame)
         local right = strsub(txt, colonPos + 1)
         right = strtrim(right)
 
-        local maxLen = 12
-        if strlenutf8(left) > maxLen then
-            left = strsub(left, 1, maxLen - 3) .. "…"
+        local maxLen = SDT:GetModuleSetting(moduleName, "maxGuildNameLength", 12)
+        if strlenutf8(left) > maxLen + 3 then
+            left = strsub(left, 1, maxLen) .. "…"
         end
 
         return format("%s: %s", left, right)

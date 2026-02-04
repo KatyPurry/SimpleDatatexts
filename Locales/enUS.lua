@@ -68,6 +68,7 @@ L["Use Class Color"] = "Use Class Color"
 L["Use Custom Color"] = "Use Custom Color"
 L["X Offset"] = "X Offset"
 L["Y Offset"] = "Y Offset"
+L["When enabled, the addon will automatically switch to a different profile each time you change specialization. Pick which profile each spec should use below."] = "When enabled, the addon will automatically switch to a different profile each time you change specialization. Pick which profile each spec should use below."
 
 -- ----------------------------
 -- Config.lua - Panels
@@ -227,6 +228,7 @@ L["Reset Session Data: Hold Ctrl + Right Click"] = "Reset Session Data: Hold Ctr
 -- modules/Guild.lua
 -- ----------------------------
 L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Ara Guild LDB object not found! SDT Guild datatext disabled."
+L["Max Guild Name Length"] = "Max Guild Name Length"
 
 -- ----------------------------
 -- modules/Haste.lua
