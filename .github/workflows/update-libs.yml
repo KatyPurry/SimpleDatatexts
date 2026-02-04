@@ -27,10 +27,11 @@ jobs:
           
       - name: Copy packaged libraries into repo
         run: |
-          if [ -d ".release/SimpleDatatexts/libs" ]; then
+          SRC=".release/SimpleDatatexts/libs"
+          if [ -d "$SRC" ] && [ "$(ls -A "$SRC")" ]; then
             rm -rf libs
             mkdir -p libs
-            cp -R .release/SimpleDatatexts/libs/* libs/
+            cp -R "$SRC"/* libs/
             
             rm -f libs/LibDataBroker-1.1/README.textile
             
@@ -63,7 +64,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
           if [ -d "libs" ]; then
-            git add -A libs/
+            git add libs/
             
             echo "=== GIT STATUS AFTER ADD ==="
             git status
