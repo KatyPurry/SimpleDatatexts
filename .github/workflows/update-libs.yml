@@ -29,9 +29,8 @@ jobs:
         run: |
           SRC=".release/SimpleDatatexts/libs"
           if [ -d "$SRC" ] && [ "$(ls -A "$SRC")" ]; then
-            rm -rf libs
             mkdir -p libs
-            cp -R "$SRC"/* libs/
+            rsync -a --delete "$SRC"/ libs/
             
             rm -f libs/LibDataBroker-1.1/README.textile
             
@@ -57,4 +56,25 @@ jobs:
             ls -la libs
           else
             echo "No packaged libs found"
+          fi
+          
+      - name: Commit Updated Libraries
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if [ -d "libs" ]; then
+            git add libs/
+            
+            echo "=== GIT STATUS AFTER ADD ==="
+            git status
+            
+            if ! git diff --staged --quiet; then
+              git commit -m "chore(libs): Update libraries"
+              git push
+            else
+              echo "No library updates needed"
+            fi
+          else
+            echo "No libs directory created - check .pkgmeta configuration"
           fi
