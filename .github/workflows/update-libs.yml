@@ -1,11 +1,6 @@
 name: Update Libraries
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'SimpleDatatexts.toc'
   workflow_dispatch:
 
 permissions:

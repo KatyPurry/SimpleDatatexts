@@ -21,32 +21,101 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
+
       - name: Get Tag
         id: vars
         run: |
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "oldtag=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))" >> $GITHUB_ENV
 
-      # Make a zip file for GitHub
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
+      - name: Git Config
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Update Libraries
+      - name: Update Libraries
+        uses: BigWigsMods/packager@master
         with:
-          filename: SimpleDatatexts-${{ env.tag }}.zip
-          exclusions: '*.git* *.pkgmeta *.svn*'
+          args: -d -z
+
+      - name: Copy packaged libraries into repo
+        run: |
+          SRC=".release/SimpleDatatexts/libs"
+          if [ -d "$SRC" ] && [ "$(ls -A "$SRC")" ]; then
+            mkdir -p libs
+            rsync -a --delete "$SRC"/ libs/
+            
+            rm -f libs/LibDataBroker-1.1/README.textile
+            
+            rm -rf libs/LibDBIcon-1.0/CallbackHandler-1.0
+            rm -rf libs/LibDBIcon-1.0/LibDataBroker-1.1
+            rm -rf libs/LibDBIcon-1.0/LibDBIcon-1.0
+            rm -rf libs/LibDBIcon-1.0/LibStub
+            rm -f libs/LibDBIcon-1.0/embeds.xml
+            rm -f libs/LibDBIcon-1.0/LibDBIcon-1.0.toc
+            
+            rm -rf libs/LibDeflate/docs
+            rm -rf libs/LibDeflate/examples
+            rm -f libs/LibDeflate/*.md
+            rm -f libs/LibDeflate/lib.xml
+            rm -f libs/LibDeflate/LICENSE.txt
+            rm -f libs/LibDeflate/LibDeflate.toc
+            
+            rm -f libs/LibSharedMedia-3.0/lib.xml
+            
+            rm -rf libs/LibStub/tests
+            rm -f libs/LibStub/LibStub.toc
+            echo "Libraries copied into repo libs/ directory"
+            ls -la libs
+          else
+            echo "No packaged libs found"
+          fi
+          
+      - name: Commit Updated Libraries
+        run: |
+          if [ -d "libs" ]; then
+            git add libs/
+            
+            if ! git diff --staged --quiet; then
+              git commit -m "chore(libs): Update libraries"
+              echo "Libraries updated"
+            else
+              echo "No library updates needed"
+            fi
+          else
+            echo "No libs directory created"
+          fi
 
       # Generate Changelog
       - name: Generate Changelog
         run: |
           git log ${{ env.oldtag }}...${{ env.tag }} --pretty=format:"%h %s" > CHANGELOG.md
 
-      # Commit Changelog for CurseForge
+      # Commit Changelog
       - name: Commit Changelog
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CHANGELOG.md
           git commit -m "chore(CHANGELOG): Update changelog for ${{ env.tag }}"
+
+      # Create the TOC release commit on top
+      - name: Create TOC Release Commit
+        run: |
+          git commit --allow-empty -m "build(TOC): ${{ env.tag }} release"
           git push origin main
+
+      # Move the tag to include the changelog commit
+      - name: Update Tag
+        run: |
+          git tag -fa ${{ env.tag }} -m "Release ${{ env.tag }}"
+          git push origin ${{ env.tag }} --force
+
+      # Make a zip file for GitHub
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: SimpleDatatexts-${{ env.tag }}.zip
+          exclusions: '*.git* *.pkgmeta'
 
       # Create a release on GitHub
       - name: Create Release
