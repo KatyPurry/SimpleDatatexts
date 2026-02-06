@@ -251,6 +251,34 @@ function SDT:GetAddonList()
 end
 
 ----------------------------------------------------
+-- Global Module Settings
+----------------------------------------------------
+function SDT:GlobalModuleSettings(moduleName)
+    -- Text Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
+    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
+
+	-- Font Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
+    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
+    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
+    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
+    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
+        ["NONE"] = L["None"],
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick Outline",
+        ["MONOCHROME"] = "Monochrome",
+        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
+        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
+    })
+
+	-- Frame Strata Settings
+    SDT:AddModuleConfigSeparator(moduleName, L["Frame Strata"])
+    SDT:AddModuleConfigSetting(moduleName, "frameStrata", L["Frame Strata"], "frameStrata", "MEDIUM")
+end
+
+----------------------------------------------------
 -- Menu List Handler (for right-click menus)
 ----------------------------------------------------
 function SDT:HandleMenuList(root, menuList, submenu, depth)
@@ -315,6 +343,28 @@ end
 ----------------------------------------------------
 function SDT:AddModuleConfigSeparator(moduleName, label)
     self:AddModuleConfigSetting(moduleName, "header", label or " ", nil, nil)
+end
+
+----------------------------------------------------
+-- Get Module Frame Strata
+----------------------------------------------------
+function SDT:GetModuleFrameStrata(moduleName)
+    local strata = self:GetModuleSetting(moduleName, "frameStrata", "MEDIUM")
+    -- Validate strata value
+    local validStratas = {
+        BACKGROUND = true,
+        LOW = true,
+        MEDIUM = true,
+        HIGH = true,
+        DIALOG = true,
+        FULLSCREEN = true,
+        FULLSCREEN_DIALOG = true,
+        TOOLTIP = true,
+    }
+    if not validStratas[strata] then
+        return "MEDIUM"
+    end
+    return strata
 end
 
 ----------------------------------------------------
@@ -385,6 +435,36 @@ function SDT:ToggleLock()
             else
                 bar:EnableMouse(true)
                 bar:SetMovable(true)
+            end
+        end
+    end
+end
+
+----------------------------------------------------
+-- Update Frame Strata for Active Modules
+----------------------------------------------------
+function SDT:UpdateAllModuleStrata()
+    -- Iterate through all bars and their slots
+    for _, bar in pairs(self.bars) do
+        if bar.slots then
+            for _, slot in ipairs(bar.slots) do
+                -- Only update slots that have an active module
+                if slot.module and slot.module ~= "(spacer)" and self.modules[slot.module] then
+                    local strata = self:GetModuleFrameStrata(slot.module)
+                    
+                    -- Set strata on the slot itself (parent frame)
+                    slot:SetFrameStrata(strata)
+                    
+                    -- Set strata on module frame if it exists
+                    if slot.moduleFrame then
+                        slot.moduleFrame:SetFrameStrata(strata)
+                    end
+                    
+                    -- Set strata on secure button if it exists
+                    if slot.secureButton then
+                        slot.secureButton:SetFrameStrata(strata)
+                    end
+                end
             end
         end
     end

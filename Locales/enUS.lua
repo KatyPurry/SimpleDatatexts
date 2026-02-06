@@ -15,6 +15,9 @@ L["GOLD"] = "GOLD"
 L["Override Global Font"] = "Override Global Font"
 L["Override Text Color"] = "Override Text Color"
 L["Settings"] = "Settings"
+L["Frame Strata"] = "Frame Strata"
+L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "Set the frame strata (layer) for this module. Higher values appear above lower values."
+L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."
 
 -- ----------------------------
 -- Core.lua

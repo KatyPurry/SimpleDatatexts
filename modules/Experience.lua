@@ -58,24 +58,7 @@ local function SetupModuleConfig()
     SDT:AddModuleConfigSetting(moduleName, "range", L["Bar Height (%)"], "expBarHeightPercent", 100, 10, 100, 5)
     SDT:AddModuleConfigSetting(moduleName, "statusbar", L["Bar Texture"], "expBarTexture", "Blizzard")
 
-    -- Text Settings
-    SDT:AddModuleConfigSeparator(moduleName, L["Text Color"])
-    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Text Color"], "overrideTextColor", false)
-    SDT:AddModuleConfigSetting(moduleName, "color", L["Text Custom Color"], "customTextColor", "#FFFFFF")
-
-    -- Font Settings
-    SDT:AddModuleConfigSeparator(moduleName, L["Font Settings"])
-    SDT:AddModuleConfigSetting(moduleName, "checkbox", L["Override Global Font"], "overrideFont", false)
-    SDT:AddModuleConfigSetting(moduleName, "font", L["Display Font:"], "font", "Friz Quadrata TT")
-    SDT:AddModuleConfigSetting(moduleName, "fontSize", L["Font Size"], "fontSize", 12, 4, 40, 1)
-    SDT:AddModuleConfigSetting(moduleName, "fontOutline", L["Font Outline"], "fontOutline", "NONE", {
-        ["NONE"] = L["None"],
-        ["OUTLINE"] = "Outline",
-        ["THICKOUTLINE"] = "Thick Outline",
-        ["MONOCHROME"] = "Monochrome",
-        ["OUTLINE, MONOCHROME"] = "Outline + Monochrome",
-        ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
-    })
+    SDT:GlobalModuleSettings(moduleName)
 end
 
 SetupModuleConfig()

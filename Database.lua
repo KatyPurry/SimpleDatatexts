@@ -35,6 +35,7 @@ local defaults = {
                 scale = 100,
                 name = nil,
                 point = nil,
+                frameStrata = "MEDIUM",
             }
         },
         

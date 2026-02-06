@@ -19,6 +19,9 @@ L["GOLD"] = "ЗОЛОТО"
 L["Override Global Font"] = "Переопределить глобальный шрифт"
 L["Override Text Color"] = "Переопределить цвет текста"
 L["Settings"] = "Настройки"
+L["Frame Strata"] = "Слой фрейма"
+L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "Устанавливает слой фрейма для этого модуля. Более высокие значения отображаются над более низкими значениями."
+L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "Устанавливает слой фрейма для этой панели. Модули будут отображаться относительно этого. Более высокие значения отображаются над более низкими значениями."
 
 -- ----------------------------
 -- Core.lua

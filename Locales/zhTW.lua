@@ -19,6 +19,9 @@ L["GOLD"] = "金幣"
 L["Override Global Font"] = "覆蓋全域字型"
 L["Override Text Color"] = "覆蓋文字顏色"
 L["Settings"] = "設定"
+L["Frame Strata"] = "框架層級"
+L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "設定此模組的框架層級。數值越高顯示在越上層。"
+L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "設定此面板的框架層級。模組將相對於此顯示。數值越高顯示在越上層。"
 
 -- ----------------------------
 -- Core.lua

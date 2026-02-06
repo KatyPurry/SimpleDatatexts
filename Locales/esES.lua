@@ -19,6 +19,9 @@ L["GOLD"] = "ORO"
 L["Override Global Font"] = "Anular fuente global"
 L["Override Text Color"] = "Anular color de texto"
 L["Settings"] = "Opciones"
+L["Frame Strata"] = "Estrato de marco"
+L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "Establece el estrato de marco (capa) para este módulo. Los valores más altos aparecen sobre los valores más bajos."
+L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "Establece el estrato de marco (capa) para este panel. Los módulos aparecerán en relación a esto. Los valores más altos aparecen sobre los valores más bajos."
 
 -- ----------------------------
 -- Core.lua

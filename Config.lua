@@ -499,6 +499,38 @@ function SDT:GetPanelOptions()
                         end,
                         order = 13,
                     },
+                    frameStrata = {
+                        type = "select",
+                        name = L["Frame Strata"],
+                        desc = L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."],
+                        values = {
+                            ["BACKGROUND"] = "BACKGROUND (0)",
+                            ["LOW"] = "LOW (1)",
+                            ["MEDIUM"] = "MEDIUM (2) - Default",
+                            ["HIGH"] = "HIGH (3)",
+                            ["DIALOG"] = "DIALOG (4)",
+                            ["FULLSCREEN"] = "FULLSCREEN (5)",
+                            ["FULLSCREEN_DIALOG"] = "FULLSCREEN_DIALOG (6)",
+                            ["TOOLTIP"] = "TOOLTIP (7)",
+                        },
+                        sorting = { "BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP" },
+                        get = function()
+                            if not self.selectedBar then return "MEDIUM" end
+                            return self.db.profile.bars[self.selectedBar].frameStrata or "MEDIUM"
+                        end,
+                        set = function(_, val)
+                            if self.selectedBar then
+                                self.db.profile.bars[self.selectedBar].frameStrata = val
+                                if self.bars[self.selectedBar] then
+                                    -- Set strata on the panel frame
+                                    self.bars[self.selectedBar]:SetFrameStrata(val)
+                                    -- Also update all slot/module strata to be relative
+                                    self:UpdateAllModuleStrata()
+                                end
+                            end
+                        end,
+                        order = 14,
+                    },
                     spacer2 = {
                         type = "header",
                         name = L["Appearance"],
@@ -970,6 +1002,29 @@ function SDT:ConvertSettingToArg(moduleName, setting, order)
             set = function(_, val)
                 self:SetModuleSetting(moduleName, setting.settingKey, val)
                 self:UpdateAllModules()
+            end,
+            order = order,
+        }
+    elseif setting.settingType == "frameStrata" then
+        return {
+            type = "select",
+            name = setting.label,
+            desc = L["Set the frame strata (layer) for this module. Higher values appear above lower values."],
+            values = {
+                ["BACKGROUND"] = "BACKGROUND (0)",
+                ["LOW"] = "LOW (1)",
+                ["MEDIUM"] = "MEDIUM (2) - Default",
+                ["HIGH"] = "HIGH (3)",
+                ["DIALOG"] = "DIALOG (4)",
+                ["FULLSCREEN"] = "FULLSCREEN (5)",
+                ["FULLSCREEN_DIALOG"] = "FULLSCREEN_DIALOG (6)",
+                ["TOOLTIP"] = "TOOLTIP (7)",
+            },
+            sorting = { "BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP" },
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModuleStrata()
             end,
             order = order,
         }

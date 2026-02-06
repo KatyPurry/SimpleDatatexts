@@ -540,6 +540,24 @@ function SDT:RebuildSlots(bar)
                 slot.text:SetText(assignedName or L["(empty)"])
             end
         end
+
+        -- Apply frame strata
+        if assignedName and assignedName ~= "(spacer)" and self.modules[assignedName] then
+            local strata = self:GetModuleFrameStrata(assignedName)
+            
+            -- Set strata on the slot itself (parent frame)
+            slot:SetFrameStrata(strata)
+            
+            -- Set strata on the module frame if it exists
+            if slot.moduleFrame then
+                slot.moduleFrame:SetFrameStrata(strata)
+            end
+            
+            -- Set strata on secure button if it exists
+            if slot.secureButton then
+                slot.secureButton:SetFrameStrata(strata)
+            end
+        end
         
         -- Apply offset
         if slot.text then
