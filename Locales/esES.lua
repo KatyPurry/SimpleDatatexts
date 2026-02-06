@@ -1,7 +1,7 @@
 local SDT = _G.SimpleDatatexts
 local L = SDT.L
 
-if SDT.cache.locale ~= "esES" then
+if SDT.cache.locale ~= "esES" and SDT.cache.locale ~= "esMX" then
     return
 end
 
