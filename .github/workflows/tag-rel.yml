@@ -90,7 +90,13 @@ jobs:
       # Generate Changelog
       - name: Generate Changelog
         run: |
-          git log ${{ env.oldtag }}...${{ env.tag }} --pretty=format:"%h %s" > CHANGELOG.md
+          echo "## Changes" > CHANGELOG.md
+          git log ${{ env.oldtag }}...${{ env.tag }} --pretty=format:"- %h %s" \
+            --invert-grep \
+            --grep="^chore(CHANGELOG):" \
+            --grep="^chore(libs):" \
+            --grep="^chore(release):" \
+            >> CHANGELOG.md
 
       # Commit Changelog
       - name: Commit Changelog
@@ -101,7 +107,7 @@ jobs:
       # Create the TOC release commit on top
       - name: Create TOC Release Commit
         run: |
-          git commit --allow-empty -m "build(TOC): ${{ env.tag }} release"
+          git commit --allow-empty -m "chore(release): ${{ env.tag }} release"
           git push origin main
 
       # Move the tag to include the changelog commit
