@@ -103,6 +103,7 @@ local obj = SDT.LDB:NewDataObject("SimpleDatatexts", {
 SDT.modules = SDT.modules or {}
 SDT.bars = SDT.bars or {}
 SDT.cache = SDT.cache or {}
+SDT.cache.locale = GetLocale()
 
 ----------------------------------------------------
 -- WoW API Locals
@@ -125,7 +126,6 @@ function SDT:BuildCache()
     self.cache.playerFaction = UnitFactionGroup("player")
     self.cache.playerLevel = UnitLevel("player")
     self.cache.charKey = self.cache.playerNameLower.."-"..self.cache.playerRealm
-    self.cache.locale = GetLocale()
     
     local colors = { GetClassColor(self.cache.playerClass):GetRGB() }
     self.cache.colorR = colors[1]
