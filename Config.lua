@@ -1028,6 +1028,76 @@ function SDT:ConvertSettingToArg(moduleName, setting, order)
             end,
             order = order,
         }
+    elseif setting.settingType == "currencyOrder" then
+        -- Get number of currently tracked currencies dynamically
+        local function GetNumTrackedCurrencies()
+            local count = 0
+            for i = 1, 8 do
+                local info = C_CurrencyInfo.GetBackpackCurrencyInfo(i)
+                if info and info.name then
+                    count = count + 1
+                else
+                    break
+                end
+            end
+            return count
+        end
+
+        -- Build a map of currencyTypesID to backpack index
+        local function GetCurrencyTypeIDToIndex()
+            local typeIDToIndex = {}
+            for i = 1, 8 do
+                local info = C_CurrencyInfo.GetBackpackCurrencyInfo(i)
+                if info and info.name and info.currencyTypesID then
+                    typeIDToIndex[info.currencyTypesID] = i
+                end
+            end
+            return typeIDToIndex
+        end
+
+        -- Build dropdown values for available currencies
+        -- Returns a table mapping currencyTypesID to display string
+        local function GetCurrencyValues()
+            local values = {}
+            local typeIDToIndex = GetCurrencyTypeIDToIndex()
+
+            for typeID, backpackIndex in pairs(typeIDToIndex) do
+                local info = C_CurrencyInfo.GetBackpackCurrencyInfo(backpackIndex)
+                if info and info.name and info.iconFileID then
+                    values[typeID] = string.format('|T%s:16:16:0:0:64:64:4:60:4:60|t %s', info.iconFileID, info.name)
+                end
+            end
+
+            return values
+        end
+
+        -- Convert setting key from currencyOrder# to currencyTypeID#
+        local typeIDKey = setting.settingKey:gsub("currencyOrder", "currencyTypeID")
+
+        return {
+            type = "select",
+            name = setting.label,
+            values = function() return GetCurrencyValues() end,
+            get = function() 
+                -- Return the currencyTypesID stored for this position
+                return self:GetModuleSetting(moduleName, typeIDKey, nil)
+            end,
+            set = function(_, val)
+                -- Store the currencyTypesID (not the backpack index)
+                self:SetModuleSetting(moduleName, typeIDKey, val)
+                self:UpdateAllModules()
+            end,
+            disabled = function()
+                -- Extract position number from setting key (e.g., "currencyOrder3" -> 3)
+                local position = tonumber(setting.settingKey:match("%d+"))
+                local trackedQty = self:GetModuleSetting(moduleName, "trackedQty", 3)
+                local numTracked = GetNumTrackedCurrencies()
+
+                -- Disable if position is beyond tracked quantity or actual tracked currencies
+                return position > trackedQty or position > numTracked
+            end,
+            order = order,
+        }
     end
 
     -- Fallback

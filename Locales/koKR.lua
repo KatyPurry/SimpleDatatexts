@@ -183,6 +183,9 @@ L["Crit"] = "치명타"
 -- ----------------------------
 L["CURRENCIES"] = "화폐"
 L["Tracked Currency Qty"] = "추적 중인 화폐 수량"
+L["Currency Display Order"] = "화폐 표시 순서"
+L["Position %d"] = "위치 %d"
+L["Empty Slot"] = "빈 슬롯"
 
 -- ----------------------------
 -- modules/Durability.lua

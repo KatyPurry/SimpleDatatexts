@@ -183,6 +183,9 @@ L["Crit"] = "致命一擊"
 -- ----------------------------
 L["CURRENCIES"] = "貨幣"
 L["Tracked Currency Qty"] = "追蹤貨幣數量"
+L["Currency Display Order"] = "貨幣顯示順序"
+L["Position %d"] = "位置 %d"
+L["Empty Slot"] = "空位"
 
 -- ----------------------------
 -- modules/Durability.lua

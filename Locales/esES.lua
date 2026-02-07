@@ -183,6 +183,9 @@ L["Crit"] = "Crítico"
 -- ----------------------------
 L["CURRENCIES"] = "MONEDAS"
 L["Tracked Currency Qty"] = "Cantidad de Moneda Rastreada"
+L["Currency Display Order"] = "Orden de Visualización de Moneda"
+L["Position %d"] = "Posición %d"
+L["Empty Slot"] = "Ranura Vacía"
 
 -- ----------------------------
 -- modules/Durability.lua
