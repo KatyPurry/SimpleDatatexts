@@ -1,5 +1,6 @@
 ## Changes
-- a0a37ad build(TOC): 12.0.0.60 release
-- 579b40c fix(Core): Cache GetLocale() earlier
-- a13fc8b feat(Currency): Allow user-selected currency order
-- 518748f feat(workflow): Omit workflow-generated commits from CHANGELOG.md
+- 83c2a2c build(TOC): 12.0.0.61 release
+- 628765e feat(Gold): Add the option to delete gold data
+- 5229337 feat(Locale): Add localization strings for anchor point settings
+- cea4ebb feat(Config): Tweak how we handle anchor point changes
+- 98f6eaf feat(Config): Add global module option for user-selected anchor point
