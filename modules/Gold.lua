@@ -152,6 +152,349 @@ local function RebuildGoldCache()
     end
 end
 
+local function ShowGoldDeleteConfirmation(characterName, realmName)
+    local dialog = StaticPopupDialogs["SDT_CONFIRM_GOLD_DELETE"]
+    if not dialog then
+        StaticPopupDialogs["SDT_CONFIRM_GOLD_DELETE"] = {
+            text = "",
+            button1 = L["Yes"],
+            button2 = L["No"],
+            OnAccept = function(self)
+                local char = self.characterName
+                local realm = self.realmName
+                
+                if char == "ALL" then
+                    -- Clear all gold data
+                    SDT.db.global.gold = {}
+                    SDT:Print(L["Gold: All data reset!"])
+                else
+                    -- Clear specific character
+                    if SDT.db.global.gold[realm] and SDT.db.global.gold[realm][char] then
+                        SDT.db.global.gold[realm][char] = nil
+                        
+                        -- If realm is now empty, remove it too
+                        local hasChars = false
+                        for _ in pairs(SDT.db.global.gold[realm] or {}) do
+                            hasChars = true
+                            break
+                        end
+                        if not hasChars then
+                            SDT.db.global.gold[realm] = nil
+                        end
+                        
+                        SDT:Print(string.format(L["Gold: Data reset for %s!"], char))
+                    end
+                end
+                
+                -- Rebuild the gold cache so tooltip updates
+                RebuildGoldCache()
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+    end
+    
+    local displayName = characterName
+    if characterName ~= "ALL" then
+        displayName = characterName .. " - " .. realmName
+    end
+    
+    StaticPopupDialogs["SDT_CONFIRM_GOLD_DELETE"].text = 
+        string.format(L["Are you sure you want to delete gold data for:\n\n|cFFFFFF00%s|r"], displayName)
+    
+    local popup = StaticPopup_Show("SDT_CONFIRM_GOLD_DELETE")
+    if popup then
+        popup.characterName = characterName
+        popup.realmName = realmName
+    end
+end
+
+-- Create the character selection menu using custom scrollable dropdown
+local function ShowGoldDeleteMenu(slotFrame)
+    local maxVisibleItems = 20 -- Maximum items to show before scrolling
+    
+    -- Collect all characters from all realms
+    local characters = {}
+    for realmName, realmData in pairs(SDT.db.global.gold or {}) do
+        for charName, charData in pairs(realmData) do
+            table.insert(characters, {
+                name = charName,
+                realm = realmName,
+                faction = charData.faction,
+                amount = charData.amount or 0
+            })
+        end
+    end
+    
+    -- Sort by realm then name
+    table.sort(characters, function(a, b)
+        if a.realm == b.realm then
+            return a.name < b.name
+        end
+        return a.realm < b.realm
+    end)
+    
+    -- Count total items (ALL button + divider + realm headers + characters + dividers between realms)
+    local totalItems = 2 -- ALL button + divider
+    if #characters > 0 then
+        local realmCount = 0
+        local lastRealm = nil
+        for _, charInfo in ipairs(characters) do
+            if charInfo.realm ~= lastRealm then
+                realmCount = realmCount + 1
+                lastRealm = charInfo.realm
+                if realmCount > 1 then
+                    totalItems = totalItems + 1 -- divider between realms
+                end
+                totalItems = totalItems + 1 -- realm header
+            end
+            totalItems = totalItems + 1 -- character button
+        end
+    else
+        totalItems = totalItems + 1 -- "No character data" message
+    end
+    
+    -- Close any existing custom dropdown
+    if SDT.goldDeleteDropdown then
+        SDT.goldDeleteDropdown:Hide()
+        SDT.goldDeleteDropdown = nil
+    end
+    
+    -- Create custom scrollable dropdown
+    local dropdown = CreateFrame("Frame", "SDT_GoldDeleteDropdown", UIParent, "BackdropTemplate")
+    SDT.goldDeleteDropdown = dropdown
+    
+    local itemHeight = 18
+    local visibleHeight = math.min(totalItems, maxVisibleItems) * itemHeight
+    local dropdownWidth = 200
+    local backdropInsets = 4
+    
+    dropdown:SetSize(dropdownWidth, visibleHeight + backdropInsets)
+    dropdown:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    dropdown:SetBackdropColor(0.1, 0.1, 0.1, 0.95)
+    dropdown:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+    dropdown:SetFrameStrata("FULLSCREEN_DIALOG")
+    dropdown:SetClampedToScreen(true)
+    
+    -- Position at cursor
+    local x, y = GetCursorPosition()
+    local scale = UIParent:GetEffectiveScale()
+    dropdown:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x / scale, y / scale)
+    
+    -- Close on escape
+    dropdown:SetScript("OnKeyDown", function(self, key)
+        if key == "ESCAPE" then
+            self:Hide()
+        end
+    end)
+    dropdown:SetPropagateKeyboardInput(false)
+    
+    -- Create scroll frame
+    local scrollFrame = CreateFrame("ScrollFrame", nil, dropdown)
+    scrollFrame:SetPoint("TOPLEFT", 2, -2)
+    scrollFrame:SetPoint("BOTTOMRIGHT", -20, 2)
+    
+    -- Create scroll child (content container)
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetSize(dropdownWidth - 22, totalItems * itemHeight)
+    scrollFrame:SetScrollChild(scrollChild)
+    
+    -- Create scrollbar (only visible if needed)
+    local scrollbar = CreateFrame("Slider", nil, dropdown, "UIPanelScrollBarTemplate")
+    scrollbar:SetPoint("TOPRIGHT", dropdown, "TOPRIGHT", -3, -18)
+    scrollbar:SetPoint("BOTTOMRIGHT", dropdown, "BOTTOMRIGHT", -3, 18)
+    scrollbar:SetMinMaxValues(0, math.max(0, (totalItems * itemHeight) - visibleHeight))
+    scrollbar:SetValueStep(itemHeight)
+    scrollbar:SetObeyStepOnDrag(true)
+    scrollbar:SetWidth(18)
+    
+    if totalItems <= maxVisibleItems then
+        scrollbar:Hide()
+    end
+    
+    scrollbar:SetScript("OnValueChanged", function(self, value)
+        scrollFrame:SetVerticalScroll(value)
+    end)
+    
+    -- Mouse wheel scrolling
+    scrollFrame:EnableMouseWheel(true)
+    scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+        local current = scrollbar:GetValue()
+        local minVal, maxVal = scrollbar:GetMinMaxValues()
+        local newValue = current - (delta * itemHeight * 3)
+        newValue = math.max(minVal, math.min(maxVal, newValue))
+        scrollbar:SetValue(newValue)
+    end)
+    
+    -- Create buttons
+    local itemIndex = 0
+    
+    local function CreateButton(charName, charFaction, goldAmount, onClick)
+        local btn = CreateFrame("Button", nil, scrollChild)
+        btn:SetSize(dropdownWidth - 22, itemHeight)
+        btn:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, -(itemIndex * itemHeight))
+        
+        -- Character name (left-aligned)
+        local factionColor = charFaction == "Alliance" and "|cFF0078FF" or "|cFFFF0000"
+        local nameText = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        nameText:SetPoint("LEFT", btn, "LEFT", 5, 0)
+        nameText:SetText(string.format("%s%s|r", factionColor, charName))
+        
+        -- Gold amount (right-aligned)
+        local gold = math.floor(goldAmount / 10000)
+        local goldText = SDT:FormatLargeNumbers(gold)
+        local goldDisplay = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        goldDisplay:SetPoint("RIGHT", btn, "RIGHT", -5, 0)
+        goldDisplay:SetText(string.format("|cFFFFD700%sg|r", goldText))
+        
+        -- Highlight texture
+        local highlight = btn:CreateTexture(nil, "BACKGROUND")
+        highlight:SetAllPoints(btn)
+        highlight:SetColorTexture(0.3, 0.3, 0.8, 0.5)
+        btn:SetHighlightTexture(highlight)
+        
+        btn:SetScript("OnClick", function()
+            onClick()
+            dropdown:Hide()
+        end)
+        
+        itemIndex = itemIndex + 1
+        return btn
+    end
+    
+    local function CreateSimpleButton(text, onClick)
+        local btn = CreateFrame("Button", nil, scrollChild)
+        btn:SetSize(dropdownWidth - 22, itemHeight)
+        btn:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, -(itemIndex * itemHeight))
+        
+        btn:SetNormalFontObject("GameFontHighlightSmall")
+        btn:SetHighlightFontObject("GameFontHighlightSmall")
+        
+        local btnText = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        btnText:SetPoint("CENTER", btn, "CENTER", 0, 0)
+        btnText:SetText(text)
+        btn:SetFontString(btnText)
+        
+        -- Highlight texture
+        local highlight = btn:CreateTexture(nil, "BACKGROUND")
+        highlight:SetAllPoints(btn)
+        highlight:SetColorTexture(0.3, 0.3, 0.8, 0.5)
+        btn:SetHighlightTexture(highlight)
+        
+        btn:SetScript("OnClick", function()
+            onClick()
+            dropdown:Hide()
+        end)
+        
+        itemIndex = itemIndex + 1
+        return btn
+    end
+    
+    local function CreateHeader(text)
+        local header = CreateFrame("Frame", nil, scrollChild)
+        header:SetSize(dropdownWidth - 22, itemHeight)
+        header:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, -(itemIndex * itemHeight))
+        
+        local headerText = header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        headerText:SetPoint("CENTER", header, "CENTER", 0, 0)
+        headerText:SetText(text)
+        
+        itemIndex = itemIndex + 1
+        return header
+    end
+    
+    local function CreateDivider()
+        local divider = CreateFrame("Frame", nil, scrollChild)
+        divider:SetSize(dropdownWidth - 22, itemHeight)
+        divider:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, -(itemIndex * itemHeight))
+        
+        local line = divider:CreateTexture(nil, "BACKGROUND")
+        line:SetHeight(1)
+        line:SetPoint("LEFT", divider, "LEFT", 5, 0)
+        line:SetPoint("RIGHT", divider, "RIGHT", -5, 0)
+        line:SetColorTexture(0.4, 0.4, 0.4, 1)
+        
+        itemIndex = itemIndex + 1
+        return divider
+    end
+    
+    -- Add "ALL" option
+    CreateSimpleButton(L["|cFFFF0000ALL CHARACTERS|r"], function()
+        ShowGoldDeleteConfirmation("ALL", nil)
+    end)
+    
+    -- Add divider
+    CreateDivider()
+    
+    if #characters > 0 then
+        local currentRealm = nil
+        for _, charInfo in ipairs(characters) do
+            -- Add realm header if this is a new realm
+            if charInfo.realm ~= currentRealm then
+                currentRealm = charInfo.realm
+                if currentRealm ~= characters[1].realm then
+                    CreateDivider()
+                end
+                CreateHeader("|cFF00CCFF" .. charInfo.realm .. "|r")
+            end
+            
+            -- Add character button with name left-aligned and gold right-aligned
+            CreateButton(
+                charInfo.name,
+                charInfo.faction,
+                charInfo.amount,
+                function()
+                    ShowGoldDeleteConfirmation(charInfo.name, charInfo.realm)
+                end
+            )
+        end
+    else
+        CreateHeader(L["|cFF808080No character data found|r"])
+    end
+    
+    -- Close on click outside
+    dropdown:SetScript("OnHide", function()
+        SDT.goldDeleteDropdown = nil
+    end)
+    
+    -- Close on right click anywhere
+    dropdown:SetScript("OnMouseDown", function(self, button)
+        if button == "RightButton" then
+            self:Hide()
+        end
+    end)
+    
+    -- Create invisible close button that covers entire screen
+    local closeButton = CreateFrame("Button", nil, UIParent)
+    closeButton:SetFrameStrata("FULLSCREEN")
+    closeButton:SetAllPoints(UIParent)
+    closeButton:SetScript("OnClick", function()
+        dropdown:Hide()
+        closeButton:Hide()
+    end)
+    closeButton:Show()
+    
+    dropdown:SetScript("OnHide", function()
+        closeButton:Hide()
+        SDT.goldDeleteDropdown = nil
+    end)
+    
+    -- Show the dropdown after close button so it's on top
+    closeButton:SetFrameLevel(dropdown:GetFrameLevel() - 1)
+    dropdown:Show()
+    
+    -- Set initial scroll position
+    scrollbar:SetValue(0)
+end
+
 ----------------------------------------------------
 -- Update logic
 ----------------------------------------------------
@@ -255,7 +598,8 @@ local function ShowTooltip(self)
     DisplayCurrencyInfo()
 
     SDT:AddTooltipLine(tooltip, 12, " ")
-    SDT:AddTooltipLine(tooltip, 12, "|cffaaaaaa" .. L["Reset Session Data: Hold Ctrl + Right Click"] .. "|r")
+    SDT:AddTooltipLine(tooltip, 12, "|cffaaaaaa" .. L["Reset Session Data:"], L["Hold Shift + Right Click"] .. "|r")
+    SDT:AddTooltipLine(tooltip, 12, "|cffaaaaaa" .. L["Reset Character Gold Data:"], L["Hold Alt + Right Click"] .. "|r")
     tooltip:Show()
 end
 
@@ -284,6 +628,9 @@ function mod.Create(slotFrame)
     local function OnEvent(_, event)
         UpdateWarbandGold()
         UpdateGold(slotFrame)
+        if not SDT.db.global.gold[SDT.cache.playerRealmProper][SDT.cache.playerName] then
+            RebuildGoldCache()
+        end
     end
     f.Update = function() OnEvent(f) end
 
@@ -309,9 +656,12 @@ function mod.Create(slotFrame)
     slotFrame:SetScript("OnClick", function(self, button)
         if button == "RightButton" then
             if IsShiftKeyDown() then
-                -- Show menu for deleting characters
-            elseif IsControlKeyDown() then
+                -- Reset session data
                 Profit, Spent = 0,0
+                SDT:Print(L["Gold: Session data reset!"])
+            elseif IsAltKeyDown() then
+                -- Show character selection menu for deletion
+                ShowGoldDeleteMenu(self)
             end
         else
             _G.ToggleAllBags()

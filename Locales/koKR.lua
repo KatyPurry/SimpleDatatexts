@@ -25,6 +25,8 @@ L["Set the frame strata (layer) for this panel. Modules will appear relative to 
 L["Slot Controls"] = "슬롯 제어"
 L["Anchor Point"] = "기준점"
 L["Set the anchor point for this module."] = "이 모듈의 기준점을 설정합니다."
+L["Yes"] = "예"
+L["No"] = "아니오"
 
 -- ----------------------------
 -- Core.lua
@@ -236,6 +238,15 @@ L["Total:"] = "총계:"
 L["Warband:"] = "전투단:"
 L["WoW Token:"] = "WoW 토큰:"
 L["Reset Session Data: Hold Ctrl + Right Click"] = "세션 데이터 재설정: Ctrl + 우클릭 유지"
+L["Gold: All data reset!"] = "골드: 모든 데이터 초기화!"
+L["Gold: Data reset for %s!"] = "골드: %s 데이터 초기화!"
+L["Are you sure you want to delete gold data for:\n\n|cFFFFFF00%s|r"] = "다음 캐릭터의 골드 데이터를 삭제하시겠습니까:\n\n|cFFFFFF00%s|r"
+L["|cFFFF0000ALL CHARACTERS|r"] = "|cFFFF0000모든 캐릭터|r"
+L["|cFF808080No character data found|r"] = "|cFF808080캐릭터 데이터를 찾을 수 없음|r"
+L["Reset Session Data:"] = "세션 데이터 초기화:"
+L["Hold Shift + Right Click"] = "Shift + 우클릭 유지"
+L["Reset Character Gold Data:"] = "캐릭터 골드 데이터 초기화:"
+L["Hold Alt + Right Click"] = "Alt + 우클릭 유지"
 
 -- ----------------------------
 -- modules/Guild.lua

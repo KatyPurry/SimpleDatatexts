@@ -25,6 +25,8 @@ L["Set the frame strata (layer) for this panel. Modules will appear relative to 
 L["Slot Controls"] = "Управление слотами"
 L["Anchor Point"] = "Точка привязки"
 L["Set the anchor point for this module."] = "Устанавливает точку привязки для этого модуля."
+L["Yes"] = "Да"
+L["No"] = "Нет"
 
 -- ----------------------------
 -- Core.lua
@@ -236,6 +238,15 @@ L["Total:"] = "Итого:"
 L["Warband:"] = "Боевой отряд:"
 L["WoW Token:"] = "Токен WoW:"
 L["Reset Session Data: Hold Ctrl + Right Click"] = "Сбросить данные сессии: удерживайте Ctrl + правая кнопка мыши"
+L["Gold: All data reset!"] = "Золото: Все данные сброшены!"
+L["Gold: Data reset for %s!"] = "Золото: Данные сброшены для %s!"
+L["Are you sure you want to delete gold data for:\n\n|cFFFFFF00%s|r"] = "Вы уверены, что хотите удалить данные о золоте для:\n\n|cFFFFFF00%s|r"
+L["|cFFFF0000ALL CHARACTERS|r"] = "|cFFFF0000ВСЕ ПЕРСОНАЖИ|r"
+L["|cFF808080No character data found|r"] = "|cFF808080Данные персонажей не найдены|r"
+L["Reset Session Data:"] = "Сбросить данные сессии:"
+L["Hold Shift + Right Click"] = "Удерживать Shift + Правая кнопка мыши"
+L["Reset Character Gold Data:"] = "Сбросить данные о золоте персонажа:"
+L["Hold Alt + Right Click"] = "Удерживать Alt + Правая кнопка мыши"
 
 -- ----------------------------
 -- modules/Guild.lua

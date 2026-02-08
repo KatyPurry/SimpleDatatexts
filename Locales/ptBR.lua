@@ -25,6 +25,8 @@ L["Set the frame strata (layer) for this panel. Modules will appear relative to 
 L["Slot Controls"] = "Controles de Slot"
 L["Anchor Point"] = "Ponto de Ancoragem"
 L["Set the anchor point for this module."] = "Define o ponto de ancoragem para este módulo."
+L["Yes"] = "Sim"
+L["No"] = "Não"
 
 -- ----------------------------
 -- Core.lua
@@ -236,6 +238,15 @@ L["Total:"] = "Total:"
 L["Warband:"] = "Grupo de guerra:"
 L["WoW Token:"] = "Token WoW:"
 L["Reset Session Data: Hold Ctrl + Right Click"] = "Redefinir dados da sessão: Segure Ctrl + clique direito"
+L["Gold: All data reset!"] = "Ouro: Todos os dados redefinidos!"
+L["Gold: Data reset for %s!"] = "Ouro: Dados redefinidos para %s!"
+L["Are you sure you want to delete gold data for:\n\n|cFFFFFF00%s|r"] = "Tem certeza de que deseja excluir os dados de ouro para:\n\n|cFFFFFF00%s|r"
+L["|cFFFF0000ALL CHARACTERS|r"] = "|cFFFF0000TODOS OS PERSONAGENS|r"
+L["|cFF808080No character data found|r"] = "|cFF808080Nenhum dado de personagem encontrado|r"
+L["Reset Session Data:"] = "Redefinir dados da sessão:"
+L["Hold Shift + Right Click"] = "Manter Shift + Botão direito"
+L["Reset Character Gold Data:"] = "Redefinir dados de ouro do personagem:"
+L["Hold Alt + Right Click"] = "Manter Alt + Botão direito"
 
 -- ----------------------------
 -- modules/Guild.lua

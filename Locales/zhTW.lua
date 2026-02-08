@@ -25,6 +25,8 @@ L["Set the frame strata (layer) for this panel. Modules will appear relative to 
 L["Slot Controls"] = "欄位控制"
 L["Anchor Point"] = "錨點"
 L["Set the anchor point for this module."] = "設定此模組的錨點。"
+L["Yes"] = "是"
+L["No"] = "否"
 
 -- ----------------------------
 -- Core.lua
@@ -236,6 +238,15 @@ L["Total:"] = "總計："
 L["Warband:"] = "戰隊："
 L["WoW Token:"] = "WoW 時光徽章："
 L["Reset Session Data: Hold Ctrl + Right Click"] = "重設工作階段資料：按住 Ctrl + 右鍵點擊"
+L["Gold: All data reset!"] = "金幣：所有資料已重置！"
+L["Gold: Data reset for %s!"] = "金幣：%s 的資料已重置！"
+L["Are you sure you want to delete gold data for:\n\n|cFFFFFF00%s|r"] = "你確定要刪除以下角色的金幣資料嗎：\n\n|cFFFFFF00%s|r"
+L["|cFFFF0000ALL CHARACTERS|r"] = "|cFFFF0000所有角色|r"
+L["|cFF808080No character data found|r"] = "|cFF808080未找到角色資料|r"
+L["Reset Session Data:"] = "重置階段資料："
+L["Hold Shift + Right Click"] = "按住 Shift + 右鍵點擊"
+L["Reset Character Gold Data:"] = "重置角色金幣資料："
+L["Hold Alt + Right Click"] = "按住 Alt + 右鍵點擊"
 
 -- ----------------------------
 -- modules/Guild.lua
