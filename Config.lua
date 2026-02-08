@@ -1035,14 +1035,24 @@ function SDT:ConvertSettingToArg(moduleName, setting, order)
             desc = L["Set the anchor point for this module."],
             values = {
                 ["LEFT"] = "LEFT",
-                ["CENTER"] = "CENTER (Default)",
+                ["CENTER"] = "CENTER - Default",
                 ["RIGHT"] = "RIGHT",
             },
-            sorting = { "LEFT", "CENTER", "RIGHT" },
+            sorting = { "CENTER", "LEFT", "RIGHT" },
             get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
             set = function(_, val)
                 self:SetModuleSetting(moduleName, setting.settingKey, val)
-                self:UpdateAllModuleAnchorPoints()
+                for barName, barData in pairs(self.db.profile.bars) do
+                    for _, slotData in pairs(barData.slots) do
+                        local module = type(slotData) == "table" and slotData.module or slotData
+                        if module == moduleName then
+                            if self.bars[barName] then
+                                self:RebuildSlots(self.bars[barName])
+                            end
+                            break
+                        end
+                    end
+                end
             end,
             order = order,
         }
