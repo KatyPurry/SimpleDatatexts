@@ -22,6 +22,9 @@ L["Settings"] = "설정"
 L["Frame Strata"] = "프레임 계층"
 L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "이 모듈의 프레임 계층(레이어)을 설정합니다. 높은 값이 낮은 값 위에 표시됩니다."
 L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "이 패널의 프레임 계층(레이어)을 설정합니다. 모듈은 이를 기준으로 표시됩니다. 높은 값이 낮은 값 위에 표시됩니다."
+L["Slot Controls"] = "슬롯 제어"
+L["Anchor Point"] = "기준점"
+L["Set the anchor point for this module."] = "이 모듈의 기준점을 설정합니다."
 
 -- ----------------------------
 -- Core.lua

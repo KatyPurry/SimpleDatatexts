@@ -18,6 +18,9 @@ L["Settings"] = "Settings"
 L["Frame Strata"] = "Frame Strata"
 L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "Set the frame strata (layer) for this module. Higher values appear above lower values."
 L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."
+L["Slot Controls"] = "Slot Controls"
+L["Anchor Point"] = "Anchor Point"
+L["Set the anchor point for this module."] = "Set the anchor point for this module."
 
 -- ----------------------------
 -- Core.lua

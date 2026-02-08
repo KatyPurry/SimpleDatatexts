@@ -22,6 +22,9 @@ L["Settings"] = "Paramètres"
 L["Frame Strata"] = "Strate de cadre"
 L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "Définit la strate de cadre (couche) pour ce module. Les valeurs plus élevées apparaissent au-dessus des valeurs plus basses."
 L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "Définit la strate de cadre (couche) pour ce panneau. Les modules apparaîtront par rapport à ceci. Les valeurs plus élevées apparaissent au-dessus des valeurs plus basses."
+L["Slot Controls"] = "Contrôles d'Emplacement"
+L["Anchor Point"] = "Point d'Ancrage"
+L["Set the anchor point for this module."] = "Définit le point d'ancrage pour ce module."
 
 -- ----------------------------
 -- Core.lua

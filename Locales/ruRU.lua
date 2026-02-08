@@ -22,6 +22,9 @@ L["Settings"] = "Настройки"
 L["Frame Strata"] = "Слой фрейма"
 L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "Устанавливает слой фрейма для этого модуля. Более высокие значения отображаются над более низкими значениями."
 L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "Устанавливает слой фрейма для этой панели. Модули будут отображаться относительно этого. Более высокие значения отображаются над более низкими значениями."
+L["Slot Controls"] = "Управление слотами"
+L["Anchor Point"] = "Точка привязки"
+L["Set the anchor point for this module."] = "Устанавливает точку привязки для этого модуля."
 
 -- ----------------------------
 -- Core.lua

@@ -22,6 +22,9 @@ L["Settings"] = "設定"
 L["Frame Strata"] = "框架層級"
 L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "設定此模組的框架層級。數值越高顯示在越上層。"
 L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "設定此面板的框架層級。模組將相對於此顯示。數值越高顯示在越上層。"
+L["Slot Controls"] = "欄位控制"
+L["Anchor Point"] = "錨點"
+L["Set the anchor point for this module."] = "設定此模組的錨點。"
 
 -- ----------------------------
 -- Core.lua
