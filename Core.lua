@@ -561,8 +561,9 @@ function SDT:RebuildSlots(bar)
         
         -- Apply offset
         if slot.text then
+            local anchorPoint = self:GetModuleSetting(assignedName, "anchorPoint", "CENTER")
             slot.text:ClearAllPoints()
-            slot.text:SetPoint("CENTER", slot, "CENTER", offsetX, offsetY)
+            slot.text:SetPoint(anchorPoint, slot, anchorPoint, offsetX, offsetY)
         end
         
         -- Set up event handlers (these need to capture current values)

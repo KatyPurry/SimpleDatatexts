@@ -1028,6 +1028,24 @@ function SDT:ConvertSettingToArg(moduleName, setting, order)
             end,
             order = order,
         }
+    elseif setting.settingType == "anchorPoint" then
+        return {
+            type = "select",
+            name = setting.label,
+            desc = L["Set the anchor point for this module."],
+            values = {
+                ["LEFT"] = "LEFT",
+                ["CENTER"] = "CENTER (Default)",
+                ["RIGHT"] = "RIGHT",
+            },
+            sorting = { "LEFT", "CENTER", "RIGHT" },
+            get = function() return self:GetModuleSetting(moduleName, setting.settingKey, setting.defaultValue) end,
+            set = function(_, val)
+                self:SetModuleSetting(moduleName, setting.settingKey, val)
+                self:UpdateAllModuleAnchorPoints()
+            end,
+            order = order,
+        }
     elseif setting.settingType == "currencyOrder" then
         -- Get number of currently tracked currencies dynamically
         local function GetNumTrackedCurrencies()

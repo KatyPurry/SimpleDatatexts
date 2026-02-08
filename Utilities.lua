@@ -273,8 +273,9 @@ function SDT:GlobalModuleSettings(moduleName)
         ["THICKOUTLINE, MONOCHROME"] = "Thick Outline + Monochrome",
     })
 
-	-- Frame Strata Settings
-    SDT:AddModuleConfigSeparator(moduleName, L["Frame Strata"])
+	-- Slot Controls
+    SDT:AddModuleConfigSeparator(moduleName, L["Slot Controls"])
+    SDT:AddModuleConfigSetting(moduleName, "anchorPoint", L["Anchor Point"], "anchorPoint", "CENTER")
     SDT:AddModuleConfigSetting(moduleName, "frameStrata", L["Frame Strata"], "frameStrata", "MEDIUM")
 end
 
@@ -465,6 +466,32 @@ function SDT:UpdateAllModuleStrata()
                         slot.secureButton:SetFrameStrata(strata)
                     end
                 end
+            end
+        end
+    end
+end
+
+----------------------------------------------------
+-- Update Anchor Points for Active Modules
+----------------------------------------------------
+function SDT:UpdateAllModuleAnchorPoints()
+    -- Iterate through all bars and their slots
+    for barName, bar in pairs(self.bars) do
+        for _, slot in ipairs(bar.slots) do
+            -- Only update slots that have an active module
+            if slot.module and slot.module ~= "(spacer)" and self.modules[slot.module] then
+                local offsetX, offsetY = 0, 0
+                for _, slotData in pairs(self.db.profile.bars[barName].slots) do
+                    local slotDataName = type(slotData) == "table" and slotData.module or nil
+                    if slotDataName == slot.module then
+                        offsetX = slotData.offsetX or 0
+                        offsetY = slotData.offsetY or 0
+                        break
+                    end
+                end
+                local anchorPoint = self:GetModuleSetting(slot.module, "anchorPoint", "CENTER")
+                slot.text:ClearAllPoints()
+                slot.text:SetPoint(anchorPoint, slot, anchorPoint, offsetX, offsetY)
             end
         end
     end
