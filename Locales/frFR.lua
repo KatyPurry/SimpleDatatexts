@@ -12,9 +12,9 @@ L["Simple Datatexts"] = "Simple Datatexts"
 L["(empty)"] = "(vide)"
 L["(spacer)"] = "(espace)"
 L["Display Font:"] = "Police :"
-L["Font Settings"] = "Paramètres de Police"
-L["Font Size"] = "Taille de Police"
-L["Font Outline"] = "Contour de Police"
+L["Font Settings"] = "Paramètres de la police"
+L["Font Size"] = "Taille de la police"
+L["Font Outline"] = "Contour de la police"
 L["GOLD"] = "OR"
 L["Override Global Font"] = "Remplacer la police globale"
 L["Override Text Color"] = "Remplacer la couleur du texte"
@@ -22,8 +22,8 @@ L["Settings"] = "Paramètres"
 L["Frame Strata"] = "Strate de cadre"
 L["Set the frame strata (layer) for this module. Higher values appear above lower values."] = "Définit la strate de cadre (couche) pour ce module. Les valeurs plus élevées apparaissent au-dessus des valeurs plus basses."
 L["Set the frame strata (layer) for this panel. Modules will appear relative to this. Higher values appear above lower values."] = "Définit la strate de cadre (couche) pour ce panneau. Les modules apparaîtront par rapport à ceci. Les valeurs plus élevées apparaissent au-dessus des valeurs plus basses."
-L["Slot Controls"] = "Contrôles d'Emplacement"
-L["Anchor Point"] = "Point d'Ancrage"
+L["Slot Controls"] = "Contrôles d'emplacement"
+L["Anchor Point"] = "Point d'ancrage"
 L["Set the anchor point for this module."] = "Définit le point d'ancrage pour ce module."
 L["Yes"] = "Oui"
 L["No"] = "Non"
@@ -65,10 +65,10 @@ L["Profile imported successfully!"] = "Profil importé avec succès !"
 -- Config.lua - Global
 -- ----------------------------
 L["Colors"] = "Couleurs"
-L["Custom Color"] = "Couleur Personnalisée"
+L["Custom Color"] = "Couleur personnalisée"
 L["Enable Per-Spec Profiles"] = "Activer les profils par spécialisation"
 L["Global"] = "Global"
-L["Global Settings"] = "Paramètres Globaux"
+L["Global Settings"] = "Paramètres globaux"
 L["Hide Module Title in Tooltip"] = "Masquer le titre du module dans l'infobulle"
 L["Lock Panels"] = "Verrouiller les panneaux"
 L["Prevent panels from being moved"] = "Empêcher le déplacement des panneaux"
@@ -86,14 +86,14 @@ L["When enabled, the addon will automatically switch to a different profile each
 -- Config.lua - Panels
 -- ----------------------------
 L["Appearance"] = "Apparence"
-L["Apply Slot Changes"] = "Appliquer les modifications de slot"
+L["Apply Slot Changes"] = "Appliquer les modifications d'emplacement"
 L["Are you sure you want to delete this bar?\nThis action cannot be undone."] = "Êtes-vous sûr de vouloir supprimer cette barre ?\nCette action est irréversible."
 L["Background Opacity"] = "Opacité de fond"
 L["Border Color"] = "Couleur de la bordure"
 L["Border Size"] = "Taille de la bordure"
 L["Create New Panel"] = "Créer un nouveau panneau"
 L["Height"] = "Hauteur"
-L["Number of Slots"] = "Nombre de slots"
+L["Number of Slots"] = "Nombre d'emplacement"
 L["Panel Settings"] = "Paramètres du panneau"
 L["Panels"] = "Panneaux"
 L["Remove Selected Panel"] = "Supprimer le panneau sélectionné"
@@ -102,16 +102,16 @@ L["Scale"] = "Échelle"
 L["Select Border:"] = "Sélectionner la bordure :"
 L["Select Panel:"] = "Sélectionner le panneau :"
 L["Size & Scale"] = "Taille & Échelle"
-L["Slot Assignments"] = "Attributions des slots"
-L["Slot %d:"] = "Slot %d :"
-L["Slots"] = "Slots"
-L["Update slot assignment dropdowns after changing number of slots"] = "Mettre à jour les menus déroulants des slots après modification du nombre de slots"
+L["Slot Assignments"] = "Attributions des emplacements"
+L["Slot %d:"] = "Emplacement %d :"
+L["Slots"] = "Emplacements"
+L["Update slot assignment dropdowns after changing number of slots"] = "Mettre à jour les menus déroulants des emplacements après modification du nombre d'emplacements"
 L["Width"] = "Largeur"
 
 -- ----------------------------
 -- Config.lua - Module Settings
 -- ----------------------------
-L["Module Settings"] = "Paramètres du Module"
+L["Module Settings"] = "Paramètres du module"
 L["Hide Decimals"] = "Masquer les décimales"
 L["Show Label"] = "Afficher le libellé"
 L["Show Short Label"] = "Afficher le libellé court"
@@ -157,7 +157,7 @@ L["Target Mitigation"] = "Réduction sur la cible"
 -- ----------------------------
 -- modules/AttackPower.lua
 -- ----------------------------
-L["AP"] = "AP"
+L["AP"] = "PA"
 
 -- ----------------------------
 -- modules/Bags.lua
@@ -187,25 +187,25 @@ L["Crit"] = "Crit"
 -- modules/Currency.lua
 -- ----------------------------
 L["CURRENCIES"] = "MONNAIES"
-L["Tracked Currency Qty"] = "Qté de Devise Suivie"
-L["Currency Display Order"] = "Ordre d'Affichage des Devises"
+L["Tracked Currency Qty"] = "Qté de devise suivie"
+L["Currency Display Order"] = "Ordre d'affichage des devises"
 L["Position %d"] = "Position %d"
-L["Empty Slot"] = "Emplacement Vide"
+L["Empty Slot"] = "Emplacement vide"
 
 -- ----------------------------
 -- modules/Durability.lua
 -- ----------------------------
-L["Dur:"] = "Durée:"
+L["Dur:"] = "Dur :"
 L["Durability:"] = "Durabilité :"
 
 -------------------------------
 -- modules/Experience.lua
 -------------------------------
-L["Max Level"] = "Niveau Maximum"
-L["N/A"] = "N/A"
+L["Max Level"] = "Niveau maximum"
+L["N/A"] = "N.D."
 L["Experience"] = "Expérience"
 L["Display Format"] = "Format d'affichage"
-L["Bar Toggles"] = "Options de barre"
+L["Bar Toggles"] = "Options de la barre"
 L["Show Graphical Bar"] = "Afficher la barre graphique"
 L["Hide Blizzard XP Bar"] = "Masquer la barre d'EXP de Blizzard"
 L["Bar Appearance"] = "Apparence de la barre"
@@ -235,11 +235,11 @@ L["Server:"] = "Serveur :"
 L["Alliance:"] = "Alliance :"
 L["Horde:"] = "Horde :"
 L["Total:"] = "Total :"
-L["Warband:"] = "Bande de guerre :"
+L["Warband:"] = "Bataillon :"
 L["WoW Token:"] = "Jeton WoW :"
 L["Reset Session Data: Hold Ctrl + Right Click"] = "Réinitialiser les données de session : maintenir Ctrl + clic droit"
-L["Gold: All data reset!"] = "Or : Toutes les données réinitialisées !"
-L["Gold: Data reset for %s!"] = "Or : Données réinitialisées pour %s !"
+L["Gold: All data reset!"] = "Or : toutes les données réinitialisées !"
+L["Gold: Data reset for %s!"] = "Or : données réinitialisées pour %s !"
 L["Are you sure you want to delete gold data for:\n\n|cFFFFFF00%s|r"] = "Êtes-vous sûr de vouloir supprimer les données d'or pour :\n\n|cFFFFFF00%s|r"
 L["|cFFFF0000ALL CHARACTERS|r"] = "|cFFFF0000TOUS LES PERSONNAGES|r"
 L["|cFF808080No character data found|r"] = "|cFF808080Aucune donnée de personnage trouvée|r"
@@ -252,7 +252,7 @@ L["Hold Alt + Right Click"] = "Maintenir Alt + Clic droit"
 -- modules/Guild.lua
 -- ----------------------------
 L["Ara Guild LDB object not found! SDT Guild datatext disabled."] = "Objet LDB Ara Guild introuvable ! Datatext Guilde SDT désactivé."
-L["Max Guild Name Length"] = "Long. max. nom de guilde"
+L["Max Guild Name Length"] = "Longueur max. du nom de guilde"
 
 -- ----------------------------
 -- modules/Haste.lua
@@ -267,8 +267,8 @@ L["Selected Hearthstone"] = "Pierre de foyer sélectionnée"
 L["Random"] = "Aléatoire"
 L["Selected:"] = "Sélectionné :"
 L["Available Hearthstones:"] = "Pierres de foyer disponibles :"
-L["Left Click: Use Hearthstone"] = "Clic gauche : Utiliser la pierre de foyer"
-L["Right Click: Select Hearthstone"] = "Clic droit : Sélectionner la pierre de foyer"
+L["Left Click: Use Hearthstone"] = "Clic gauche : utiliser la pierre de foyer"
+L["Right Click: Select Hearthstone"] = "Clic droit : sélectionner la pierre de foyer"
 L["Cannot use hearthstone while in combat"] = "Impossible d'utiliser la pierre de foyer en combat"
 
 -- ----------------------------
@@ -292,15 +292,15 @@ L["No Mail"] = "Aucun courrier"
 -- ----------------------------
 L["Map Name"] = "Nom de la carte"
 L["Zone Name"] = "Nom de zone"
-L["Subzone Name"] = "Nom de sous-zone"
+L["Subzone Name"] = "Nom de la sous-zone"
 L["Zone - Subzone"] = "Zone - Sous-zone"
 L["Zone / Subzone (Two Lines)"] = "Zone / Sous-zone (Deux lignes)"
 L["Minimap Zone"] = "Zone de la minicarte"
 L["Show Zone on Tooltip"] = "Afficher la zone dans l'infobulle"
 L["Show Coordinates on Tooltip"] = "Afficher les coordonnées dans l'infobulle"
-L["Zone:"] = "Zone:"
-L["Subzone:"] = "Sous-zone:"
-L["Coordinates:"] = "Coordonnées:"
+L["Zone:"] = "Zone :"
+L["Subzone:"] = "Sous-zone :"
+L["Coordinates:"] = "Coordonnées :"
 
 -- ----------------------------
 -- modules/Mastery.lua
@@ -310,8 +310,8 @@ L["Mastery:"] = "Maîtrise :"
 -- ----------------------------
 -- modules/MythicPlusKey.lua
 -- ----------------------------
-L["Mythic+ Keystone"] = "Pierre de clé mythique+"
-L["No Mythic+ Keystone"] = "Pas de pierre de clé mythique+"
+L["Mythic+ Keystone"] = "Clé mythique+"
+L["No Mythic+ Keystone"] = "Pas de clé mythique+"
 L["Current Key:"] = "Clé actuelle :"
 L["Dungeon Teleport is on cooldown for "] = "La téléportation vers le donjon est en recharge pendant "
 L[" more seconds."] = " secondes de plus."
@@ -319,8 +319,8 @@ L["You do not know the teleport spell for "] = "Vous ne connaissez pas le sort d
 L["Key: "] = "Clé : "
 L["None"] = "Aucun"
 L["No Key"] = "Pas de clé"
-L["Left Click: Teleport to Dungeon"] = "Clic gauche : Se téléporter au donjon"
-L["Right Click: List Group in Finder"] = "Clic droit : Créer un groupe dans le chercheur"
+L["Left Click: Teleport to Dungeon"] = "Clic gauche : se téléporter au donjon"
+L["Right Click: List Group in Finder"] = "Clic droit : créer un groupe dans la recherche de groupe"
 
 -- ----------------------------
 -- modules/SpecSwitch.lua
@@ -349,7 +349,7 @@ L["Speed: "] = "Vitesse : "
 -- ----------------------------
 -- modules/Strength.lua
 -- ----------------------------
-L["Str"] = "Str"
+L["Str"] = "Force"
 
 -- ----------------------------
 -- modules/System.lua
@@ -396,7 +396,7 @@ L["Shift + Right Click: Select Output Audio Device"] = "Maj + clic droit : séle
 L["M. Vol"] = "Vol. Pr"
 L["FX"] = "Eff"
 L["Amb"] = "Amb"
-L["Dlg"] = "Disc"
+L["Dlg"] = "Dial"
 L["Mus"] = "Mus"
 
 -- ----------------------------
